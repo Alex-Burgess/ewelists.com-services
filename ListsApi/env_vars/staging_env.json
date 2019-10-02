@@ -1,0 +1,5 @@
+{
+  "CreateListFunction": {
+    "TABLE_NAME": "lists-staging"
+  }
+}

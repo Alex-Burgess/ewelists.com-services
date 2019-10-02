@@ -1,42 +1,62 @@
 import json
+import os
+import boto3
+import logging
+import time
 
-# import requests
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+if logger.handlers:
+    handler = logger.handlers[0]
+    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
+
+
+dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    """Sample pure Lambda function
+    response = create_main(event)
+    return response
 
-    Parameters
-    ----------
-    event: dict, required
-        API Gateway Lambda Proxy Input Format
 
-        Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
-
-    context: object, required
-        Lambda Context runtime methods and attributes
-
-        Context doc: https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
-
-    Returns
-    ------
-    API Gateway Lambda Proxy Output Format: dict
-
-        Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
-    """
-
-    # try:
-    #     ip = requests.get("http://checkip.amazonaws.com/")
-    # except requests.RequestException as e:
-    #     # Send some context about this error to Lambda Logs
-    #     print(e)
-
-    #     raise e
-
-    return {
-        "statusCode": 200,
-        "body": json.dumps({
-            "message": "hello world",
-            # "location": ip.text.replace("\n", "")
-        }),
+def create_main(event):
+    item = {
+        'userId': {'S': '12345678'},
+        'listId': {'S': '1234abcd'},
+        'createdAt': {'N': str(int(time.time()))}
     }
+
+    try:
+        table_name = get_table_name()
+        dynamodb.put_item(TableName=table_name, Item=item)
+    except Exception as e:
+        logger.error("Exception: {}".format(e))
+        response = create_response(500, json.dumps({'error': str(e)}))
+        logger.info("Returning response: {}".format(response))
+        return response
+
+    body = "List was created with ID: 1234abcd"
+    response = create_response(200, body)
+    return response
+
+
+def get_table_name():
+    try:
+        table_name = os.environ['TABLE_NAME']
+        logger.info("TABLE_NAME environment variable value: " + table_name)
+    except KeyError:
+        logger.error('TABLE_NAME environment variable not set correctly')
+        raise Exception('TABLE_NAME environment variable not set correctly')
+
+    return table_name
+
+
+def create_response(code, body):
+    logger.info("Creating response with status code ({}) and body ({})".format(code, body))
+    response = {'statusCode': code,
+                'body': body,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                }}
+    return response

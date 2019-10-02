@@ -39,7 +39,7 @@ Resources:
       Role: !GetAtt FunctionRole.Arn
       Environment:
         Variables:
-          DB_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
       # Events:
       #   UnsolvedPuzzle:
       #     Type: Api
