@@ -20,6 +20,11 @@ def handler(event, context):
 
 
 def create_main(event):
+
+    # Get userID from 
+    # Get random list ID
+    # Check list ID does not already exist?
+
     item = {
         'userId': {'S': '12345678'},
         'listId': {'S': '1234abcd'},

@@ -43,7 +43,7 @@
     "identity": {
       "cognitoIdentityPoolId": null,
       "accountId": null,
-      "cognitoIdentityId": null,
+      "cognitoIdentityId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c",
       "caller": null,
       "accessKey": null,
       "sourceIp": "127.0.0.1",

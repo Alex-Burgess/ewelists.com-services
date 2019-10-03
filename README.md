@@ -20,3 +20,22 @@ sam local invoke CreateListFunction --event events/event.json --env-vars env_var
 pyenv versions
 pyenv local 3.6.8
 ```
+
+### Create an s3 bucket for SAM builds
+```
+aws cloudformation create-stack --stack-name sam-builds-lists --template-body file://sam-builds-bucket.yaml
+```
+
+### Deploy to test environment
+```
+sam build
+
+sam package \
+    --output-template-file packaged.yaml \
+    --s3-bucket sam-builds-lists
+
+sam deploy \
+    --template-file packaged.yaml \
+    --stack-name Service-lists-test \
+    --capabilities CAPABILITY_NAMED_IAM
+```
