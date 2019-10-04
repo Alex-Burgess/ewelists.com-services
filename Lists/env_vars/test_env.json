@@ -1,5 +1,14 @@
 {
   "CreateListFunction": {
     "TABLE_NAME": "lists-test"
+  },
+  "ListFunction": {
+    "TABLE_NAME": "lists-test"
+  },
+  "GetListFunction": {
+    "TABLE_NAME": "lists-test"
+  },
+  "DeleteListFunction": {
+    "TABLE_NAME": "lists-test"
   }
 }
