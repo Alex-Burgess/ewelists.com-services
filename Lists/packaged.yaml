@@ -140,10 +140,12 @@ Resources:
     Type: AWS::Serverless::Api
   CreateListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/2ad9a35aedb6cd70217ff3790f5f84f9
+      CodeUri: s3://sam-builds-lists/ff7d5b70cb9e23c60bbe5922682560e5
       Description: Creates list items in table
       Environment:
         Variables:
+          API_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
+          API_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
           TABLE_NAME:
             Fn::Sub: ${TableNamePrefix}-${Environment}
       Events:

@@ -12,7 +12,7 @@ sam init --runtime python3.6 --name lists
 
 ### Test a function locally
 ```
-sam local invoke CreateListFunction --event events/event.json --env-vars env_vars/test_env.json
+sam local invoke CreateListFunction --event events/user_create_event.json --env-vars env_vars/test_env.json
 ```
 
 ### Set python version
