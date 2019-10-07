@@ -33,7 +33,12 @@ def delete_main(event):
         logger.info("Returning response: {}".format(response))
         return response
 
-    data = {'deleted': True, 'message': message}
+
+        # response = create_response(500, json.dumps({'error': str(e)}))
+        # error_data = {'deleted': False, 'listId': listId, 'message': response}
+        # logger.info("Returning response: {}".format(error_data))
+
+    data = {'deleted': True, 'listId': listId, 'message': message}
 
     response = create_response(200, json.dumps(data))
     return response
@@ -69,7 +74,7 @@ def delete_item(table_name, cognito_identity_id, list_id):
     except ClientError as e:
         if e.response['Error']['Code'] == "ConditionalCheckFailedException":
             logger.info("Delete request failed for List ID: {} and user {} as condition check for List ID failed.  List does not exist.".format(list_id, cognito_identity_id))
-            raise Exception("Delete request failed for List ID: {} and user {} as condition check for List ID failed.  List does not exist.".format(list_id, cognito_identity_id))
+            raise Exception("List does not exist.")
         else:
             raise
 
