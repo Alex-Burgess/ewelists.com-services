@@ -16,7 +16,6 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    logger.info("Event: " + json.dumps(event))
     response = delete_main(event)
     return response
 
@@ -25,34 +24,18 @@ def delete_main(event):
     try:
         table_name = common.get_table_name(os.environ)
         identity = common.get_identity(event, os.environ)
-        listId = get_list_id(event)
-        message = delete_item(table_name, identity['cognitoIdentityId'], listId)
+        list_id = common.get_list_id(event)
+        message = delete_item(table_name, identity['cognitoIdentityId'], list_id)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = create_response(500, json.dumps({'error': str(e)}))
         logger.info("Returning response: {}".format(response))
         return response
 
-
-        # response = create_response(500, json.dumps({'error': str(e)}))
-        # error_data = {'deleted': False, 'listId': listId, 'message': response}
-        # logger.info("Returning response: {}".format(error_data))
-
-    data = {'deleted': True, 'listId': listId, 'message': message}
+    data = {'deleted': True, 'listId': list_id, 'message': message}
 
     response = create_response(200, json.dumps(data))
     return response
-
-
-def get_list_id(event):
-    try:
-        list_id = event['pathParameters']['id']
-        logger.info("List ID: " + list_id)
-    except Exception:
-        logger.error("API Event did not contain a List ID in the path parameters.")
-        raise Exception('API Event did not contain a List ID in the path parameters.')
-
-    return list_id
 
 
 def delete_item(table_name, cognito_identity_id, list_id):

@@ -2,6 +2,8 @@ import json
 import os
 import boto3
 import logging
+from lists import common
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -14,28 +16,48 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    response = create_main(event)
+    response = get_list_main(event)
     return response
 
 
-def create_main(event):
-    # try:
-    #     table_name = get_table_name()
-    #     identity = get_identity(event)
-    #     listId = generate_list_id(identity['cognitoIdentityId'], table_name)
-    #     message = put_item_in_table(table_name, identity['cognitoIdentityId'], identity['userPoolSub'], listId)
-    # except Exception as e:
-    #     logger.error("Exception: {}".format(e))
-    #     response = create_response(500, json.dumps({'error': str(e)}))
-    #     logger.info("Returning response: {}".format(response))
-    #     return response
-    #
-    # data = {'listId': listId, 'message': message}
+def get_list_main(event):
+    try:
+        table_name = common.get_table_name(os.environ)
+        identity = common.get_identity(event, os.environ)
+        list_id = common.get_list_id(event)
+        usersLists = get_list_query(table_name, identity['cognitoIdentityId'], list_id)
+    except Exception as e:
+        logger.error("Exception: {}".format(e))
+        response = create_response(500, json.dumps({'error': str(e)}))
+        logger.info("Returning response: {}".format(response))
+        return response
 
-    data = "A list will be returned"
-
-    response = create_response(200, json.dumps(data))
+    response = create_response(200, json.dumps(usersLists))
     return response
+
+
+def get_list_query(table_name, cognito_identity_id, list_id):
+    logger.info("Querying table")
+
+    key = {
+        'userId': {'S': cognito_identity_id},
+        'listId': {'S': list_id}
+    }
+
+    try:
+        response = dynamodb.get_item(TableName=table_name, Key=key)
+        # item = response['Item']
+    except ClientError as e:
+        logger.info("get item response" + json.dumps(e.response))
+        raise Exception("Unexpected error when getting list item from table.")
+
+    if 'Item' not in response:
+        logger.info("List ID ({} did not exist in table for user: {})".format(list_id, cognito_identity_id))
+        raise Exception("List does not exist.")
+
+    item = response['Item']
+
+    return item
 
 
 def create_response(code, body):

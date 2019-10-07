@@ -61,3 +61,14 @@ def get_api_identity(env):
         raise Exception('API_IDENTITY_ID and API_USERPOOL_SUB environment variables not set correctly')
 
     return api_identity
+
+
+def get_list_id(event):
+    try:
+        list_id = event['pathParameters']['id']
+        logger.info("List ID: " + list_id)
+    except Exception:
+        logger.error("API Event did not contain a List ID in the path parameters.")
+        raise Exception('API Event did not contain a List ID in the path parameters.')
+
+    return list_id

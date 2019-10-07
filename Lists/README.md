@@ -18,6 +18,10 @@ sam local invoke CreateListFunction --event events/user_create_event.json --env-
 sam local invoke DeleteListFunction --event events/delete_list_event.json --env-vars env_vars/test_env.json
 ```
 
+*Get List:*
+```
+sam local invoke GetListFunction --event events/get_list_event.json --env-vars env_vars/test_env.json
+```
 
 ### Deploy to test environment
 ```
