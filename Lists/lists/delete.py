@@ -2,6 +2,8 @@ import json
 import os
 import boto3
 import logging
+from lists import common
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -14,28 +16,66 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    response = create_main(event)
+    logger.info("Event: " + json.dumps(event))
+    response = delete_main(event)
     return response
 
 
-def create_main(event):
-    # try:
-    #     table_name = get_table_name()
-    #     identity = get_identity(event)
-    #     listId = generate_list_id(identity['cognitoIdentityId'], table_name)
-    #     message = put_item_in_table(table_name, identity['cognitoIdentityId'], identity['userPoolSub'], listId)
-    # except Exception as e:
-    #     logger.error("Exception: {}".format(e))
-    #     response = create_response(500, json.dumps({'error': str(e)}))
-    #     logger.info("Returning response: {}".format(response))
-    #     return response
-    #
-    # data = {'listId': listId, 'message': message}
+def delete_main(event):
+    try:
+        table_name = common.get_table_name(os.environ)
+        identity = common.get_identity(event, os.environ)
+        listId = get_list_id(event)
+        message = delete_item(table_name, identity['cognitoIdentityId'], listId)
+    except Exception as e:
+        logger.error("Exception: {}".format(e))
+        response = create_response(500, json.dumps({'error': str(e)}))
+        logger.info("Returning response: {}".format(response))
+        return response
 
-    data = "lists will be deleted"
+    data = {'deleted': True, 'message': message}
 
     response = create_response(200, json.dumps(data))
     return response
+
+
+def get_list_id(event):
+    try:
+        list_id = event['pathParameters']['id']
+        logger.info("List ID: " + list_id)
+    except Exception:
+        logger.error("API Event did not contain a List ID in the path parameters.")
+        raise Exception('API Event did not contain a List ID in the path parameters.')
+
+    return list_id
+
+
+def delete_item(table_name, cognito_identity_id, list_id):
+    logger.info("Deleting List ID: {} for user: {}".format(list_id, cognito_identity_id))
+
+    key = {
+        'userId': {'S': cognito_identity_id},
+        'listId': {'S': list_id}
+    }
+
+    try:
+        response = dynamodb.delete_item(
+            TableName=table_name,
+            Key=key,
+            ConditionExpression="listId = :list_id",
+            ExpressionAttributeValues={":list_id":  {'S': list_id}}
+        )
+        logger.info("Delete response: {}".format(response))
+    except ClientError as e:
+        if e.response['Error']['Code'] == "ConditionalCheckFailedException":
+            logger.info("Delete request failed for List ID: {} and user {} as condition check for List ID failed.  List does not exist.".format(list_id, cognito_identity_id))
+            raise Exception("Delete request failed for List ID: {} and user {} as condition check for List ID failed.  List does not exist.".format(list_id, cognito_identity_id))
+        else:
+            raise
+
+    logger.info("Delete request successfull for List ID: {} and user: {}".format(list_id, cognito_identity_id))
+    message = "Delete request successfull for List ID: {} and user: {}".format(list_id, cognito_identity_id)
+    return message
 
 
 def create_response(code, body):
