@@ -204,6 +204,21 @@ Resources:
                         '
                     statusCode: '200'
                 type: mock
+            put:
+              responses:
+                '200':
+                  description: 200 response
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+              security:
+              - sigv4: []
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateListFunction.Arn}/invocations
         schemes:
         - https
         securityDefinitions:
@@ -224,7 +239,7 @@ Resources:
     Type: AWS::Serverless::Api
   CreateListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/a1c69936e270cbd7b6aa10e203eb5f70
+      CodeUri: s3://sam-builds-lists/f044f7d2941c4997fea5076b0b3fb6d7
       Description: Creates list items in table
       Environment:
         Variables:
@@ -271,7 +286,7 @@ Resources:
     Type: AWS::ApiGateway::GatewayResponse
   DeleteListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/a1c69936e270cbd7b6aa10e203eb5f70
+      CodeUri: s3://sam-builds-lists/f044f7d2941c4997fea5076b0b3fb6d7
       Description: Deletes a list item for a given user in the table
       Environment:
         Variables:
@@ -330,7 +345,7 @@ Resources:
     Type: AWS::IAM::Role
   GetListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/a1c69936e270cbd7b6aa10e203eb5f70
+      CodeUri: s3://sam-builds-lists/f044f7d2941c4997fea5076b0b3fb6d7
       Description: Gets a list item for a user in the table
       Environment:
         Variables:
@@ -359,7 +374,7 @@ Resources:
     Type: AWS::Serverless::Function
   ListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/a1c69936e270cbd7b6aa10e203eb5f70
+      CodeUri: s3://sam-builds-lists/f044f7d2941c4997fea5076b0b3fb6d7
       Description: Gets all list items for a user in the table
       Environment:
         Variables:
@@ -378,6 +393,35 @@ Resources:
       FunctionName:
         Fn::Sub: ${ServiceName}-list-${Environment}
       Handler: lists/list.handler
+      MemorySize: 512
+      Role:
+        Fn::GetAtt:
+        - FunctionRole
+        - Arn
+      Runtime: python3.6
+      Timeout: 3
+    Type: AWS::Serverless::Function
+  UpdateListFunction:
+    Properties:
+      CodeUri: s3://sam-builds-lists/f044f7d2941c4997fea5076b0b3fb6d7
+      Description: Updates a list item for a user in the table
+      Environment:
+        Variables:
+          API_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
+          API_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
+          TABLE_NAME:
+            Fn::Sub: ${TableNamePrefix}-${Environment}
+      Events:
+        CreateList:
+          Properties:
+            Method: PUT
+            Path: /lists/{id}
+            RestApiId:
+              Ref: Api
+          Type: Api
+      FunctionName:
+        Fn::Sub: ${ServiceName}-updatelist-${Environment}
+      Handler: lists/update.handler
       MemorySize: 512
       Role:
         Fn::GetAtt:

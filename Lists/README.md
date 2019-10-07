@@ -10,17 +10,27 @@ pyenv local 3.6.8
 ### Local Function Tests
 *Create:*
 ```
-sam local invoke CreateListFunction --event events/user_create_event.json --env-vars env_vars/test_env.json
+sam local invoke CreateListFunction --event events/create_list.json --env-vars env_vars/test_env.json
 ```
 
 *Delete:*
 ```
-sam local invoke DeleteListFunction --event events/delete_list_event.json --env-vars env_vars/test_env.json
+sam local invoke DeleteListFunction --event events/delete_list.json --env-vars env_vars/test_env.json
 ```
 
 *Get List:*
 ```
-sam local invoke GetListFunction --event events/get_list_event.json --env-vars env_vars/test_env.json
+sam local invoke GetListFunction --event events/get_list.json --env-vars env_vars/test_env.json
+```
+
+*Update List Title:*
+```
+sam local invoke UpdateListFunction --event events/update_list_title.json --env-vars env_vars/test_env.json
+```
+
+*Update List Description:*
+```
+sam local invoke UpdateListFunction --event events/update_list_description.json --env-vars env_vars/test_env.json
 ```
 
 ### Deploy to test environment

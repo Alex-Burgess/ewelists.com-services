@@ -107,6 +107,29 @@ Resources:
             Path: /lists/{id}
             Method: GET
 
+  UpdateListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ServiceName}-updatelist-${Environment}'
+      Handler: lists/update.handler
+      Runtime: python3.6
+      MemorySize: 512
+      Timeout: 3
+      Description: Updates a list item for a user in the table
+      Role: !GetAtt FunctionRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          API_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
+          API_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
+      Events:
+        CreateList:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /lists/{id}
+            Method: PUT
+
   DeleteListFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -251,6 +274,20 @@ Resources:
               - sigv4: []
               x-amazon-apigateway-integration:
                 uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetListFunction.Arn}/invocations'
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                type: "aws_proxy"
+            put:
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - sigv4: []
+              x-amazon-apigateway-integration:
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateListFunction.Arn}/invocations'
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 type: "aws_proxy"

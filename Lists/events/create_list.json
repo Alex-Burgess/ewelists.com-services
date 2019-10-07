@@ -41,18 +41,18 @@
         "requestTimeEpoch": 1570180180874,
         "requestId": "5f789813-c339-48b4-845c-8fb19b64a09d",
         "identity": {
-            "cognitoIdentityPoolId": null,
+            "cognitoIdentityPoolId": "eu-west-1:2208d797-dfc9-40b4-8029-827c9e76e029",
             "accountId": "123456789012",
-            "cognitoIdentityId": null,
-            "caller": "AIDAZUFPDMJLW3EPFG2ZK",
+            "cognitoIdentityId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c",
+            "caller": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials",
             "sourceIp": "31.49.230.217",
             "principalOrgId": "o-d8jj6dyqv2",
             "accessKey": "ABCDEFGPDMJL4EB35H6H",
-            "cognitoAuthenticationType": null,
-            "cognitoAuthenticationProvider": null,
-            "userArn": "arn:aws:iam::123456789012:user/ApiTestUser",
-            "userAgent": "PostmanRuntime/7.15.2",
-            "user": "AIDAZUFPDMJLW3EPFG2ZK"
+            "cognitoAuthenticationType": "authenticated",
+            "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:42cf26f5-407c-47cf-bcb6-f70cd63ac119",
+            "userArn": "arn:aws:sts::123456789012:assumed-role/Ewelists-test-CognitoAuthRole/CognitoIdentityCredentials",
+            "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
+            "user": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials"
         },
         "domainName": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
         "apiId": "4sdcvv0n2e"

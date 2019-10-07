@@ -46,9 +46,8 @@ def get_list_query(table_name, cognito_identity_id, list_id):
 
     try:
         response = dynamodb.get_item(TableName=table_name, Key=key)
-        # item = response['Item']
     except ClientError as e:
-        logger.info("get item response" + json.dumps(e.response))
+        logger.info("get item response: " + json.dumps(e.response))
         raise Exception("Unexpected error when getting list item from table.")
 
     if 'Item' not in response:

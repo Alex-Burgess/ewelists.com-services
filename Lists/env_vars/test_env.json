@@ -10,5 +10,8 @@
   },
   "DeleteListFunction": {
     "TABLE_NAME": "lists-test"
+  },
+  "UpdateListFunction": {
+    "TABLE_NAME": "lists-test"
   }
 }
