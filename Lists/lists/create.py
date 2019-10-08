@@ -26,7 +26,8 @@ def create_main(event):
         table_name = common.get_table_name(os.environ)
         identity = common.get_identity(event, os.environ)
         listId = generate_list_id(identity['cognitoIdentityId'], table_name)
-        message = put_item_in_table(table_name, identity['cognitoIdentityId'], identity['userPoolSub'], listId)
+        attributes = get_attribute_details(event)
+        message = put_item_in_table(table_name, identity['cognitoIdentityId'], identity['userPoolSub'], listId, attributes)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = create_response(500, json.dumps({'error': str(e)}))
@@ -62,11 +63,32 @@ def generate_list_id(cognito_identity_id, table_name):
     return newlistId
 
 
-def put_item_in_table(table_name, cognito_identity_id, user_pool_sub, listId):
+def get_attribute_details(event):
+    try:
+        body = event['body']
+        logger.info("Event body: " + json.dumps(body))
+    except Exception:
+        logger.error("API Event was empty.")
+        raise Exception('API Event was empty.')
+
+    try:
+        attribute_details = json.loads(body)
+        logger.info("Attributes for create: " + json.dumps(attribute_details))
+    except Exception:
+        logger.error("API Event did not contain a valid body.")
+        raise Exception('API Event did not contain a valid body.')
+
+    return attribute_details
+
+
+def put_item_in_table(table_name, cognito_identity_id, user_pool_sub, listId, attributes):
     item = {
         'userId': {'S': cognito_identity_id},
         'userPoolSub': {'S': user_pool_sub},
         'listId': {'S': listId},
+        'title': {'S': attributes['title']},
+        'description': {'S': attributes['description']},
+        'occasion': {'S': attributes['occasion']},
         'createdAt': {'N': str(int(time.time()))}
     }
 
