@@ -18,6 +18,11 @@ sam local invoke CreateListFunction --event events/create_list.json --env-vars e
 sam local invoke DeleteListFunction --event events/delete_list.json --env-vars env_vars/test_env.json
 ```
 
+*Get All Lists:*
+```
+sam local invoke ListAllFunction --event events/get_all_lists.json --env-vars env_vars/test_env.json
+```
+
 *Get List:*
 ```
 sam local invoke GetListFunction --event events/get_list.json --env-vars env_vars/test_env.json

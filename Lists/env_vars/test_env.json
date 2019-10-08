@@ -2,7 +2,7 @@
   "CreateListFunction": {
     "TABLE_NAME": "lists-test"
   },
-  "ListFunction": {
+  "ListAllFunction": {
     "TABLE_NAME": "lists-test"
   },
   "GetListFunction": {

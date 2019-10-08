@@ -61,10 +61,10 @@ Resources:
             Path: /lists
             Method: POST
 
-  ListFunction:
+  ListAllFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub '${ServiceName}-list-${Environment}'
+      FunctionName: !Sub '${ServiceName}-listall-${Environment}'
       Handler: lists/list.handler
       Runtime: python3.6
       MemorySize: 512
@@ -227,7 +227,7 @@ Resources:
               security:
               - sigv4: []
               x-amazon-apigateway-integration:
-                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListFunction.Arn}/invocations'
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListAllFunction.Arn}/invocations'
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 type: "aws_proxy"

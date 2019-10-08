@@ -51,6 +51,9 @@ def get_lists(table_name, cognito_identity_id):
     for i in response['Items']:
         list = {}
         list['listId'] = i['listId']['S']
+        list['title'] = i['title']['S']
+        list['description'] = i['description']['S']
+        list['occasion'] = i['occasion']['S']
         lists['lists'].append(list)
 
     return lists

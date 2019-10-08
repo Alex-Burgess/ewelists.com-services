@@ -81,7 +81,7 @@ Resources:
                 passthroughBehavior: when_no_match
                 type: aws_proxy
                 uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListFunction.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListAllFunction.Arn}/invocations
             options:
               consumes:
               - application/json
@@ -239,7 +239,7 @@ Resources:
     Type: AWS::Serverless::Api
   CreateListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/24c44c15d2f12e007098269cd2ffb094
+      CodeUri: s3://sam-builds-lists/caf6ea8f9dd7f7fd06313fda40e16d7f
       Description: Creates list items in table
       Environment:
         Variables:
@@ -286,7 +286,7 @@ Resources:
     Type: AWS::ApiGateway::GatewayResponse
   DeleteListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/24c44c15d2f12e007098269cd2ffb094
+      CodeUri: s3://sam-builds-lists/caf6ea8f9dd7f7fd06313fda40e16d7f
       Description: Deletes a list item for a given user in the table
       Environment:
         Variables:
@@ -345,7 +345,7 @@ Resources:
     Type: AWS::IAM::Role
   GetListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/24c44c15d2f12e007098269cd2ffb094
+      CodeUri: s3://sam-builds-lists/caf6ea8f9dd7f7fd06313fda40e16d7f
       Description: Gets a list item for a user in the table
       Environment:
         Variables:
@@ -372,9 +372,9 @@ Resources:
       Runtime: python3.6
       Timeout: 3
     Type: AWS::Serverless::Function
-  ListFunction:
+  ListAllFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/24c44c15d2f12e007098269cd2ffb094
+      CodeUri: s3://sam-builds-lists/caf6ea8f9dd7f7fd06313fda40e16d7f
       Description: Gets all list items for a user in the table
       Environment:
         Variables:
@@ -391,7 +391,7 @@ Resources:
               Ref: Api
           Type: Api
       FunctionName:
-        Fn::Sub: ${ServiceName}-list-${Environment}
+        Fn::Sub: ${ServiceName}-listall-${Environment}
       Handler: lists/list.handler
       MemorySize: 512
       Role:
@@ -403,7 +403,7 @@ Resources:
     Type: AWS::Serverless::Function
   UpdateListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/24c44c15d2f12e007098269cd2ffb094
+      CodeUri: s3://sam-builds-lists/caf6ea8f9dd7f7fd06313fda40e16d7f
       Description: Updates a list item for a user in the table
       Environment:
         Variables:
