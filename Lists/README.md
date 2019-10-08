@@ -28,15 +28,11 @@ sam local invoke ListAllFunction --event events/get_all_lists.json --env-vars en
 sam local invoke GetListFunction --event events/get_list.json --env-vars env_vars/test_env.json
 ```
 
-*Update List Title:*
+*Update List Details:*
 ```
-sam local invoke UpdateListFunction --event events/update_list_title.json --env-vars env_vars/test_env.json
+sam local invoke UpdateListFunction --event events/update_list_details.json --env-vars env_vars/test_env.json
 ```
 
-*Update List Description:*
-```
-sam local invoke UpdateListFunction --event events/update_list_description.json --env-vars env_vars/test_env.json
-```
 
 ### Deploy to test environment
 ```

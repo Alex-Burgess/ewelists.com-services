@@ -2,7 +2,7 @@
     "resource": "/lists/{id}",
     "path": "/lists/cf19fb62",
     "httpMethod": "PUT",
-    "body": "{\n    \"attribute_name\": \"description\",\n    \"attribute_value\": \"The is a demo list for an event that doesn't exist.\"\n}",
+    "body": "{\n    \"attribute_name\": \"title\",\n    \"attribute_value\": \"My new title\"\n}",
     "headers": {
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate",
