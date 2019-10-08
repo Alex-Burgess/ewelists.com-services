@@ -16,7 +16,7 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    logger.info("Event: " + json.dumps(event))
+    # logger.info("Event: " + json.dumps(event))
     response = update_list_main(event)
     return response
 
@@ -27,14 +27,14 @@ def update_list_main(event):
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
         attribute_details = get_attribute_details(event)
-        udatedNewAttributes = update_list(table_name, identity['cognitoIdentityId'], list_id, attribute_details)
+        updatedNewAttributes = update_list(table_name, identity['cognitoIdentityId'], list_id, attribute_details)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = create_response(500, json.dumps({'error': str(e)}))
         logger.info("Returning response: {}".format(response))
         return response
 
-    response = create_response(200, udatedNewAttributes)
+    response = create_response(200, json.dumps(updatedNewAttributes))
     return response
 
 

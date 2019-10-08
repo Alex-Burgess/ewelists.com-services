@@ -189,7 +189,7 @@ Resources:
                   default:
                     responseParameters:
                       method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
-                      method.response.header.Access-Control-Allow-Methods: '''GET,DELETE,OPTIONS'''
+                      method.response.header.Access-Control-Allow-Methods: '''GET,DELETE,PUT,OPTIONS'''
                       method.response.header.Access-Control-Allow-Origin:
                         Fn::If:
                         - Prod
@@ -239,7 +239,7 @@ Resources:
     Type: AWS::Serverless::Api
   CreateListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/f044f7d2941c4997fea5076b0b3fb6d7
+      CodeUri: s3://sam-builds-lists/b972bd9de65aa810e219f5a1075ee8cb
       Description: Creates list items in table
       Environment:
         Variables:
@@ -286,7 +286,7 @@ Resources:
     Type: AWS::ApiGateway::GatewayResponse
   DeleteListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/f044f7d2941c4997fea5076b0b3fb6d7
+      CodeUri: s3://sam-builds-lists/b972bd9de65aa810e219f5a1075ee8cb
       Description: Deletes a list item for a given user in the table
       Environment:
         Variables:
@@ -345,7 +345,7 @@ Resources:
     Type: AWS::IAM::Role
   GetListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/f044f7d2941c4997fea5076b0b3fb6d7
+      CodeUri: s3://sam-builds-lists/b972bd9de65aa810e219f5a1075ee8cb
       Description: Gets a list item for a user in the table
       Environment:
         Variables:
@@ -374,7 +374,7 @@ Resources:
     Type: AWS::Serverless::Function
   ListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/f044f7d2941c4997fea5076b0b3fb6d7
+      CodeUri: s3://sam-builds-lists/b972bd9de65aa810e219f5a1075ee8cb
       Description: Gets all list items for a user in the table
       Environment:
         Variables:
@@ -403,7 +403,7 @@ Resources:
     Type: AWS::Serverless::Function
   UpdateListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/f044f7d2941c4997fea5076b0b3fb6d7
+      CodeUri: s3://sam-builds-lists/b972bd9de65aa810e219f5a1075ee8cb
       Description: Updates a list item for a user in the table
       Environment:
         Variables:
