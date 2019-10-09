@@ -4,7 +4,7 @@ import re
 import json
 import boto3
 from moto import mock_dynamodb2
-from lists import get_list
+from lists import update
 
 import sys
 import logging
@@ -15,13 +15,14 @@ logger.addHandler(stream_handler)
 
 
 @pytest.fixture
-def api_gateway_get_list_event():
+def api_gateway_update_event():
     """ Generates API GW Event"""
 
     return {
         "resource": "/lists/{id}",
-        "path": "/lists/1234abcd",
-        "httpMethod": "GET",
+        "path": "/lists/cf19fb62",
+        "httpMethod": "PUT",
+        "body": "{\n    \"attribute_name\": \"title\",\n    \"attribute_value\": \"My new title\"\n}",
         "headers": {
             "Accept": "*/*",
             "Accept-Encoding": "gzip, deflate",
@@ -32,36 +33,38 @@ def api_gateway_get_list_event():
             "CloudFront-Is-SmartTV-Viewer": "false",
             "CloudFront-Is-Tablet-Viewer": "false",
             "CloudFront-Viewer-Country": "GB",
+            "Content-Type": "text/plain",
             "Host": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
-            "Postman-Token": "68cd6f41-1d8a-420d-95ae-d46612ee8d54",
+            "Postman-Token": "d38bfa3c-26b3-4a42-acfa-ecc30a12d767",
             "User-Agent": "PostmanRuntime/7.15.2",
-            "Via": "1.1 5eade7e5ebbbd665bf0f8d23a84cc713.cloudfront.net (CloudFront)",
-            "X-Amz-Cf-Id": "OgLVkBcert4ANwvUz3GBUX2aGDY_iiDv4QrQFFqha7v3y1gglIRm4g==",
-            "x-amz-date": "20191007T153345Z",
-            "X-Amzn-Trace-Id": "Root=1-5d9b5ad9-9cc41570632adb90a8ba3800",
-            "X-Forwarded-For": "5.81.150.55, 70.132.15.85",
+            "Via": "1.1 f76142b838785e2eec49408a3d9d8285.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Id": "pUhW1u14GSPTlHCQed4C5eTsM3Biv_ca3cDVCh9hbcnZ3_e4z0CgVw==",
+            "x-amz-content-sha256": "51f3f8790f9b06462165164ab5e1bf33fd64f8230e962c445681a63555e04429",
+            "x-amz-date": "20191007T160043Z",
+            "X-Amzn-Trace-Id": "Root=1-5d9b612b-c2a6fbd0452771f0b0155f70",
+            "X-Forwarded-For": "5.81.150.55, 70.132.15.71",
             "X-Forwarded-Port": "443",
             "X-Forwarded-Proto": "https"
         },
         "queryStringParameters": "null",
         "multiValueQueryStringParameters": "null",
         "pathParameters": {
-            "id": "1234abcd"
+            "id": "cf19fb62"
         },
         "stageVariables": "null",
         "requestContext": {
             "resourceId": "4j13uq",
             "resourcePath": "/lists/{id}",
-            "httpMethod": "GET",
-            "extendedRequestId": "BMsiDFARjoEFgOg=",
-            "requestTime": "07/Oct/2019:15:33:45 +0000",
-            "path": "/test/lists/1234abcd",
+            "httpMethod": "PUT",
+            "extendedRequestId": "BMwexGf4DoEFoJA=",
+            "requestTime": "07/Oct/2019:16:00:43 +0000",
+            "path": "/test/lists/cf19fb62",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
             "domainPrefix": "4sdcvv0n2e",
-            "requestTimeEpoch": 1570462425886,
-            "requestId": "4fa38ad5-1706-4bdb-b0e2-6a5519cc12fa",
+            "requestTimeEpoch": 1570464043231,
+            "requestId": "c410dfa4-713a-4ac3-afe5-2e3ab3d4066f",
             "identity": {
                 "cognitoIdentityPoolId": "eu-west-1:2208d797-dfc9-40b4-8029-827c9e76e029",
                 "accountId": "123456789012",
@@ -79,7 +82,6 @@ def api_gateway_get_list_event():
             "domainName": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
             "apiId": "4sdcvv0n2e"
         },
-        "body": "null",
         "isBase64Encoded": "false"
     }
 
@@ -138,53 +140,4 @@ def dynamodb_mock():
     mock.stop()
 
 
-class TestGetListQuery:
-    def test_get_list_query(self, dynamodb_mock):
-        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
-        item = get_list.get_list_query('lists-unittest', cognito_identity_id, "1234abcd")
-        assert item['userId']['S'] == 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c', "Get list item did not contain a userId"
-        assert item['title']['S'] == 'My Test List', "Get list item did not contain a title"
-        assert item['description']['S'] == 'Test description for the list.', "Get list item did not contain a description"
-        assert item['occasion']['S'] == 'Birthday', "Get list item did not contain a occasion"
-        assert len(item['listId']['S']) == 8, "Get list response did not contain a listId."
-
-    def test_get_list_query_no_table_name(self, dynamodb_mock):
-        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
-
-        with pytest.raises(Exception) as e:
-            get_list.get_list_query('lists-unittes', cognito_identity_id, "1234abcd")
-        assert str(e.value) == "Unexpected error when getting list item from table.", "Exception not as expected."
-
-    def test_get_list_query_for_item_that_does_not_exist(self, dynamodb_mock):
-        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
-
-        with pytest.raises(Exception) as e:
-            get_list.get_list_query('lists-unittest', cognito_identity_id, "1234abc")
-        assert str(e.value) == "List does not exist.", "Exception not as expected."
-
-
-class TestGetListMain:
-    def test_get_list_main(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-
-        response = get_list.get_list_main(api_gateway_get_list_event)
-        body = json.loads(response['body'])
-
-        assert len(body['listId']['S']) == 8, "Get list response did not contain a listId."
-        assert body['userId']['S'] == "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "Get list response did not contain a userId."
-
-    def test_get_list_main_no_table(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
-
-        response = get_list.get_list_main(api_gateway_get_list_event)
-        body = json.loads(response['body'])
-
-        assert body['error'] == 'Unexpected error when getting list item from table.', "Get list response did not contain the correct error message."
-
-
-def test_handler(api_gateway_get_list_event, monkeypatch, dynamodb_mock):
-    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    response = get_list.handler(api_gateway_get_list_event, None)
-    assert response['statusCode'] == 200
-    assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
-    assert re.match('{"userId": .*}', response['body'])
+# Add tests

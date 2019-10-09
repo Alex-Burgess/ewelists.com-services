@@ -2,7 +2,6 @@ import pytest
 import os
 import re
 import json
-import copy
 import boto3
 from moto import mock_dynamodb2
 from lists import delete
