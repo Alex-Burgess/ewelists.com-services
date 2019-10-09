@@ -10,13 +10,13 @@ if logger.handlers:
     handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
 
 
-def get_table_name(env):
+def get_table_name(osenv):
     try:
-        table_name = env['TABLE_NAME']
+        table_name = osenv['TABLE_NAME']
         logger.info("TABLE_NAME environment variable value: " + table_name)
     except KeyError:
-        logger.error('TABLE_NAME environment variable not set correctly')
-        raise Exception('TABLE_NAME environment variable not set correctly')
+        logger.error('TABLE_NAME environment variable not set correctly.')
+        raise Exception('TABLE_NAME environment variable not set correctly.')
 
     return table_name
 
@@ -36,9 +36,9 @@ def get_identity(event, osenv):
     pattern = re.compile("^arn:aws:iam::[0-9]{12}:user/ApiTestUser")
     if pattern.match(userArn):
         logger.info('Request was from postman, using API test identity.')
-        api_identity = get_api_identity(osenv)
-        identity["cognitoIdentityId"] = api_identity["API_IDENTITY_ID"]
-        identity["userPoolSub"] = api_identity["API_USERPOOL_SUB"]
+        os_identity = get_postman_identity(osenv)
+        identity["cognitoIdentityId"] = os_identity["POSTMAN_IDENTITY_ID"]
+        identity["userPoolSub"] = os_identity["POSTMAN_USERPOOL_SUB"]
     else:
         if cognito_identity_id is None:
             raise Exception("There was no cognitoIdentityId in the API event.")
@@ -51,16 +51,16 @@ def get_identity(event, osenv):
     return identity
 
 
-def get_api_identity(osenv):
-    api_identity = {}
+def get_postman_identity(osenv):
+    os_identity = {}
     try:
-        api_identity["API_IDENTITY_ID"] = osenv['API_IDENTITY_ID']
-        api_identity["API_USERPOOL_SUB"] = osenv['API_USERPOOL_SUB']
+        os_identity["POSTMAN_IDENTITY_ID"] = osenv['POSTMAN_IDENTITY_ID']
+        os_identity["POSTMAN_USERPOOL_SUB"] = osenv['POSTMAN_USERPOOL_SUB']
     except KeyError:
-        logger.error('API_IDENTITY_ID and API_USERPOOL_SUB environment variables not set correctly.')
-        raise Exception('API_IDENTITY_ID and API_USERPOOL_SUB environment variables not set correctly.')
+        logger.error('POSTMAN_IDENTITY_ID and POSTMAN_USERPOOL_SUB environment variables not set correctly.')
+        raise Exception('POSTMAN_IDENTITY_ID and POSTMAN_USERPOOL_SUB environment variables not set correctly.')
 
-    return api_identity
+    return os_identity
 
 
 def get_list_id(event):
