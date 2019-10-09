@@ -21,7 +21,7 @@ def get_table_name(env):
     return table_name
 
 
-def get_identity(event, env):
+def get_identity(event, osenv):
     identity = {}
 
     try:
@@ -36,7 +36,7 @@ def get_identity(event, env):
     pattern = re.compile("^arn:aws:iam::[0-9]{12}:user/ApiTestUser")
     if pattern.match(userArn):
         logger.info('Request was from postman, using API test identity.')
-        api_identity = get_api_identity(env)
+        api_identity = get_api_identity(osenv)
         identity["cognitoIdentityId"] = api_identity["API_IDENTITY_ID"]
         identity["userPoolSub"] = api_identity["API_USERPOOL_SUB"]
     else:
@@ -51,14 +51,14 @@ def get_identity(event, env):
     return identity
 
 
-def get_api_identity(env):
+def get_api_identity(osenv):
     api_identity = {}
     try:
-        api_identity["API_IDENTITY_ID"] = env['API_IDENTITY_ID']
-        api_identity["API_USERPOOL_SUB"] = env['API_USERPOOL_SUB']
+        api_identity["API_IDENTITY_ID"] = osenv['API_IDENTITY_ID']
+        api_identity["API_USERPOOL_SUB"] = osenv['API_USERPOOL_SUB']
     except KeyError:
-        logger.error('API_IDENTITY_ID and API_USERPOOL_SUB environment variables not set correctly')
-        raise Exception('API_IDENTITY_ID and API_USERPOOL_SUB environment variables not set correctly')
+        logger.error('API_IDENTITY_ID and API_USERPOOL_SUB environment variables not set correctly.')
+        raise Exception('API_IDENTITY_ID and API_USERPOOL_SUB environment variables not set correctly.')
 
     return api_identity
 

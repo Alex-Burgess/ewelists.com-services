@@ -1,5 +1,6 @@
 import pytest
 import copy
+import os
 from lists import common
 import sys
 import logging
@@ -158,3 +159,30 @@ class TestGetListIdFromPath:
         with pytest.raises(Exception) as e:
             common.get_list_id(api_gateway_without_id_event)
         assert str(e.value) == "API Event did not contain a List ID in the path parameters."
+
+
+class TestAscertainIdentity:
+    def test_get_api_identity(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'API_IDENTITY_ID', 'eu-west-1:1234abcd-1234-abcd-efgh-1234abcd5678')
+        monkeypatch.setitem(os.environ, 'API_USERPOOL_SUB', '1234efgh-1234-abcd-efgh-1234abcd5678')
+
+        identity = common.get_api_identity(os.environ)
+        assert identity['API_IDENTITY_ID'] == 'eu-west-1:1234abcd-1234-abcd-efgh-1234abcd5678'
+        assert identity['API_USERPOOL_SUB'] == '1234efgh-1234-abcd-efgh-1234abcd5678'
+
+    def test_get_api_identity_when_both_osvars_missing(self):
+        with pytest.raises(Exception) as e:
+            common.get_api_identity(os.environ)
+        assert str(e.value) == "API_IDENTITY_ID and API_USERPOOL_SUB environment variables not set correctly."
+
+    def test_get_api_identity_when_userpool_missing(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'API_IDENTITY_ID', 'eu-west-1:1234abcd-1234-abcd-efgh-1234abcd5678')
+        with pytest.raises(Exception) as e:
+            common.get_api_identity(os.environ)
+        assert str(e.value) == "API_IDENTITY_ID and API_USERPOOL_SUB environment variables not set correctly."
+
+    def test_get_api_identity_when_identity_id_missing(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'API_USERPOOL_SUB', '1234efgh-1234-abcd-efgh-1234abcd5678')
+        with pytest.raises(Exception) as e:
+            common.get_api_identity(os.environ)
+        assert str(e.value) == "API_IDENTITY_ID and API_USERPOOL_SUB environment variables not set correctly."
