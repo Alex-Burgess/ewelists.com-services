@@ -72,3 +72,14 @@ def get_list_id(event):
         raise Exception('API Event did not contain a List ID in the path parameters.')
 
     return list_id
+
+
+def create_response(code, body):
+    logger.info("Creating response with status code ({}) and body ({})".format(code, body))
+    response = {'statusCode': code,
+                'body': body,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                }}
+    return response

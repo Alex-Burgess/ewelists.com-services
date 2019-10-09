@@ -30,13 +30,13 @@ def create_main(event):
         message = put_item_in_table(table_name, identity['cognitoIdentityId'], identity['userPoolSub'], listId, attributes)
     except Exception as e:
         logger.error("Exception: {}".format(e))
-        response = create_response(500, json.dumps({'error': str(e)}))
+        response = common.create_response(500, json.dumps({'error': str(e)}))
         logger.info("Returning response: {}".format(response))
         return response
 
     data = {'listId': listId, 'message': message}
 
-    response = create_response(200, json.dumps(data))
+    response = common.create_response(200, json.dumps(data))
     return response
 
 
@@ -103,14 +103,3 @@ def get_attribute_details(event):
         raise Exception('API Event did not contain a valid body.')
 
     return attribute_details
-
-
-def create_response(code, body):
-    logger.info("Creating response with status code ({}) and body ({})".format(code, body))
-    response = {'statusCode': code,
-                'body': body,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                }}
-    return response

@@ -30,11 +30,11 @@ def update_list_main(event):
         updatedNewAttributes = update_list(table_name, identity['cognitoIdentityId'], list_id, attribute_details)
     except Exception as e:
         logger.error("Exception: {}".format(e))
-        response = create_response(500, json.dumps({'error': str(e)}))
+        response = common.create_response(500, json.dumps({'error': str(e)}))
         logger.info("Returning response: {}".format(response))
         return response
 
-    response = create_response(200, json.dumps(updatedNewAttributes))
+    response = common.create_response(200, json.dumps(updatedNewAttributes))
     return response
 
 
@@ -81,14 +81,3 @@ def update_list(table_name, cognito_identity_id, list_id, attribute_details):
     logger.info("update item response: " + json.dumps(response))
 
     return response['Attributes']
-
-
-def create_response(code, body):
-    logger.info("Creating response with status code ({}) and body ({})".format(code, body))
-    response = {'statusCode': code,
-                'body': body,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                }}
-    return response

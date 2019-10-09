@@ -28,13 +28,13 @@ def delete_main(event):
         message = delete_item(table_name, identity['cognitoIdentityId'], list_id)
     except Exception as e:
         logger.error("Exception: {}".format(e))
-        response = create_response(500, json.dumps({'error': str(e)}))
+        response = common.create_response(500, json.dumps({'error': str(e)}))
         logger.info("Returning response: {}".format(response))
         return response
 
     data = {'deleted': True, 'listId': list_id, 'message': message}
 
-    response = create_response(200, json.dumps(data))
+    response = common.create_response(200, json.dumps(data))
     return response
 
 
@@ -64,14 +64,3 @@ def delete_item(table_name, cognito_identity_id, list_id):
     logger.info("Delete request successfull for List ID: {} and user: {}".format(list_id, cognito_identity_id))
     message = "Delete request successfull for List ID: {} and user: {}".format(list_id, cognito_identity_id)
     return message
-
-
-def create_response(code, body):
-    logger.info("Creating response with status code ({}) and body ({})".format(code, body))
-    response = {'statusCode': code,
-                'body': body,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                }}
-    return response

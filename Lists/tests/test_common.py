@@ -276,6 +276,18 @@ def api_gateway_noid_event():
     }
 
 
+def test_create_response():
+    response = common.create_response(200, 'Success message')
+
+    expected_response = {'statusCode': 200,
+                         'body': 'Success message',
+                         'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                         }}
+    assert response == expected_response, "Create_response did not return the expected response value."
+
+
 class TestGetListIdFromPath:
     def test_get_list_id(self, api_gateway_with_id_event):
         list_id = common.get_list_id(api_gateway_with_id_event)

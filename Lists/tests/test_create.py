@@ -139,18 +139,6 @@ def dynamodb_mock():
     mock.stop()
 
 
-def test_create_response():
-    response = create.create_response(200, 'Success message')
-
-    expected_response = {'statusCode': 200,
-                         'body': 'Success message',
-                         'headers': {
-                            'Content-Type': 'application/json',
-                            'Access-Control-Allow-Origin': '*'
-                         }}
-    assert response == expected_response, "Create_response did not return the expected response value."
-
-
 class TestGetAttributeDetails:
     def test_get_attribute_details(self, api_gateway_create_event):
         attribute_details = create.get_attribute_details(api_gateway_create_event)
