@@ -1,5 +1,4 @@
 import pytest
-import copy
 import os
 from lists import common
 import sys

@@ -40,6 +40,30 @@ def create_main(event):
     return response
 
 
+def put_item_in_table(table_name, cognito_identity_id, user_pool_sub, listId, attributes):
+    item = {
+        'userId': {'S': cognito_identity_id},
+        'userPoolSub': {'S': user_pool_sub},
+        'listId': {'S': listId},
+        'title': {'S': attributes['title']},
+        'description': {'S': attributes['description']},
+        'occasion': {'S': attributes['occasion']},
+        'createdAt': {'N': str(int(time.time()))}
+    }
+
+    logger.info("Put item for lists table: {}".format(item))
+
+    try:
+        dynamodb.put_item(TableName=table_name, Item=item)
+    except Exception as e:
+        logger.error("List could not be created: {}".format(e))
+        raise Exception('List could not be created.')
+
+    message = "List was created."
+
+    return message
+
+
 def generate_list_id(cognito_identity_id, table_name):
     # Generate a random uid, then check that the user does not already have a list with that ID.
     Invalid = True
@@ -79,30 +103,6 @@ def get_attribute_details(event):
         raise Exception('API Event did not contain a valid body.')
 
     return attribute_details
-
-
-def put_item_in_table(table_name, cognito_identity_id, user_pool_sub, listId, attributes):
-    item = {
-        'userId': {'S': cognito_identity_id},
-        'userPoolSub': {'S': user_pool_sub},
-        'listId': {'S': listId},
-        'title': {'S': attributes['title']},
-        'description': {'S': attributes['description']},
-        'occasion': {'S': attributes['occasion']},
-        'createdAt': {'N': str(int(time.time()))}
-    }
-
-    logger.info("Put item for lists table: {}".format(item))
-
-    try:
-        dynamodb.put_item(TableName=table_name, Item=item)
-    except Exception as e:
-        logger.error("List not could be created: {}".format(e))
-        raise
-
-    message = "List was created."
-
-    return message
 
 
 def create_response(code, body):
