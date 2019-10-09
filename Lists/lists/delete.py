@@ -39,7 +39,7 @@ def delete_main(event):
 
 
 def delete_item(table_name, cognito_identity_id, list_id):
-    logger.info("Deleting List ID: {} for user: {}".format(list_id, cognito_identity_id))
+    logger.info("Deleting List ID: {} for user: {}.".format(list_id, cognito_identity_id))
 
     key = {
         'userId': {'S': cognito_identity_id},
@@ -61,6 +61,6 @@ def delete_item(table_name, cognito_identity_id, list_id):
         else:
             raise
 
-    logger.info("Delete request successfull for List ID: {} and user: {}".format(list_id, cognito_identity_id))
-    message = "Delete request successfull for List ID: {} and user: {}".format(list_id, cognito_identity_id)
+    logger.info("Delete request successfull for List ID: {} and user: {}.".format(list_id, cognito_identity_id))
+    message = "Delete request successfull for List ID: {} and user: {}.".format(list_id, cognito_identity_id)
     return message
