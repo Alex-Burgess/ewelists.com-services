@@ -88,6 +88,9 @@ def generate_list_id(cognito_identity_id, table_name):
 
 
 def get_attribute_details(event):
+    if event['body'] == "null":
+        raise Exception('API Event Body was empty.')
+
     try:
         body = event['body']
         logger.info("Event body: " + json.dumps(body))

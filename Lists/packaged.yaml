@@ -239,12 +239,12 @@ Resources:
     Type: AWS::Serverless::Api
   CreateListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/caf6ea8f9dd7f7fd06313fda40e16d7f
+      CodeUri: s3://sam-builds-lists/4b375e36b4c4888be9221e2eb3c9bfb5
       Description: Creates list items in table
       Environment:
         Variables:
-          API_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
-          API_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
+          POSTMAN_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
+          POSTMAN_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
           TABLE_NAME:
             Fn::Sub: ${TableNamePrefix}-${Environment}
       Events:
@@ -286,12 +286,12 @@ Resources:
     Type: AWS::ApiGateway::GatewayResponse
   DeleteListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/caf6ea8f9dd7f7fd06313fda40e16d7f
+      CodeUri: s3://sam-builds-lists/4b375e36b4c4888be9221e2eb3c9bfb5
       Description: Deletes a list item for a given user in the table
       Environment:
         Variables:
-          API_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
-          API_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
+          POSTMAN_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
+          POSTMAN_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
           TABLE_NAME:
             Fn::Sub: ${TableNamePrefix}-${Environment}
       Events:
@@ -345,12 +345,12 @@ Resources:
     Type: AWS::IAM::Role
   GetListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/caf6ea8f9dd7f7fd06313fda40e16d7f
+      CodeUri: s3://sam-builds-lists/4b375e36b4c4888be9221e2eb3c9bfb5
       Description: Gets a list item for a user in the table
       Environment:
         Variables:
-          API_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
-          API_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
+          POSTMAN_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
+          POSTMAN_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
           TABLE_NAME:
             Fn::Sub: ${TableNamePrefix}-${Environment}
       Events:
@@ -374,12 +374,12 @@ Resources:
     Type: AWS::Serverless::Function
   ListAllFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/caf6ea8f9dd7f7fd06313fda40e16d7f
+      CodeUri: s3://sam-builds-lists/4b375e36b4c4888be9221e2eb3c9bfb5
       Description: Gets all list items for a user in the table
       Environment:
         Variables:
-          API_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
-          API_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
+          POSTMAN_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
+          POSTMAN_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
           TABLE_NAME:
             Fn::Sub: ${TableNamePrefix}-${Environment}
       Events:
@@ -403,12 +403,12 @@ Resources:
     Type: AWS::Serverless::Function
   UpdateListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/caf6ea8f9dd7f7fd06313fda40e16d7f
+      CodeUri: s3://sam-builds-lists/4b375e36b4c4888be9221e2eb3c9bfb5
       Description: Updates a list item for a user in the table
       Environment:
         Variables:
-          API_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
-          API_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
+          POSTMAN_IDENTITY_ID: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee
+          POSTMAN_USERPOOL_SUB: ae617d08-1127-4066-87ec-b6df345793b8
           TABLE_NAME:
             Fn::Sub: ${TableNamePrefix}-${Environment}
       Events:

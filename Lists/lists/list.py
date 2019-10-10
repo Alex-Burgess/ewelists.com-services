@@ -36,7 +36,6 @@ def list_main(event):
 
 def get_lists(table_name, cognito_identity_id):
     lists = {"lists": []}
-    # list ID, title, description
 
     logger.info("Querying table")
 

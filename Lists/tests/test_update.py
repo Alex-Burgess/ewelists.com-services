@@ -20,9 +20,9 @@ def api_gateway_update_event():
 
     return {
         "resource": "/lists/{id}",
-        "path": "/lists/cf19fb62",
+        "path": "/lists/1234abcd",
         "httpMethod": "PUT",
-        "body": "{\n    \"attribute_name\": \"title\",\n    \"attribute_value\": \"My new title\"\n}",
+        "body": "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"Updated description for the list.\",\n    \"occasion\": \"Christmas\"\n}",
         "headers": {
             "Accept": "*/*",
             "Accept-Encoding": "gzip, deflate",
@@ -49,7 +49,7 @@ def api_gateway_update_event():
         "queryStringParameters": "null",
         "multiValueQueryStringParameters": "null",
         "pathParameters": {
-            "id": "cf19fb62"
+            "id": "1234abcd"
         },
         "stageVariables": "null",
         "requestContext": {
@@ -58,7 +58,7 @@ def api_gateway_update_event():
             "httpMethod": "PUT",
             "extendedRequestId": "BMwexGf4DoEFoJA=",
             "requestTime": "07/Oct/2019:16:00:43 +0000",
-            "path": "/test/lists/cf19fb62",
+            "path": "/test/lists/1234abcd",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
@@ -140,4 +140,102 @@ def dynamodb_mock():
     mock.stop()
 
 
-# Add tests
+class TestGetAttributeDetails:
+    def test_get_attribute_details_with_correct_attributes(self, api_gateway_update_event):
+        update_attributes = update.get_attribute_details(api_gateway_update_event)
+
+        assert len(update_attributes) == 3, "Update attributes object did not contain expected number of attributes."
+        assert update_attributes['title'] == "My Updated Title", "Update attributes object did not contain title as expected."
+        assert update_attributes['description'] == "Updated description for the list.", "Update attributes object did not contain description as expected."
+        assert update_attributes['occasion'] == "Christmas", "Update attributes object did not contain occasion as expected."
+
+    def test_get_attribute_details_with_one_attributes(self, api_gateway_update_event):
+        api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\"\n}"
+
+        with pytest.raises(Exception) as e:
+            update.get_attribute_details(api_gateway_update_event)
+        assert str(e.value) == "Event body did not contain the expected keys ['title', 'description', 'occasion'].", "Exception not as expected."
+
+    def test_get_attribute_details_with_empty_body(self, api_gateway_update_event):
+        api_gateway_update_event['body'] = "null"
+
+        with pytest.raises(Exception) as e:
+            update.get_attribute_details(api_gateway_update_event)
+        assert str(e.value) == "API Event Body was empty.", "Exception not as expected."
+
+    def test_get_attribute_details_with_body_not_json(self, api_gateway_update_event):
+        api_gateway_update_event['body'] = "some text"
+
+        with pytest.raises(Exception) as e:
+            update.get_attribute_details(api_gateway_update_event)
+        assert str(e.value) == "API Event did not contain a valid body.", "Exception not as expected."
+
+
+class TestUpdateList:
+    def test_update_list_with_one_attribute(self, api_gateway_update_event, dynamodb_mock):
+        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
+        list_id = "1234abcd"
+        api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"Test description for the list.\",\n    \"occasion\": \"Birthday\"\n}"
+
+        update_attributes = json.loads(api_gateway_update_event['body'])
+        response = update.update_list('lists-unittest', cognito_identity_id, list_id, update_attributes)
+
+        assert len(response) == 1, "Update response did not contain expected number of updated attributes."
+        assert response['title']['S'] == "My Updated Title", "Update response did not contain expected value for title."
+
+    def test_update_list_with_wrong_table(self, api_gateway_update_event, dynamodb_mock):
+        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
+        list_id = "1234abcd"
+        api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\"\n}"
+        update_attributes = json.loads(api_gateway_update_event['body'])
+
+        with pytest.raises(Exception) as e:
+            update.update_list('lists-unittet', cognito_identity_id, list_id, update_attributes)
+        assert str(e.value) == "Unexpected error when updating the list item.", "Exception not as expected."
+
+    def test_update_list_with_multiple_attributes(self, api_gateway_update_event, dynamodb_mock):
+        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
+        list_id = "1234abcd"
+        update_attributes = json.loads(api_gateway_update_event['body'])
+        response = update.update_list('lists-unittest', cognito_identity_id, list_id, update_attributes)
+
+        assert len(response) == 3, "Update response did not contain expected number of updated attributes."
+        assert response['title']['S'] == "My Updated Title", "Update response did not contain expected value for title."
+
+
+class TestUpdateListMain:
+    def test_update_list_main(self, api_gateway_update_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        response = update.update_list_main(api_gateway_update_event)
+        body = json.loads(response['body'])
+
+        expected_body = {"title": {"S": "My Updated Title"}, "description": {"S": "Updated description for the list."}, "occasion": {"S": "Christmas"}}
+
+        assert len(body.keys()) == 3, "Update main response did not contain expected number of updated attributes."
+        assert body == expected_body, "Updated attributes from response were not as expected."
+
+    def test_update_list_main_with_just_title(self, api_gateway_update_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"Test description for the list.\",\n    \"occasion\": \"Birthday\"\n}"
+        response = update.update_list_main(api_gateway_update_event)
+        body = json.loads(response['body'])
+
+        expected_body = {"title": {"S": "My Updated Title"}}
+
+        assert len(body.keys()) == 1, "Update main response did not contain expected number of updated attributes."
+        assert body == expected_body, "Updated attributes from response were not as expected."
+
+    def test_update_list_main_with_empty_body(self, monkeypatch, api_gateway_update_event, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_update_event['body'] = "null"
+        response = update.update_list_main(api_gateway_update_event)
+        body = json.loads(response['body'])
+        assert body['error'] == 'API Event Body was empty.', "Update main response did not contain the correct error message."
+
+
+def test_handler(api_gateway_update_event, monkeypatch, dynamodb_mock):
+    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    response = update.handler(api_gateway_update_event, None)
+    assert response['statusCode'] == 200
+    assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
+    assert re.match('{"title": .*}', response['body'])

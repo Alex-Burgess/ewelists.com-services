@@ -16,7 +16,7 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    # logger.info("Event: " + json.dumps(event))
+    logger.info("Event: " + json.dumps(event))
     response = update_list_main(event)
     return response
 
@@ -27,18 +27,21 @@ def update_list_main(event):
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
         attribute_details = get_attribute_details(event)
-        updatedNewAttributes = update_list(table_name, identity['cognitoIdentityId'], list_id, attribute_details)
+        updated_attributes = update_list(table_name, identity['cognitoIdentityId'], list_id, attribute_details)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
         logger.info("Returning response: {}".format(response))
         return response
 
-    response = common.create_response(200, json.dumps(updatedNewAttributes))
+    response = common.create_response(200, json.dumps(updated_attributes))
     return response
 
 
 def get_attribute_details(event):
+    if event['body'] == "null":
+        raise Exception('API Event Body was empty.')
+
     try:
         body = event['body']
         logger.info("Event body: " + json.dumps(body))
@@ -47,16 +50,22 @@ def get_attribute_details(event):
         raise Exception('API Event was empty.')
 
     try:
-        attribute_details = json.loads(body)
+        update_attributes = json.loads(body)
     except Exception:
         logger.error("API Event did not contain a valid body.")
         raise Exception('API Event did not contain a valid body.')
 
-    return attribute_details
+    expected_keys = ["title", "description", "occasion"]
+
+    if list(update_attributes.keys()) != expected_keys:
+        logger.error("Event body did not contain the expected keys " + str(expected_keys) + ".")
+        raise Exception("Event body did not contain the expected keys " + str(expected_keys) + ".")
+
+    return update_attributes
 
 
-def update_list(table_name, cognito_identity_id, list_id, attribute_details):
-    logger.info("Querying table")
+def update_list(table_name, cognito_identity_id, list_id, update_attributes):
+    logger.info("Updating item in table with attribute values: " + json.dumps(update_attributes))
 
     key = {
         'userId': {'S': cognito_identity_id},
@@ -67,16 +76,18 @@ def update_list(table_name, cognito_identity_id, list_id, attribute_details):
         response = dynamodb.update_item(
             TableName=table_name,
             Key=key,
-            UpdateExpression="set " + attribute_details["attribute_name"] + " = :a",
+            UpdateExpression="set title = :t, description = :d, occasion = :o",
             ExpressionAttributeValues={
-                ':a': {'S': attribute_details["attribute_value"]},
+                ':t': {'S': update_attributes["title"]},
+                ':d': {'S': update_attributes["description"]},
+                ':o': {'S': update_attributes["occasion"]}
             },
             ReturnValues="UPDATED_NEW"
         )
 
-    except ClientError as e:
-        logger.info("update item response: " + json.dumps(e.response))
-        raise Exception("Unexpected error when updating the list item")
+    except Exception as e:
+        logger.info("update item exception: " + str(e))
+        raise Exception("Unexpected error when updating the list item.")
 
     logger.info("update item response: " + json.dumps(response))
 
