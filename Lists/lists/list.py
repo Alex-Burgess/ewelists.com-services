@@ -40,13 +40,17 @@ def get_lists(table_name, cognito_identity_id):
 
     logger.info("Querying table")
 
-    response = dynamodb.query(
-        TableName=table_name,
-        KeyConditionExpression="userId = :userId",
-        ExpressionAttributeValues={":userId":  {'S': cognito_identity_id}}
-    )
+    try:
+        response = dynamodb.query(
+            TableName=table_name,
+            KeyConditionExpression="userId = :userId",
+            ExpressionAttributeValues={":userId":  {'S': cognito_identity_id}}
+        )
+    except Exception as e:
+        logger.info("get item response: " + json.dumps(e.response))
+        raise Exception("Unexpected error when getting lists from table.")
 
-    logger.info("Parsing response")
+    logger.info(str(len(response['Items'])) + "lists were returned.")
 
     for i in response['Items']:
         list = {}

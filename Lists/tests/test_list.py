@@ -155,4 +155,68 @@ def dynamodb_mock():
     mock.stop()
 
 
-# Add tests
+class TestGetLists:
+    def test_get_lists(self, dynamodb_mock):
+        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        lists = list.get_lists('lists-unittest', cognito_identity_id)
+
+        test_item1 = {
+            'listId': '1234abcd',
+            'title': 'My Test List',
+            'description': 'Test description for the list.',
+            'occasion': 'Birthday'
+        }
+
+        test_item2 = {
+            'listId': '1234efgh',
+            'title': 'My Test List2',
+            'description': 'Another description for the list.',
+            'occasion': 'Birthday'
+        }
+
+        assert lists['lists'][0] == test_item1, "First list item was not as expected."
+        assert lists['lists'][1] == test_item2, "Second list item was not as expected."
+
+    def test_get_lists_bad_table_name(self, dynamodb_mock):
+        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+
+        with pytest.raises(Exception) as e:
+            list.get_lists('lists-unittes', cognito_identity_id)
+        assert str(e.value) == "Unexpected error when getting lists from table.", "Exception not as expected."
+
+    def test_get_lists_for_user_with_no_lists(self, dynamodb_mock):
+        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684'
+        lists = list.get_lists('lists-unittest', cognito_identity_id)
+        assert len(lists['lists']) == 0, "Number of lists was not 0."
+
+
+class TestListMain:
+    def test_list_main(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        response = list.list_main(api_gateway_listall_event)
+        body = json.loads(response['body'])
+
+        assert len(body['lists']) == 2, "Number of lists returned was not as expected."
+
+    def test_list_main_no_table(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
+        response = list.list_main(api_gateway_listall_event)
+        body = json.loads(response['body'])
+
+        assert body['error'] == 'Unexpected error when getting lists from table.', "Exception was not as expected."
+
+    def test_list_main_no_lists(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_listall_event['requestContext']['identity']['cognitoIdentityId'] = 'null'
+        response = list.list_main(api_gateway_listall_event)
+        body = json.loads(response['body'])
+
+        assert len(body['lists']) == 0, "Number of lists returned was not as expected."
+
+
+def test_handler(api_gateway_listall_event, monkeypatch, dynamodb_mock):
+    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    response = list.handler(api_gateway_listall_event, None)
+    assert response['statusCode'] == 200
+    assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
+    assert re.match('{"lists": .*}', response['body'])
