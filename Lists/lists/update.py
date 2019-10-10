@@ -3,7 +3,6 @@ import os
 import boto3
 import logging
 from lists import common
-from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -16,7 +15,6 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    logger.info("Event: " + json.dumps(event))
     response = update_list_main(event)
     return response
 

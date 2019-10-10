@@ -100,13 +100,19 @@
 			"response": []
 		},
 		{
-			"name": "list",
+			"name": "create 2nd list",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
 						"exec": [
+							"pm.test(\"Add variable for new List ID\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    listId = jsonData[\"listId\"];",
+							"    pm.environment.set(\"list_id2\", listId);",
+							"});",
+							"",
 							"pm.test(\"response is ok\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
@@ -162,8 +168,94 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"My Christmas List\",\n    \"description\": \"A gift wish list for Christmas.\",\n    \"occasion\": \"Christmas\"\n}"
+				},
+				"url": {
+					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists",
+					"protocol": "https",
+					"host": [
+						"4sdcvv0n2e",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"test",
+						"lists"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
+			"name": "create with no body",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(500);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"Response message should exist\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var message = jsonData['error'];",
+							"    pm.expect(message).to.eql('API Event did not contain a valid body.');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists",
 					"protocol": "https",
@@ -203,17 +295,28 @@
 							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
 							"});",
 							"",
-							"pm.test(\"A list Id should be returned\", function () {",
+							"pm.test(\"The returned object should contain the correct attributes\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    var listId = jsonData['listId'];",
-							"    pm.expect(listId.length).to.eql(8);",
+							"    var keys = Object.keys(jsonData)",
+							"    pm.expect(keys.length).to.eql(7);",
 							"});",
 							"",
-							"pm.test(\"Response message should be created\", function () {",
+							"pm.test(\"Check that returned attributes contain the values we expect\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    var message = jsonData['message'];",
-							"    pm.expect(message).to.eql('List was created.');",
+							"    var listId = jsonData['listId'];",
+							"    pm.expect(listId.S.length).to.eql(8);",
+							"    ",
+							"    var createdAt = jsonData['createdAt'];",
+							"    pm.expect(createdAt.N.length).to.eql(10);",
+							"",
+							"    pm.expect(jsonData['occasion']['S']).to.eql(\"Birthday\");",
+							"    pm.expect(jsonData['userId']['S']).to.eql(\"eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee\");",
+							"    pm.expect(jsonData['description']['S']).to.eql(\"A gift wish list for my birthday.\");",
+							"    pm.expect(jsonData['userPoolSub']['S']).to.eql(\"ae617d08-1127-4066-87ec-b6df345793b8\");",
+							"    pm.expect(jsonData['title']['S']).to.eql(\"My Birthday List\");",
+							"",
 							"});",
+							"",
 							""
 						],
 						"type": "text/javascript"
@@ -279,117 +382,6 @@
 			"response": []
 		},
 		{
-			"name": "update list title",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-						"exec": [
-							"pm.test(\"response is ok\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"response must be valid and have a body\", function () {",
-							"     // assert that the status code is 200",
-							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-							"     // assert that the response has a valid JSON body",
-							"     pm.response.to.be.withBody;",
-							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-							"});",
-							"",
-							"pm.test(\"A list Id should be returned\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var listId = jsonData['listId'];",
-							"    pm.expect(listId.length).to.eql(8);",
-							"});",
-							"",
-							"pm.test(\"Response message should be created\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var message = jsonData['message'];",
-							"    pm.expect(message).to.eql('List was created.');",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
-						"exec": [
-							"pm.environment.get(\"list_id\")"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "awsv4",
-					"awsv4": [
-						{
-							"key": "secretKey",
-							"value": "{{SecretKey}}",
-							"type": "string"
-						},
-						{
-							"key": "accessKey",
-							"value": "{{AccessKey}}",
-							"type": "string"
-						},
-						{
-							"key": "service",
-							"value": "",
-							"type": "string"
-						},
-						{
-							"key": "region",
-							"value": "eu-west-1",
-							"type": "string"
-						}
-					]
-				},
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"attribute_name\": \"title\",\n    \"attribute_value\": \"My new title\"\n}"
-				},
-				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/{{list_id}}",
-					"protocol": "https",
-					"host": [
-						"4sdcvv0n2e",
-						"execute-api",
-						"eu-west-1",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"test",
-						"lists",
-						"{{list_id}}"
-					],
-					"query": [
-						{
-							"key": "attribute_name",
-							"value": "title",
-							"disabled": true
-						},
-						{
-							"key": "attribute_value",
-							"value": "My new title",
-							"disabled": true
-						}
-					]
-				},
-				"description": "Update list with an attribute"
-			},
-			"response": []
-		},
-		{
 			"name": "get list not in table",
 			"event": [
 				{
@@ -398,28 +390,23 @@
 						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
 						"exec": [
 							"pm.test(\"response is ok\", function () {",
-							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(500);",
 							"});",
 							"",
 							"pm.test(\"response must be valid and have a body\", function () {",
 							"     // assert that the status code is 200",
-							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
 							"     // assert that the response has a valid JSON body",
 							"     pm.response.to.be.withBody;",
 							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
 							"});",
 							"",
-							"pm.test(\"A list Id should be returned\", function () {",
+							"pm.test(\"Response message should exist\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    var listId = jsonData['listId'];",
-							"    pm.expect(listId.length).to.eql(8);",
+							"    var message = jsonData['error'];",
+							"    pm.expect(message).to.eql('List does not exist.');",
 							"});",
 							"",
-							"pm.test(\"Response message should be created\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var message = jsonData['message'];",
-							"    pm.expect(message).to.eql('List was created.');",
-							"});",
 							""
 						],
 						"type": "text/javascript"
@@ -481,6 +468,320 @@
 					]
 				},
 				"description": "A request for an item not in the table. Should fail with an appropriate message."
+			},
+			"response": []
+		},
+		{
+			"name": "list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"The correct number of list objects should be returned\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData['lists'].length).to.eql(2);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Each list object should contain four attributes\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var list1keys = Object.keys(jsonData['lists'][0])",
+							"    pm.expect(list1keys.length).to.eql(4);",
+							"    ",
+							"    var list2keys = Object.keys(jsonData['lists'][1])",
+							"    pm.expect(list2keys.length).to.eql(4);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists",
+					"protocol": "https",
+					"host": [
+						"4sdcvv0n2e",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"test",
+						"lists"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
+			"name": "update only title",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"The returned object should contain the correct attributes\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var keys = Object.keys(jsonData)",
+							"    pm.expect(keys.length).to.eql(3);",
+							"});",
+							"",
+							"pm.test(\"Check that returned attributes contain the values we expect\", function () {",
+							"    var jsonData = pm.response.json();",
+							"",
+							"    pm.expect(jsonData['occasion']['S']).to.eql(\"Birthday\");",
+							"    pm.expect(jsonData['description']['S']).to.eql(\"A gift wish list for my birthday.\");",
+							"    pm.expect(jsonData['title']['S']).to.eql(\"My Updated Title\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
+						"exec": [
+							"pm.environment.get(\"list_id\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\"\n}"
+				},
+				"url": {
+					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/{{list_id}}",
+					"protocol": "https",
+					"host": [
+						"4sdcvv0n2e",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"test",
+						"lists",
+						"{{list_id}}"
+					],
+					"query": [
+						{
+							"key": "attribute_name",
+							"value": "title",
+							"disabled": true
+						},
+						{
+							"key": "attribute_value",
+							"value": "My new title",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Update list with an attribute"
+			},
+			"response": []
+		},
+		{
+			"name": "update all attributes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"The returned object should contain the correct attributes\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var keys = Object.keys(jsonData)",
+							"    pm.expect(keys.length).to.eql(3);",
+							"});",
+							"",
+							"pm.test(\"Check that returned attributes contain the values we expect\", function () {",
+							"    var jsonData = pm.response.json();",
+							"",
+							"    pm.expect(jsonData['occasion']['S']).to.eql(\"Christmas\");",
+							"    pm.expect(jsonData['description']['S']).to.eql(\"Updated description for the list.\");",
+							"    pm.expect(jsonData['title']['S']).to.eql(\"My Updated Title2\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
+						"exec": [
+							"pm.environment.get(\"list_id\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"My Updated Title2\",\n    \"description\": \"Updated description for the list.\",\n    \"occasion\": \"Christmas\"\n}"
+				},
+				"url": {
+					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/{{list_id}}",
+					"protocol": "https",
+					"host": [
+						"4sdcvv0n2e",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"test",
+						"lists",
+						"{{list_id}}"
+					],
+					"query": [
+						{
+							"key": "attribute_name",
+							"value": "title",
+							"disabled": true
+						},
+						{
+							"key": "attribute_value",
+							"value": "My new title",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Update list with an attribute"
 			},
 			"response": []
 		},
@@ -580,6 +881,101 @@
 			"response": []
 		},
 		{
+			"name": "delete 2nd list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"Response should confirm deleted\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var deletedBool = jsonData['deleted'];",
+							"    pm.expect(deletedBool).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"Response message should confirm delete successfull\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var message = jsonData['message'];",
+							"    pm.expect(message).to.include(\"Delete request successfull for List ID\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+						"exec": [
+							"pm.environment.get(\"list_id2\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/{{list_id2}}",
+					"protocol": "https",
+					"host": [
+						"4sdcvv0n2e",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"test",
+						"lists",
+						"{{list_id2}}"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
 			"name": "delete item not in table",
 			"event": [
 				{
@@ -655,6 +1051,84 @@
 					]
 				},
 				"description": "Delete request for an item not in the table.  Should fail with an appropriate message."
+			},
+			"response": []
+		},
+		{
+			"name": "list returns 0 lists",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"The correct number of list objects should be returned\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData['lists'].length).to.eql(0);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists",
+					"protocol": "https",
+					"host": [
+						"4sdcvv0n2e",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"test",
+						"lists"
+					]
+				},
+				"description": "Create list"
 			},
 			"response": []
 		}
