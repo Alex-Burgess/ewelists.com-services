@@ -45,7 +45,7 @@ def put_item_in_table(table_name, cognito_identity_id, user_pool_sub, listId, at
         'userId': {'S': cognito_identity_id},
         'userPoolSub': {'S': user_pool_sub},
         'listId': {'S': listId},
-        'title': {'S': attributes['title']},
+        'title': {'S': "Manual" + attributes['title']},
         'description': {'S': attributes['description']},
         'occasion': {'S': attributes['occasion']},
         'createdAt': {'N': str(int(time.time()))}
