@@ -239,7 +239,7 @@ Resources:
     Type: AWS::Serverless::Api
   CreateListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/01d81a298d97531965a852ffa182d42a
+      CodeUri: s3://sam-builds-lists/25ef2d6d5295a09f76a8af013d557b47
       Description: Creates list items in table
       Environment:
         Variables:
@@ -286,7 +286,7 @@ Resources:
     Type: AWS::ApiGateway::GatewayResponse
   DeleteListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/01d81a298d97531965a852ffa182d42a
+      CodeUri: s3://sam-builds-lists/25ef2d6d5295a09f76a8af013d557b47
       Description: Deletes a list item for a given user in the table
       Environment:
         Variables:
@@ -345,7 +345,7 @@ Resources:
     Type: AWS::IAM::Role
   GetListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/01d81a298d97531965a852ffa182d42a
+      CodeUri: s3://sam-builds-lists/25ef2d6d5295a09f76a8af013d557b47
       Description: Gets a list item for a user in the table
       Environment:
         Variables:
@@ -374,7 +374,7 @@ Resources:
     Type: AWS::Serverless::Function
   ListAllFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/01d81a298d97531965a852ffa182d42a
+      CodeUri: s3://sam-builds-lists/25ef2d6d5295a09f76a8af013d557b47
       Description: Gets all list items for a user in the table
       Environment:
         Variables:
@@ -403,7 +403,7 @@ Resources:
     Type: AWS::Serverless::Function
   UpdateListFunction:
     Properties:
-      CodeUri: s3://sam-builds-lists/01d81a298d97531965a852ffa182d42a
+      CodeUri: s3://sam-builds-lists/25ef2d6d5295a09f76a8af013d557b47
       Description: Updates a list item for a user in the table
       Environment:
         Variables:
