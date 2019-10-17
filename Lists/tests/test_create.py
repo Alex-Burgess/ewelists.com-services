@@ -131,18 +131,6 @@ def dynamodb_mock():
     for item in items:
         table.put_item(TableName=table_name, Item=item)
 
-    # item = {
-    #     'userId': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c',
-    #     'userPoolSub': '42cf26f5-407c-47cf-bcb6-f70cd63ac119',
-    #     'listId': '1234abcd',
-    #     'title': 'My Test List',
-    #     'description': 'Test description for the list.',
-    #     'occasion': 'Birthday',
-    #     'createdAt': 1570552083
-    # }
-    #
-    # table.put_item(TableName=table_name, Item=item)
-
     yield
     # teardown: stop moto server
     mock.stop()

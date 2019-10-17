@@ -1,6 +1,6 @@
 {
     "resource": "/lists/{id}",
-    "path": "/lists/12345678",
+    "path": "/lists/76a2fe57-9fac-4a0d-9225-1942949889ba",
     "httpMethod": "DELETE",
     "headers": {
         "Accept": "*/*",
@@ -26,7 +26,7 @@
     "queryStringParameters": null,
     "multiValueQueryStringParameters": null,
     "pathParameters": {
-        "id": "12345678"
+        "id": "76a2fe57-9fac-4a0d-9225-1942949889ba"
     },
     "stageVariables": null,
     "requestContext": {
@@ -35,7 +35,7 @@
         "httpMethod": "DELETE",
         "extendedRequestId": "BL7sTFalDoEFrYA=",
         "requestTime": "07/Oct/2019:10:00:21 +0000",
-        "path": "/test/lists/12345678",
+        "path": "/test/lists/76a2fe57-9fac-4a0d-9225-1942949889ba",
         "accountId": "123456789012",
         "protocol": "HTTP/1.1",
         "stage": "test",
