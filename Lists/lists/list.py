@@ -3,6 +3,7 @@ import os
 import boto3
 import logging
 from lists import common
+from lists.entities import User, List
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -22,8 +23,9 @@ def handler(event, context):
 def list_main(event):
     try:
         table_name = common.get_table_name(os.environ)
+        index_name = "userId-index"
         identity = common.get_identity(event, os.environ)
-        usersLists = get_lists(table_name, identity['cognitoIdentityId'])
+        usersLists = get_lists(table_name, index_name, identity['cognitoIdentityId'])
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -34,29 +36,34 @@ def list_main(event):
     return response
 
 
-def get_lists(table_name, cognito_identity_id):
-    lists = {"lists": []}
+def get_lists(table_name, index_name, cognito_identity_id):
+    response_data = {"user": None, "owned": [], "shared": []}
 
     logger.info("Querying table")
 
     try:
         response = dynamodb.query(
             TableName=table_name,
+            IndexName=index_name,
             KeyConditionExpression="userId = :userId",
             ExpressionAttributeValues={":userId":  {'S': cognito_identity_id}}
         )
     except Exception as e:
-        logger.info("get item response: " + json.dumps(e.response))
+        logger.info("Exception: " + str(e))
         raise Exception("Unexpected error when getting lists from table.")
 
-    logger.info(str(len(response['Items'])) + "lists were returned.")
+    user = User(response['Items'].pop())
+    response_data['user'] = user.get_basic_details()
 
-    for i in response['Items']:
-        list = {}
-        list['listId'] = i['listId']['S']
-        list['title'] = i['title']['S']
-        list['description'] = i['description']['S']
-        list['occasion'] = i['occasion']['S']
-        lists['lists'].append(list)
+    if len(response['Items']) > 0:
+        for item in response['Items']:
+            if item['listOwner']['S'] == cognito_identity_id and item['SK']['S'].startswith("USER"):
+                list_details = List(item).get_details()
+                response_data['owned'].append(list_details)
+            elif item['listOwner']['S'] != cognito_identity_id and item['SK']['S'].startswith("SHARE"):
+                list_details = List(item).get_details()
+                response_data['shared'].append(list_details)
+    else:
+        logger.info("0 lists were returned.")
 
-    return lists
+    return response_data

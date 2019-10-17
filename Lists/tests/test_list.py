@@ -102,53 +102,63 @@ def dynamodb_mock():
             TableName=table_name,
             KeySchema=[
                 {
-                    'AttributeName': 'userId',
+                    'AttributeName': 'PK',
                     'KeyType': 'HASH'
                 },
                 {
-                    'AttributeName': 'listId',
+                    'AttributeName': 'SK',
                     'KeyType': 'RANGE'
                 }
             ],
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'userId',
+                    'AttributeName': 'PK',
                     'AttributeType': 'S'
                 },
                 {
-                    'AttributeName': 'listId',
+                    'AttributeName': 'SK',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'userId',
                     'AttributeType': 'S'
                 }
             ],
             ProvisionedThroughput={
                 'ReadCapacityUnits': 5,
                 'WriteCapacityUnits': 5
-            }
+            },
+            GlobalSecondaryIndexes=[
+                {
+                    'IndexName': 'userId-index',
+                    'KeySchema': [
+                         {
+                             'AttributeName': 'userId',
+                             'KeyType': 'HASH'
+                         },
+                         {
+                             'AttributeName': 'PK',
+                             'KeyType': 'RANGE'
+                         }
+                     ],
+                     'Projection': {
+                        'ProjectionType': 'ALL'
+                     }
+                }
+            ]
         )
 
-    item = {
-        'userId': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c',
-        'userPoolSub': '42cf26f5-407c-47cf-bcb6-f70cd63ac119',
-        'listId': '1234abcd',
-        'title': 'My Test List',
-        'description': 'Test description for the list.',
-        'occasion': 'Birthday',
-        'createdAt': 1570552083
-    }
+    items = [
+        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "email": "test.user@gmail.com", "name": "Test User", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"},
+        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-efgh-efgh-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-efgh-efgh-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:1234250a-0fb0-4b32-9842-041c69be1234", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#87654321-axyz-axyz-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "87654321-axyz-axyz-123456789112", "createdAt": "2019-09-01T10:00:00", "listOwner": "eu-west-1:6789250a-0fb0-4b32-9842-041c69be6789", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "2019-10-31"}
+    ]
 
-    table.put_item(TableName=table_name, Item=item)
-
-    item2 = {
-        'userId': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c',
-        'userPoolSub': '42cf26f5-407c-47cf-bcb6-f70cd63ac119',
-        'listId': '1234efgh',
-        'title': 'My Test List2',
-        'description': 'Another description for the list.',
-        'occasion': 'Birthday',
-        'createdAt': 1570552183
-    }
-
-    table.put_item(TableName=table_name, Item=item2)
+    for item in items:
+        table.put_item(TableName=table_name, Item=item)
 
     yield
     # teardown: stop moto server
@@ -158,36 +168,40 @@ def dynamodb_mock():
 class TestGetLists:
     def test_get_lists(self, dynamodb_mock):
         cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
-        lists = list.get_lists('lists-unittest', cognito_identity_id)
+        lists_response = list.get_lists('lists-unittest', 'userId-index', cognito_identity_id)
 
-        test_item1 = {
-            'listId': '1234abcd',
-            'title': 'My Test List',
-            'description': 'Test description for the list.',
-            'occasion': 'Birthday'
-        }
+        test_user = {"email": "test.user@gmail.com", "name": "Test User"}
+        assert lists_response['user'] == test_user, "Test user was not as expected."
 
-        test_item2 = {
-            'listId': '1234efgh',
-            'title': 'My Test List2',
-            'description': 'Another description for the list.',
-            'occasion': 'Birthday'
-        }
+        owned_list = {"listId": "12345678-abcd-abcd-123456789112", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"}
+        assert len(lists_response['owned']) == 1, "User should only own 1 list."
+        assert lists_response['owned'][0] == owned_list, "Details of the list owned by user was not as expected."
 
-        assert lists['lists'][0] == test_item1, "First list item was not as expected."
-        assert lists['lists'][1] == test_item2, "Second list item was not as expected."
+        shared_list1 = {"listId": "12345678-efgh-efgh-123456789112", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"}
+        shared_list2 = {"listId": "87654321-axyz-axyz-123456789112", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "2019-10-31"}
+        assert len(lists_response['shared']) == 2, "User should only have 2 lists shared with them."
+        assert lists_response['shared'][0] == shared_list1, "Details of the list shared with user was not as expected."
+        assert lists_response['shared'][1] == shared_list2, "Details of the list shared with user was not as expected."
 
     def test_get_lists_bad_table_name(self, dynamodb_mock):
         cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
 
         with pytest.raises(Exception) as e:
-            list.get_lists('lists-unittes', cognito_identity_id)
+            list.get_lists('lists-unittes', 'userId-index', cognito_identity_id)
+        assert str(e.value) == "Unexpected error when getting lists from table.", "Exception not as expected."
+
+    def test_get_lists_bad_index_name(self, dynamodb_mock):
+        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+
+        with pytest.raises(Exception) as e:
+            list.get_lists('lists-unittest', 'userId-inde', cognito_identity_id)
         assert str(e.value) == "Unexpected error when getting lists from table.", "Exception not as expected."
 
     def test_get_lists_for_user_with_no_lists(self, dynamodb_mock):
         cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684'
-        lists = list.get_lists('lists-unittest', cognito_identity_id)
-        assert len(lists['lists']) == 0, "Number of lists was not 0."
+        lists_response = list.get_lists('lists-unittest', 'userId-index', cognito_identity_id)
+        assert len(lists_response['owned']) == 0, "Number of lists was not 0."
+        assert len(lists_response['shared']) == 0, "Number of lists was not 0."
 
 
 class TestListMain:
@@ -196,7 +210,8 @@ class TestListMain:
         response = list.list_main(api_gateway_listall_event)
         body = json.loads(response['body'])
 
-        assert len(body['lists']) == 2, "Number of lists returned was not as expected."
+        assert len(body['owned']) == 1, "Number of lists returned was not as expected."
+        assert len(body['shared']) == 2, "Number of lists returned was not as expected."
 
     def test_list_main_no_table(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
@@ -207,11 +222,12 @@ class TestListMain:
 
     def test_list_main_no_lists(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_listall_event['requestContext']['identity']['cognitoIdentityId'] = 'null'
+        api_gateway_listall_event['requestContext']['identity']['cognitoIdentityId'] = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684'
         response = list.list_main(api_gateway_listall_event)
         body = json.loads(response['body'])
 
-        assert len(body['lists']) == 0, "Number of lists returned was not as expected."
+        assert len(body['owned']) == 0, "Number of lists returned was not as expected."
+        assert len(body['shared']) == 0, "Number of lists returned was not as expected."
 
 
 def test_handler(api_gateway_listall_event, monkeypatch, dynamodb_mock):
@@ -219,4 +235,4 @@ def test_handler(api_gateway_listall_event, monkeypatch, dynamodb_mock):
     response = list.handler(api_gateway_listall_event, None)
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
-    assert re.match('{"lists": .*}', response['body'])
+    assert re.match('{"user": .*}', response['body'])
