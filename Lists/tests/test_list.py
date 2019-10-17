@@ -173,12 +173,12 @@ class TestGetLists:
         test_user = {"email": "test.user@gmail.com", "name": "Test User"}
         assert lists_response['user'] == test_user, "Test user was not as expected."
 
-        owned_list = {"listId": "12345678-abcd-abcd-123456789112", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"}
+        owned_list = {"listId": "12345678-abcd-abcd-123456789112", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Api Childs birthday."}
         assert len(lists_response['owned']) == 1, "User should only own 1 list."
         assert lists_response['owned'][0] == owned_list, "Details of the list owned by user was not as expected."
 
-        shared_list1 = {"listId": "12345678-efgh-efgh-123456789112", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"}
-        shared_list2 = {"listId": "87654321-axyz-axyz-123456789112", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "2019-10-31"}
+        shared_list1 = {"listId": "12345678-efgh-efgh-123456789112", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Oscars birthday."}
+        shared_list2 = {"listId": "87654321-axyz-axyz-123456789112", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "description": "A gift list for Oscars 2nd Birthday."}
         assert len(lists_response['shared']) == 2, "User should only have 2 lists shared with them."
         assert lists_response['shared'][0] == shared_list1, "Details of the list shared with user was not as expected."
         assert lists_response['shared'][1] == shared_list2, "Details of the list shared with user was not as expected."

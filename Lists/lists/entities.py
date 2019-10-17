@@ -24,7 +24,7 @@ class List:
         self.title = item.get('title').get('S')
         self.description = item.get('description').get('S')
         self.occasion = item.get('occasion').get('S')
-        self.eventDate = item.get('eventDate').get('S')
+        # self.eventDate = item.get('eventDate').get('S')
 
     def __repr__(self):
         return "List<{} -- {} -- {}>".format(self.list_id, self.title, self.occasion)
@@ -35,7 +35,7 @@ class List:
             'title': self.title,
             'description': self.description,
             'occasion': self.occasion,
-            'eventDate': self.eventDate
+            # 'eventDate': self.eventDate
         }
 
         return list

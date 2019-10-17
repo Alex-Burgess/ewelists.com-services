@@ -48,19 +48,23 @@ def get_lists(table_name, index_name, cognito_identity_id):
             KeyConditionExpression="userId = :userId",
             ExpressionAttributeValues={":userId":  {'S': cognito_identity_id}}
         )
+        logger.info("All items in query response. ({})".format(response['Items']))
     except Exception as e:
         logger.info("Exception: " + str(e))
         raise Exception("Unexpected error when getting lists from table.")
 
-    user = User(response['Items'].pop())
-    response_data['user'] = user.get_basic_details()
-
     if len(response['Items']) > 0:
         for item in response['Items']:
-            if item['listOwner']['S'] == cognito_identity_id and item['SK']['S'].startswith("USER"):
+            if item['PK']['S'] == item['SK']['S']:
+                logger.info("Adding user item to response data. ({})".format(item))
+                user = User(item)
+                response_data['user'] = user.get_basic_details()
+            elif item['listOwner']['S'] == cognito_identity_id and item['SK']['S'].startswith("USER"):
+                logger.info("Adding owner list item to response data. ({})".format(item))
                 list_details = List(item).get_details()
                 response_data['owned'].append(list_details)
             elif item['listOwner']['S'] != cognito_identity_id and item['SK']['S'].startswith("SHARE"):
+                logger.info("Adding list shared with user to response data. ({})".format(item))
                 list_details = List(item).get_details()
                 response_data['shared'].append(list_details)
     else:

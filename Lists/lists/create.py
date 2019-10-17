@@ -27,7 +27,7 @@ def create_main(event):
         identity = common.get_identity(event, os.environ)
         listId = generate_list_id(identity['cognitoIdentityId'], table_name)
         attributes = get_attribute_details(event)
-        message = put_item_in_table(table_name, identity['cognitoIdentityId'], identity['userPoolSub'], listId, attributes)
+        message = put_item_in_table(table_name, identity['cognitoIdentityId'], listId, attributes)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -40,24 +40,33 @@ def create_main(event):
     return response
 
 
-def put_item_in_table(table_name, cognito_identity_id, user_pool_sub, listId, attributes):
+def put_item_in_table(table_name, cognito_identity_id, listId, attributes):
     item = {
-        'userId': {'S': cognito_identity_id},
-        'userPoolSub': {'S': user_pool_sub},
+        'PK': {'S': "LIST#{}".format(listId)},
+        'SK': {'S': "USER#{}".format(cognito_identity_id)},
         'listId': {'S': listId},
+        "listOwner": {'S': cognito_identity_id},
+        'userId': {'S': cognito_identity_id},
         'title': {'S': attributes['title']},
-        'description': {'S': attributes['description']},
         'occasion': {'S': attributes['occasion']},
+        'description': {'S': attributes['description']},
         'createdAt': {'N': str(int(time.time()))}
     }
 
-    logger.info("Put item for lists table: {}".format(item))
-
     try:
+        logger.info("Put owned item for lists table: {}".format(item))
         dynamodb.put_item(TableName=table_name, Item=item)
     except Exception as e:
         logger.error("List could not be created: {}".format(e))
         raise Exception('List could not be created.')
+
+    try:
+        item['SK']['S'] = "SHARE#{}".format(cognito_identity_id)
+        logger.info("Put shared item for lists table: {}".format(item))
+        dynamodb.put_item(TableName=table_name, Item=item)
+    except Exception as e:
+        logger.error("List shared item for owner could not be created: {}".format(e))
+        raise Exception('List shared item for owner could not be created.')
 
     message = "List was created."
 
@@ -65,24 +74,9 @@ def put_item_in_table(table_name, cognito_identity_id, user_pool_sub, listId, at
 
 
 def generate_list_id(cognito_identity_id, table_name):
-    # Generate a random uid, then check that the user does not already have a list with that ID.
-    Invalid = True
-    while Invalid:
-        newlistId = uuid.uuid4().hex[:8]
-        logger.info("Generated List ID: {}".format(newlistId))
-
-        key = {
-            'userId': {'S': cognito_identity_id},
-            'listId': {'S': newlistId}
-        }
-
-        response = dynamodb.get_item(TableName=table_name, Key=key)
-
-        if 'Item' in response:
-            logger.info("Generated List ID existed: {}".format(response))
-        else:
-            logger.info("List ID ({}) unique in table for user: {}".format(newlistId, cognito_identity_id))
-            Invalid = False
+    # Generate a random uid
+    newlistId = str(uuid.uuid4())
+    logger.info("Generated List ID: {}".format(newlistId))
 
     return newlistId
 

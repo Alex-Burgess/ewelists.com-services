@@ -45,7 +45,7 @@
         "identity": {
             "cognitoIdentityPoolId": "eu-west-1:2208d797-dfc9-40b4-8029-827c9e76e029",
             "accountId": "123456789012",
-            "cognitoIdentityId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c",
+            "cognitoIdentityId": "eu-west-1:2e54250a-0fb0-4b32-9842-041c69be15b7",
             "caller": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials",
             "sourceIp": "31.49.230.217",
             "principalOrgId": "o-d8jj6dyqv2",

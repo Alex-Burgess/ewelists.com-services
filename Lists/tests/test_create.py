@@ -98,21 +98,21 @@ def dynamodb_mock():
             TableName=table_name,
             KeySchema=[
                 {
-                    'AttributeName': 'userId',
+                    'AttributeName': 'PK',
                     'KeyType': 'HASH'
                 },
                 {
-                    'AttributeName': 'listId',
+                    'AttributeName': 'SK',
                     'KeyType': 'RANGE'
                 }
             ],
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'userId',
+                    'AttributeName': 'PK',
                     'AttributeType': 'S'
                 },
                 {
-                    'AttributeName': 'listId',
+                    'AttributeName': 'SK',
                     'AttributeType': 'S'
                 }
             ],
@@ -122,17 +122,26 @@ def dynamodb_mock():
             }
         )
 
-    item = {
-        'userId': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c',
-        'userPoolSub': '42cf26f5-407c-47cf-bcb6-f70cd63ac119',
-        'listId': '1234abcd',
-        'title': 'My Test List',
-        'description': 'Test description for the list.',
-        'occasion': 'Birthday',
-        'createdAt': 1570552083
-    }
+    items = [
+        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "email": "test.user@gmail.com", "name": "Test User", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+    ]
 
-    table.put_item(TableName=table_name, Item=item)
+    for item in items:
+        table.put_item(TableName=table_name, Item=item)
+
+    # item = {
+    #     'userId': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c',
+    #     'userPoolSub': '42cf26f5-407c-47cf-bcb6-f70cd63ac119',
+    #     'listId': '1234abcd',
+    #     'title': 'My Test List',
+    #     'description': 'Test description for the list.',
+    #     'occasion': 'Birthday',
+    #     'createdAt': 1570552083
+    # }
+    #
+    # table.put_item(TableName=table_name, Item=item)
 
     yield
     # teardown: stop moto server
@@ -159,15 +168,14 @@ class TestGenerateListId:
     def test_generate_list_id(self, dynamodb_mock, api_gateway_create_event):
         cognito_identity_id = api_gateway_create_event['requestContext']['identity']['cognitoIdentityId']
         list_id = create.generate_list_id(cognito_identity_id, 'lists-unittest')
-        assert len(list_id) == 8, "List ID not 8 characters long."
-        assert list_id != '1234abcd', "List ID shouldn't match the ID of the list already in the table."
+        assert len(list_id) == 36, "List ID not 36 characters long."
+        assert list_id != '12345678-abcd-abcd-123456789112', "List ID shouldn't match the ID of the list already in the table (Pretty Unlikely)."
 
 
 class TestPutItemInTable:
     def test_put_item_in_table(self, dynamodb_mock):
         cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
-        user_pool_sub = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
-        listId = 'efgh5678'
+        listId = 'b2ed81b0-67eb-4599-98b9-60c0e739de2d'
 
         attributes = {
             'title': 'My Test List',
@@ -175,13 +183,22 @@ class TestPutItemInTable:
             'occasion': 'Birthday',
         }
 
-        message = create.put_item_in_table('lists-unittest', cognito_identity_id, user_pool_sub, listId, attributes)
+        message = create.put_item_in_table('lists-unittest', cognito_identity_id, listId, attributes)
         assert message == "List was created.", "Put item message not as expected."
+
+        # Check the table was updated with right number of items
+        dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
+
+        test_response = dynamodb.query(
+            TableName='lists-unittest',
+            KeyConditionExpression="PK = :PK",
+            ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(listId)}}
+        )
+        assert len(test_response['Items']) == 2, "Number of items for new list should be 2."
 
     def test_put_item_in_table_with_bad_name(self, dynamodb_mock):
         cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
-        user_pool_sub = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
-        listId = 'efgh5678'
+        listId = '9500f915-df8f-46b7-bc3f-7ea6a2bc0f84'
 
         attributes = {
             'title': 'My Test List',
@@ -190,7 +207,7 @@ class TestPutItemInTable:
         }
 
         with pytest.raises(Exception) as e:
-            create.put_item_in_table('lists-unittes', cognito_identity_id, user_pool_sub, listId, attributes)
+            create.put_item_in_table('lists-unittes', cognito_identity_id, listId, attributes)
         assert str(e.value) == "List could not be created.", "Exception not as expected."
 
 
@@ -202,7 +219,7 @@ class TestCreateMain:
         body = json.loads(response['body'])
 
         assert body['message'] == 'List was created.', "Create main response did not contain the correct message."
-        assert len(body['listId']) == 8, "Create main response did not contain a listId."
+        assert len(body['listId']) == 36, "Create main response did not contain a listId."
 
     def test_create_main_with_no_event_body(self, monkeypatch, api_gateway_create_event, dynamodb_mock):
         event_no_body = copy.deepcopy(api_gateway_create_event)
