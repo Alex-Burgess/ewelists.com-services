@@ -20,7 +20,7 @@ def api_gateway_get_list_event():
 
     return {
         "resource": "/lists/{id}",
-        "path": "/lists/1234abcd",
+        "path": "/lists/12345678-abcd-abcd-123456789112",
         "httpMethod": "GET",
         "headers": {
             "Accept": "*/*",
@@ -46,7 +46,7 @@ def api_gateway_get_list_event():
         "queryStringParameters": "null",
         "multiValueQueryStringParameters": "null",
         "pathParameters": {
-            "id": "1234abcd"
+            "id": "12345678-abcd-abcd-123456789112"
         },
         "stageVariables": "null",
         "requestContext": {
@@ -55,7 +55,7 @@ def api_gateway_get_list_event():
             "httpMethod": "GET",
             "extendedRequestId": "BMsiDFARjoEFgOg=",
             "requestTime": "07/Oct/2019:15:33:45 +0000",
-            "path": "/test/lists/1234abcd",
+            "path": "/test/lists/12345678-abcd-abcd-123456789112",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
@@ -97,21 +97,21 @@ def dynamodb_mock():
             TableName=table_name,
             KeySchema=[
                 {
-                    'AttributeName': 'userId',
+                    'AttributeName': 'PK',
                     'KeyType': 'HASH'
                 },
                 {
-                    'AttributeName': 'listId',
+                    'AttributeName': 'SK',
                     'KeyType': 'RANGE'
                 }
             ],
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'userId',
+                    'AttributeName': 'PK',
                     'AttributeType': 'S'
                 },
                 {
-                    'AttributeName': 'listId',
+                    'AttributeName': 'SK',
                     'AttributeType': 'S'
                 }
             ],
@@ -121,17 +121,20 @@ def dynamodb_mock():
             }
         )
 
-    item = {
-        'userId': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c',
-        'userPoolSub': '42cf26f5-407c-47cf-bcb6-f70cd63ac119',
-        'listId': '1234abcd',
-        'title': 'My Test List',
-        'description': 'Test description for the list.',
-        'occasion': 'Birthday',
-        'createdAt': 1570552083
-    }
+    items = [
+        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "email": "test.user@gmail.com", "name": "Test User", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"},
+        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#49d47a66-8825-4872-85c2-e15a12d19aed", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Oscar's 2019 Christmas List", "occasion": "Christmas", "listId": "49d47a66-8825-4872-85c2-e15a12d19aed", "listOwner": "eu-west-1:1234250a-0fb0-4b32-9842-041c69be1234", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas.", "eventDate": "2019-12-25"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1001", "quantity": 2, "reserved": 0},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1}
+    ]
 
-    table.put_item(TableName=table_name, Item=item)
+    for item in items:
+        table.put_item(TableName=table_name, Item=item)
 
     yield
     # teardown: stop moto server
@@ -141,26 +144,22 @@ def dynamodb_mock():
 class TestGetListQuery:
     def test_get_list_query(self, dynamodb_mock):
         cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
-        item = get_list.get_list_query('lists-unittest', cognito_identity_id, "1234abcd")
-        assert item['userId']['S'] == 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c', "Get list item did not contain a userId"
-        assert item['title']['S'] == 'My Test List', "Get list item did not contain a title"
-        assert item['description']['S'] == 'Test description for the list.', "Get list item did not contain a description"
-        assert item['occasion']['S'] == 'Birthday', "Get list item did not contain a occasion"
-        assert len(item['listId']['S']) == 8, "Get list response did not contain a listId."
+        items = get_list.get_list_query('lists-unittest', cognito_identity_id, "12345678-abcd-abcd-123456789112")
+        assert len(items) == 6, "Number of items deleted was not as expected."
 
     def test_get_list_query_no_table_name(self, dynamodb_mock):
         cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
 
         with pytest.raises(Exception) as e:
-            get_list.get_list_query('lists-unittes', cognito_identity_id, "1234abcd")
+            get_list.get_list_query('lists-unittes', cognito_identity_id, "12345678-abcd-abcd-123456789112")
         assert str(e.value) == "Unexpected error when getting list item from table.", "Exception not as expected."
 
     def test_get_list_query_for_item_that_does_not_exist(self, dynamodb_mock):
         cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
 
         with pytest.raises(Exception) as e:
-            get_list.get_list_query('lists-unittest', cognito_identity_id, "1234abc")
-        assert str(e.value) == "List does not exist.", "Exception not as expected."
+            get_list.get_list_query('lists-unittest', cognito_identity_id, "12345678-abcd-abcd-123456789112-diff")
+        assert str(e.value) == "No query results for List ID 12345678-abcd-abcd-123456789112-diff and user: eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c.", "Exception not as expected."
 
 
 class TestGetListMain:
@@ -170,8 +169,22 @@ class TestGetListMain:
         response = get_list.get_list_main(api_gateway_get_list_event)
         body = json.loads(response['body'])
 
-        assert len(body['listId']['S']) == 8, "Get list response did not contain a listId."
-        assert body['userId']['S'] == "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "Get list response did not contain a userId."
+        assert body['list']['listId'] == "12345678-abcd-abcd-123456789112", "Get list response did not contain a listId."
+        assert body['list']['title'] == "Api Child's 1st Birthday", "Get list response did not contain a title."
+        assert body['list']['description'] == "A gift list for Api Childs birthday.", "Get list response did not contain a description."
+        assert body['list']['occasion'] == "Birthday", "Get list response did not contain an occasion."
+        assert len(body['products']) == 3, "Get list response did not contain correct number of products."
+        assert body['products'][0]['productId'] == "PRODUCT#1000", "Product ID was not correct."
+        assert body['products'][0]['quantity'] == 1, "Quantity of product was not correct."
+        assert body['products'][0]['reserved'] == 0, "Reserved quantity of product was not correct."
+
+        assert body['products'][1]['productId'] == "PRODUCT#1001", "Product ID was not correct."
+        assert body['products'][1]['quantity'] == 2, "Quantity of product was not correct."
+        assert body['products'][1]['reserved'] == 0, "Reserved quantity of product was not correct."
+
+        assert body['products'][2]['productId'] == "PRODUCT#1002", "Product ID was not correct."
+        assert body['products'][2]['quantity'] == 2, "Quantity of product was not correct."
+        assert body['products'][2]['reserved'] == 1, "Reserved quantity of product was not correct."
 
     def test_get_list_main_no_table(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
@@ -181,10 +194,19 @@ class TestGetListMain:
 
         assert body['error'] == 'Unexpected error when getting list item from table.', "Get list response did not contain the correct error message."
 
+    def test_get_list_that_requestor_does_not_own(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_get_list_event['pathParameters']['id'] = "49d47a66-8825-4872-85c2-e15a12d19aed"
+
+        response = get_list.get_list_main(api_gateway_get_list_event)
+        body = json.loads(response['body'])
+
+        assert body['error'] == "Owner of List ID 49d47a66-8825-4872-85c2-e15a12d19aed did not match user id of requestor: eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c.", "Get list response did not contain the correct error message."
+
 
 def test_handler(api_gateway_get_list_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
     response = get_list.handler(api_gateway_get_list_event, None)
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
-    assert re.match('{"userId": .*}', response['body'])
+    assert re.match('{"list": .*}', response['body'])

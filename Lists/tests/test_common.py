@@ -360,3 +360,25 @@ class TestGetTableName:
         with pytest.raises(Exception) as e:
             common.get_table_name(os.environ)
         assert str(e.value) == "TABLE_NAME environment variable not set correctly.", "Exception not as expected."
+
+
+# class TestConfirmOwner:
+# class TestCheckRequestUserOwnsList:
+#     def test_check_request_user_owns_list(self, dynamodb_mock):
+#         cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+#         items = [
+#             {"PK": {'S': "LIST#12345678-abcd-abcd-123456789112"}, 'SK': {'S': "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}, 'listOwner': {'S': "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}}
+#         ]
+#
+#         result = delete.check_request_user_owns_list(cognito_identity_id, items)
+#         assert result, "User did not own list."
+#
+#     def test_check_request_user_does_not_own_list(self, dynamodb_mock):
+#         cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d123'
+#         items = [
+#             {"PK": {'S': "LIST#12345678-abcd-abcd-123456789112"}, 'SK': {'S': "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}, 'listOwner': {'S': "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}}
+#         ]
+#
+#         with pytest.raises(Exception) as e:
+#             delete.check_request_user_owns_list(cognito_identity_id, items)
+#         assert str(e.value) == "You are not the owner of this list.", "Exception not as expected."

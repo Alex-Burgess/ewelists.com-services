@@ -231,7 +231,7 @@ class TestDeleteMain:
 
     def test_delete_main_with_bad_user(self, api_gateway_delete_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_delete_event['requestContext']['identity']['cognitoIdentityId'] = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d681",
+        api_gateway_delete_event['requestContext']['identity']['cognitoIdentityId'] = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d681"
         response = delete.delete_main(api_gateway_delete_event)
         body = json.loads(response['body'])
         assert body['error'] == 'You are not the owner of this list.', "Create main response did not contain the correct error message."

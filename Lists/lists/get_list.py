@@ -3,6 +3,7 @@ import os
 import boto3
 import logging
 from lists import common
+from lists.entities import List, Product
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
@@ -25,35 +26,50 @@ def get_list_main(event):
         table_name = common.get_table_name(os.environ)
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
-        usersLists = get_list_query(table_name, identity['cognitoIdentityId'], list_id)
+        response_items = get_list_query(table_name, identity['cognitoIdentityId'], list_id)
+        common.confirm_owner(identity['cognitoIdentityId'], list_id, response_items)
+        list_object = generate_list_object(response_items)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
         logger.info("Returning response: {}".format(response))
         return response
 
-    response = common.create_response(200, json.dumps(usersLists))
+    response = common.create_response(200, json.dumps(list_object))
     return response
 
 
 def get_list_query(table_name, cognito_identity_id, list_id):
-    logger.info("Querying table")
-
-    key = {
-        'userId': {'S': cognito_identity_id},
-        'listId': {'S': list_id}
-    }
+    logger.info("Querying table {} for list ID {} owned by user ID {} .".format(table_name, cognito_identity_id, list_id))
 
     try:
-        response = dynamodb.get_item(TableName=table_name, Key=key)
+        response = dynamodb.query(
+            TableName=table_name,
+            KeyConditionExpression="PK = :PK",
+            ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
+        )
+        logger.info("Response: " + json.dumps(response))
     except ClientError as e:
         logger.info("get item response: " + json.dumps(e.response))
         raise Exception("Unexpected error when getting list item from table.")
 
-    if 'Item' not in response:
-        logger.info("List ID ({} did not exist in table for user: {})".format(list_id, cognito_identity_id))
-        raise Exception("List does not exist.")
+    if len(response['Items']) == 0:
+        logger.info("No query results for List ID {} and user: {}.".format(list_id, cognito_identity_id))
+        raise Exception("No query results for List ID {} and user: {}.".format(list_id, cognito_identity_id))
 
-    item = response['Item']
+    return response['Items']
 
-    return item
+
+def generate_list_object(response_items):
+    list = {"list": None, "products": []}
+
+    for item in response_items:
+        if item['SK']['S'].startswith("USER"):
+            logger.info("List Owner Item: {}".format(item))
+            list['list'] = List(item).get_details()
+        elif item['SK']['S'].startswith("PRODUCT"):
+            logger.info("Product Item: {}".format(item))
+            product = Product(item).get_details()
+            list['products'].append(product)
+
+    return list

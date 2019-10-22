@@ -21,6 +21,21 @@ def get_table_name(osenv):
     return table_name
 
 
+def confirm_owner(cognito_identity_id, list_id, response_items):
+    list_owner_id = None
+    for item in response_items:
+        if item['SK']['S'].startswith("USER"):
+            logger.info("List Owner Item: {}".format(item))
+            logger.info("List Owner: {}".format(item['listOwner']['S']))
+            list_owner_id = item['listOwner']['S']
+
+    if list_owner_id != cognito_identity_id:
+        logger.info("Owner of List ID {} did not match user id of requestor: {}.".format(list_id, cognito_identity_id))
+        raise Exception("Owner of List ID {} did not match user id of requestor: {}.".format(list_id, cognito_identity_id))
+
+    return True
+
+
 def get_identity(event, osenv):
     identity = {}
 
