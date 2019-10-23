@@ -16,17 +16,17 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    response = get_list_main(event)
+    response = get_shared_list_main(event)
     return response
 
 
-def get_list_main(event):
+def get_shared_list_main(event):
     try:
         table_name = common.get_table_name(os.environ)
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
         response_items = get_list_query(table_name, identity['cognitoIdentityId'], list_id)
-        common.confirm_owner(identity['cognitoIdentityId'], list_id, response_items)
+        common.confirm_list_shared_with_user(identity['cognitoIdentityId'], list_id, response_items)
         list_object = common.generate_list_object(response_items)
     except Exception as e:
         logger.error("Exception: {}".format(e))

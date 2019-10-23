@@ -1,7 +1,7 @@
 # A collection of methods that are common across all modules.
 import logging
 import re
-
+from lists.entities import List, Product
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -34,6 +34,32 @@ def confirm_owner(cognito_identity_id, list_id, response_items):
         raise Exception("Owner of List ID {} did not match user id of requestor: {}.".format(list_id, cognito_identity_id))
 
     return True
+
+
+def confirm_list_shared_with_user(cognito_identity_id, list_id, response_items):
+    shared_user = 'SHARE#' + cognito_identity_id
+    for item in response_items:
+        if item['SK']['S'] == shared_user:
+            logger.info("Confirmed list {} is shared with user {}".format(list_id, cognito_identity_id))
+            return True
+
+    logger.info("List ID {} did not have a shared item with user {}.".format(list_id, cognito_identity_id))
+    raise Exception("List ID {} did not have a shared item with user {}.".format(list_id, cognito_identity_id))
+
+
+def generate_list_object(response_items):
+    list = {"list": None, "products": []}
+
+    for item in response_items:
+        if item['SK']['S'].startswith("USER"):
+            logger.info("List Owner Item: {}".format(item))
+            list['list'] = List(item).get_details()
+        elif item['SK']['S'].startswith("PRODUCT"):
+            logger.info("Product Item: {}".format(item))
+            product = Product(item).get_details()
+            list['products'].append(product)
+
+    return list
 
 
 def get_identity(event, osenv):

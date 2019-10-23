@@ -78,7 +78,7 @@ Resources:
           POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
           POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
       Events:
-        CreateList:
+        ListAll:
           Type: Api
           Properties:
             RestApiId: !Ref Api
@@ -101,11 +101,34 @@ Resources:
           POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
           POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
       Events:
-        CreateList:
+        GetList:
           Type: Api
           Properties:
             RestApiId: !Ref Api
             Path: /lists/{id}
+            Method: GET
+
+  GetSharedListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ServiceName}-getsharedlist-${Environment}'
+      Handler: lists/get_shared_list.handler
+      Runtime: python3.6
+      MemorySize: 512
+      Timeout: 3
+      Description: Gets a list item that was shared with a user
+      Role: !GetAtt FunctionRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
+          POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
+      Events:
+        GetSharedList:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /lists/{id}/shared
             Method: GET
 
   UpdateListFunction:
@@ -124,7 +147,7 @@ Resources:
           POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
           POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
       Events:
-        CreateList:
+        UpdateList:
           Type: Api
           Properties:
             RestApiId: !Ref Api
@@ -338,6 +361,52 @@ Resources:
                   application/json: "{\n  \"statusCode\" : 200\n}\n"
                 passthroughBehavior: "when_no_match"
                 type: "mock"
+          "/lists/{id}/shared":
+            get:
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - sigv4: []
+              x-amazon-apigateway-integration:
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetSharedListFunction.Arn}/invocations'
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                type: "aws_proxy"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: !If [Prod, !Sub "'https://${DomainName}'",
+                                                                            !If [Staging, !Sub "'https://${Environment}.${DomainName}'", "'*'"]
+                                                                          ]
+                    responseTemplates:
+                      application/json: "{}\n"
+                requestTemplates:
+                  application/json: "{\n  \"statusCode\" : 200\n}\n"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
         securityDefinitions:
           sigv4:
             type: "apiKey"
@@ -371,10 +440,6 @@ Outputs:
   ApiId:
     Description: ID for the API
     Value: !Ref Api
-
-  CreateListFunctionName:
-    Description: Create List Function Name
-    Value: !Ref CreateListFunction
 
   FunctionIamRole:
     Description: Implicit IAM Role created for function

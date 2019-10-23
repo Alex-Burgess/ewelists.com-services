@@ -8,6 +8,9 @@
   "GetListFunction": {
     "TABLE_NAME": "lists-test"
   },
+  "GetSharedListFunction": {
+    "TABLE_NAME": "lists-test"
+  },
   "DeleteListFunction": {
     "TABLE_NAME": "lists-test"
   },
