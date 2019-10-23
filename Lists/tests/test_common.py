@@ -276,6 +276,22 @@ def api_gateway_noid_event():
     }
 
 
+@pytest.fixture()
+def response_items():
+    response_items = [
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "PENDING#new.user@gmail.com"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "email": {"S": "new.user@gmail.com"}, "title": {"S": "Oscar's 1st Birthday"}},
+        {"quantity": {"N": "1"}, "reserved": {"N": "0"}, "SK": {"S": "PRODUCT#1009"}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}},
+        {"quantity": {"N": "2"}, "reserved": {"N": "1"}, "SK": {"S": "PRODUCT#1010"}, "reservedDetails": {"M": {"name": {"S": "Azara-Jane Higgins"}, "userId": {"S": "eu-west-1:6789250a-0fb0-4b32-9842-041c69be6789"}, "reserved": {"N": "1"}, "timestamp": {"S": "2018-11-01T10:00:00"}}}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}},
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "userId": {"S": "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "title": {"S": "Oscar's 1st Birthday"}},
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "userId": {"S": "eu-west-1:1234250a-0fb0-4b32-9842-041c69be1234"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#eu-west-1:1234250a-0fb0-4b32-9842-041c69be1234"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "title": {"S": "Oscar's 1st Birthday"}},
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "userId": {"S": "eu-west-1:6789250a-0fb0-4b32-9842-041c69be6789"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#eu-west-1:6789250a-0fb0-4b32-9842-041c69be6789"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "title": {"S": "Oscar's 1st Birthday"}},
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "userId": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "title": {"S": "Oscar's 1st Birthday"}},
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "userId": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "USER#eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "title": {"S": "Oscar's 1st Birthday"}}
+    ]
+
+    return response_items
+
+
 def test_create_response():
     response = common.create_response(200, 'Success message')
 
@@ -362,23 +378,50 @@ class TestGetTableName:
         assert str(e.value) == "TABLE_NAME environment variable not set correctly.", "Exception not as expected."
 
 
-# class TestConfirmOwner:
-# class TestCheckRequestUserOwnsList:
-#     def test_check_request_user_owns_list(self, dynamodb_mock):
-#         cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
-#         items = [
-#             {"PK": {'S': "LIST#12345678-abcd-abcd-123456789112"}, 'SK': {'S': "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}, 'listOwner': {'S': "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}}
-#         ]
-#
-#         result = delete.check_request_user_owns_list(cognito_identity_id, items)
-#         assert result, "User did not own list."
-#
-#     def test_check_request_user_does_not_own_list(self, dynamodb_mock):
-#         cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d123'
-#         items = [
-#             {"PK": {'S': "LIST#12345678-abcd-abcd-123456789112"}, 'SK': {'S': "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}, 'listOwner': {'S': "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}}
-#         ]
-#
-#         with pytest.raises(Exception) as e:
-#             delete.check_request_user_owns_list(cognito_identity_id, items)
-#         assert str(e.value) == "You are not the owner of this list.", "Exception not as expected."
+class TestConfirmOwner:
+    def test_confirm_owner(self, response_items):
+        cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04'
+        list_id = '76a2fe57-9fac-4a0d-9225-1942949889ba'
+        result = common.confirm_owner(cognito_identity_id, list_id, response_items)
+        assert result, "List should be owned by user."
+
+    def test_confirm_not_owner(self, response_items):
+        cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03'
+        list_id = '76a2fe57-9fac-4a0d-9225-1942949889ba'
+        with pytest.raises(Exception) as e:
+            common.confirm_owner(cognito_identity_id, list_id, response_items)
+        assert str(e.value) == "Owner of List ID 76a2fe57-9fac-4a0d-9225-1942949889ba did not match user id of requestor: eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03.", "Exception not thrown for list not being owned by user."
+
+
+class TestConfirmListSharedWithUser:
+    def test_confirm_list_shared_with_user(self, response_items):
+        cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04'
+        list_id = '76a2fe57-9fac-4a0d-9225-1942949889ba'
+        result = common.confirm_list_shared_with_user(cognito_identity_id, list_id, response_items)
+        assert result, "List should be shared with user."
+
+    def test_confirm_list_not_shared_with_user(self, response_items):
+        cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03'
+        list_id = '76a2fe57-9fac-4a0d-9225-1942949889ba'
+        with pytest.raises(Exception) as e:
+            common.confirm_list_shared_with_user(cognito_identity_id, list_id, response_items)
+        assert str(e.value) == "List ID 76a2fe57-9fac-4a0d-9225-1942949889ba did not have a shared item with user eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03.", "Exception not thrown for list not being shared with user."
+
+
+class TestGenerateListObject:
+    def test_generate_list_object(self, response_items):
+        items = common.generate_list_object(response_items)
+        assert items['list']['listId'] == "76a2fe57-9fac-4a0d-9225-1942949889ba", "Get list response did not contain a listId."
+        assert items['list']['title'] == "Oscar's 1st Birthday", "Get list response did not contain a title."
+        assert items['list']['description'] == "A gift list for Oscars birthday.", "Get list response did not contain a description."
+        assert items['list']['occasion'] == "Birthday", "Get list response did not contain an occasion."
+
+        assert len(items['products']) == 2, "Number of products was not 2."
+
+        assert items['products'][0]['productId'] == "PRODUCT#1009", "Product ID was not correct."
+        assert items['products'][0]['quantity'] == 1, "Quantity of product was not correct."
+        assert items['products'][0]['reserved'] == 0, "Reserved quantity of product was not correct."
+
+        assert items['products'][1]['productId'] == "PRODUCT#1010", "Product ID was not correct."
+        assert items['products'][1]['quantity'] == 2, "Quantity of product was not correct."
+        assert items['products'][1]['reserved'] == 1, "Reserved quantity of product was not correct."

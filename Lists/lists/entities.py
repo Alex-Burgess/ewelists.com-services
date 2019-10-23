@@ -45,7 +45,7 @@ class Product:
 
     def __init__(self, item):
         self.listId = item.get('PK').get('S')
-        self.productId = item.get('SK').get('S')
+        self.productId = item.get('SK').get('S').split("#")[1]
         self.quantity = item.get('quantity').get('N')
         self.reserved = item.get('reserved').get('N')
 
