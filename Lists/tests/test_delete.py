@@ -208,7 +208,7 @@ class TestCheckRequestUserOwnsList:
 
         with pytest.raises(Exception) as e:
             delete.check_request_user_owns_list(cognito_identity_id, items)
-        assert str(e.value) == "You are not the owner of this list.", "Exception not as expected."
+        assert str(e.value) == "User is not able to delete this list.", "Exception not as expected."
 
 
 class TestDeleteMain:
@@ -234,7 +234,15 @@ class TestDeleteMain:
         api_gateway_delete_event['requestContext']['identity']['cognitoIdentityId'] = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d681"
         response = delete.delete_main(api_gateway_delete_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'You are not the owner of this list.', "Create main response did not contain the correct error message."
+        assert body['error'] == 'User is not able to delete this list.', "Create main response did not contain the correct error message."
+
+    def test_delete_main_with_bad_list(self, api_gateway_delete_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_delete_event['pathParameters']['id'] = "12345678-nolist"
+
+        response = delete.delete_main(api_gateway_delete_event)
+        body = json.loads(response['body'])
+        assert body['error'] == 'No list exists with this ID.', "Create main response did not contain the correct error message."
 
 
 def test_handler(api_gateway_delete_event, monkeypatch, dynamodb_mock):

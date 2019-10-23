@@ -86,6 +86,10 @@ def get_items_associated_with_list(table_name, list_id):
         logger.info("Exception: " + str(e))
         raise Exception("Unexpected error when getting lists from table.")
 
+    if len(response['Items']) == 0:
+        logger.info("No items for the list {} were found.".format(list_id))
+        raise Exception("No list exists with this ID.")
+
     return response['Items']
 
 
@@ -98,6 +102,6 @@ def check_request_user_owns_list(cognito_identity_id, items):
             list_owner_item = item['listOwner']['S']
 
     if list_owner_item != cognito_identity_id:
-        raise Exception("You are not the owner of this list.")
+        raise Exception("User is not able to delete this list.")
 
     return True
