@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "87988cfe-109f-4689-a8cd-66711e712201",
-		"name": "Ewelists (Test)",
+		"name": "Ewelists (Lists)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -34,7 +34,7 @@
 							"pm.test(\"A list Id should be returned\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    var listId = jsonData['listId'];",
-							"    pm.expect(listId.length).to.eql(8);",
+							"    pm.expect(listId.length).to.eql(36);",
 							"});",
 							"",
 							"pm.test(\"Response message should be created\", function () {",
@@ -81,17 +81,17 @@
 					"raw": "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\"\n}"
 				},
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists"
 					]
 				},
@@ -128,7 +128,7 @@
 							"pm.test(\"A list Id should be returned\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    var listId = jsonData['listId'];",
-							"    pm.expect(listId.length).to.eql(8);",
+							"    pm.expect(listId.length).to.eql(36);",
 							"});",
 							"",
 							"pm.test(\"Response message should be created\", function () {",
@@ -175,17 +175,17 @@
 					"raw": "{\n    \"title\": \"My Christmas List\",\n    \"description\": \"A gift wish list for Christmas.\",\n    \"occasion\": \"Christmas\"\n}"
 				},
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists"
 					]
 				},
@@ -257,17 +257,17 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists"
 					]
 				},
@@ -295,26 +295,12 @@
 							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
 							"});",
 							"",
-							"pm.test(\"The returned object should contain the correct attributes\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var keys = Object.keys(jsonData)",
-							"    pm.expect(keys.length).to.eql(7);",
-							"});",
-							"",
-							"pm.test(\"Check that returned attributes contain the values we expect\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var listId = jsonData['listId'];",
-							"    pm.expect(listId.S.length).to.eql(8);",
-							"    ",
-							"    var createdAt = jsonData['createdAt'];",
-							"    pm.expect(createdAt.N.length).to.eql(10);",
-							"",
-							"    pm.expect(jsonData['occasion']['S']).to.eql(\"Birthday\");",
-							"    pm.expect(jsonData['userId']['S']).to.eql(\"eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee\");",
-							"    pm.expect(jsonData['description']['S']).to.eql(\"A gift wish list for my birthday.\");",
-							"    pm.expect(jsonData['userPoolSub']['S']).to.eql(\"ae617d08-1127-4066-87ec-b6df345793b8\");",
-							"    pm.expect(jsonData['title']['S']).to.eql(\"My Birthday List\");",
-							"",
+							"pm.test(\"The returned object should contain the correct list details\", function () {",
+							"    var list_obj = pm.response.json();",
+							"    pm.expect(list_obj.list.listId.length).to.eql(36);",
+							"    pm.expect(list_obj.list.title).to.eql(\"My Birthday List\");",
+							"    pm.expect(list_obj.list.description).to.eql(\"A gift wish list for my birthday.\");",
+							"    pm.expect(list_obj.list.occasion).to.eql(\"Birthday\");",
 							"});",
 							"",
 							""
@@ -362,19 +348,112 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/{{list_id}}",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists",
 						"{{list_id}}"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
+			"name": "get shared list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"The returned object should contain the correct list details\", function () {",
+							"    var list_obj = pm.response.json();",
+							"    pm.expect(list_obj.list.listId.length).to.eql(36);",
+							"    pm.expect(list_obj.list.title).to.eql(\"My Birthday List\");",
+							"    pm.expect(list_obj.list.description).to.eql(\"A gift wish list for my birthday.\");",
+							"    pm.expect(list_obj.list.occasion).to.eql(\"Birthday\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
+						"exec": [
+							"pm.environment.get(\"list_id\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/shared",
+					"protocol": "https",
+					"host": [
+						"{{url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"lists",
+						"{{list_id}}",
+						"shared"
 					]
 				},
 				"description": "Create list"
@@ -404,7 +483,7 @@
 							"pm.test(\"Response message should exist\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    var message = jsonData['error'];",
-							"    pm.expect(message).to.eql('List does not exist.');",
+							"    pm.expect(message).to.eql('No query results for List ID 1234abcd and user: eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee.');",
 							"});",
 							"",
 							""
@@ -452,17 +531,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/1234abcd",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/1234abcd",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists",
 						"1234abcd"
 					]
@@ -472,7 +551,7 @@
 			"response": []
 		},
 		{
-			"name": "list",
+			"name": "lists",
 			"event": [
 				{
 					"listen": "test",
@@ -491,20 +570,33 @@
 							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
 							"});",
 							"",
-							"pm.test(\"The correct number of list objects should be returned\", function () {",
+							"pm.test(\"A user object should exist\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData['lists'].length).to.eql(2);",
+							"    pm.expect(jsonData['user']['name']).to.eql(\"Api User\");",
+							"    pm.expect(jsonData['user']['email']).to.eql(\"burgess.alexander+apitestuser@gmail.com\");",
 							"});",
 							"",
-							"",
-							"pm.test(\"Each list object should contain four attributes\", function () {",
+							"pm.test(\"The user should own 2 lists\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    var list1keys = Object.keys(jsonData['lists'][0])",
-							"    pm.expect(list1keys.length).to.eql(4);",
+							"    pm.expect(jsonData['owned'].length).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"The user should have 0 lists shared with them\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData['shared'].length).to.eql(0);",
+							"});",
+							"",
+							"// pm.test(\"Each list object should contain four attributes\", function () {",
+							"//     var jsonData = pm.response.json();",
+							"//     var list1keys = Object.keys(jsonData['owned'][0])",
+							"//     pm.expect(list1keys.length).to.eql(4);",
 							"    ",
-							"    var list2keys = Object.keys(jsonData['lists'][1])",
-							"    pm.expect(list2keys.length).to.eql(4);",
-							"});",
+							"//     var list2keys = Object.keys(jsonData['shared'][0])",
+							"//     pm.expect(list2keys.length).to.eql(4);",
+							"    ",
+							"//     var list3keys = Object.keys(jsonData['shared'][1])",
+							"//     pm.expect(list3keys.length).to.eql(4);",
+							"// });",
 							"",
 							""
 						],
@@ -541,17 +633,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists"
 					]
 				},
@@ -641,17 +733,17 @@
 					"raw": "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\"\n}"
 				},
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/{{list_id}}",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists",
 						"{{list_id}}"
 					],
@@ -754,17 +846,17 @@
 					"raw": "{\n    \"title\": \"My Updated Title2\",\n    \"description\": \"Updated description for the list.\",\n    \"occasion\": \"Christmas\"\n}"
 				},
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/{{list_id}}",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists",
 						"{{list_id}}"
 					],
@@ -811,10 +903,16 @@
 							"    pm.expect(deletedBool).to.eql(true);",
 							"});",
 							"",
+							"pm.test(\"Response should have a delete count\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var count = jsonData['count'];",
+							"    pm.expect(count).to.eql(2);",
+							"});",
+							"",
 							"pm.test(\"Response message should confirm delete successfull\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    var message = jsonData['message'];",
-							"    pm.expect(message).to.include(\"Delete request successfull for List ID\");",
+							"    pm.expect(message).to.include(\"Deleted all items\");",
 							"});",
 							""
 						],
@@ -861,17 +959,17 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/{{list_id}}",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists",
 						"{{list_id}}"
 					]
@@ -906,10 +1004,16 @@
 							"    pm.expect(deletedBool).to.eql(true);",
 							"});",
 							"",
+							"pm.test(\"Response should have a delete count\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var count = jsonData['count'];",
+							"    pm.expect(count).to.eql(2);",
+							"});",
+							"",
 							"pm.test(\"Response message should confirm delete successfull\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    var message = jsonData['message'];",
-							"    pm.expect(message).to.include(\"Delete request successfull for List ID\");",
+							"    pm.expect(message).to.include(\"Deleted all items\");",
 							"});",
 							""
 						],
@@ -956,17 +1060,17 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/{{list_id2}}",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id2}}",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists",
 						"{{list_id2}}"
 					]
@@ -976,7 +1080,7 @@
 			"response": []
 		},
 		{
-			"name": "delete item not in table",
+			"name": "delete a list that does not exist",
 			"event": [
 				{
 					"listen": "test",
@@ -998,7 +1102,7 @@
 							"pm.test(\"Response message should exist\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    var message = jsonData['error'];",
-							"    pm.expect(message).to.eql('List does not exist.');",
+							"    pm.expect(message).to.eql('No list exists with this ID.');",
 							"});",
 							""
 						],
@@ -1035,19 +1139,98 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists/1234abcd",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/1234abcd",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists",
 						"1234abcd"
+					]
+				},
+				"description": "Delete request for an item not in the table.  Should fail with an appropriate message."
+			},
+			"response": []
+		},
+		{
+			"name": "delete a list not owned by user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is 500\", function () {",
+							"    pm.response.to.have.status(500);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     pm.response.to.be.error;",
+							"     ",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"Response message should exist\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var message = jsonData['error'];",
+							"    pm.expect(message).to.eql('User is not able to delete this list.');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/76a2fe57-9fac-4a0d-9225-1942949889ba",
+					"protocol": "https",
+					"host": [
+						"{{url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"lists",
+						"76a2fe57-9fac-4a0d-9225-1942949889ba"
 					]
 				},
 				"description": "Delete request for an item not in the table.  Should fail with an appropriate message."
@@ -1076,7 +1259,8 @@
 							"",
 							"pm.test(\"The correct number of list objects should be returned\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData['lists'].length).to.eql(0);",
+							"    pm.expect(jsonData['owned'].length).to.eql(0);",
+							"    pm.expect(jsonData['shared'].length).to.eql(0);",
 							"});",
 							"",
 							""
@@ -1114,17 +1298,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com/test/lists",
+					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
 					"protocol": "https",
 					"host": [
-						"4sdcvv0n2e",
+						"{{url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
 						"com"
 					],
 					"path": [
-						"test",
+						"{{env}}",
 						"lists"
 					]
 				},
