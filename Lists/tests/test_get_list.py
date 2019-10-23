@@ -174,15 +174,15 @@ class TestGetListMain:
         assert body['list']['description'] == "A gift list for Api Childs birthday.", "Get list response did not contain a description."
         assert body['list']['occasion'] == "Birthday", "Get list response did not contain an occasion."
         assert len(body['products']) == 3, "Get list response did not contain correct number of products."
-        assert body['products'][0]['productId'] == "PRODUCT#1000", "Product ID was not correct."
+        assert body['products'][0]['productId'] == "1000", "Product ID was not correct."
         assert body['products'][0]['quantity'] == 1, "Quantity of product was not correct."
         assert body['products'][0]['reserved'] == 0, "Reserved quantity of product was not correct."
 
-        assert body['products'][1]['productId'] == "PRODUCT#1001", "Product ID was not correct."
+        assert body['products'][1]['productId'] == "1001", "Product ID was not correct."
         assert body['products'][1]['quantity'] == 2, "Quantity of product was not correct."
         assert body['products'][1]['reserved'] == 0, "Reserved quantity of product was not correct."
 
-        assert body['products'][2]['productId'] == "PRODUCT#1002", "Product ID was not correct."
+        assert body['products'][2]['productId'] == "1002", "Product ID was not correct."
         assert body['products'][2]['quantity'] == 2, "Quantity of product was not correct."
         assert body['products'][2]['reserved'] == 1, "Reserved quantity of product was not correct."
 

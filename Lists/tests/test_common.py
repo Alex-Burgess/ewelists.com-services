@@ -418,10 +418,10 @@ class TestGenerateListObject:
 
         assert len(items['products']) == 2, "Number of products was not 2."
 
-        assert items['products'][0]['productId'] == "PRODUCT#1009", "Product ID was not correct."
+        assert items['products'][0]['productId'] == "1009", "Product ID was not correct."
         assert items['products'][0]['quantity'] == 1, "Quantity of product was not correct."
         assert items['products'][0]['reserved'] == 0, "Reserved quantity of product was not correct."
 
-        assert items['products'][1]['productId'] == "PRODUCT#1010", "Product ID was not correct."
+        assert items['products'][1]['productId'] == "1010", "Product ID was not correct."
         assert items['products'][1]['quantity'] == 2, "Quantity of product was not correct."
         assert items['products'][1]['reserved'] == 1, "Reserved quantity of product was not correct."
