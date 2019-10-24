@@ -28,7 +28,7 @@ def delete_main(event):
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
         items = get_items_associated_with_list(table_name, list_id)
-        check_request_user_owns_list(identity['cognitoIdentityId'], items)
+        common.confirm_owner(identity['cognitoIdentityId'], list_id, items)
         message = delete_items(table_name, identity['cognitoIdentityId'], list_id, items)
     except Exception as e:
         logger.error("Exception: {}".format(e))
@@ -91,17 +91,3 @@ def get_items_associated_with_list(table_name, list_id):
         raise Exception("No list exists with this ID.")
 
     return response['Items']
-
-
-def check_request_user_owns_list(cognito_identity_id, items):
-    list_owner_item = None
-    for item in items:
-        if item['SK']['S'].startswith("USER"):
-            logger.info("List Owner Item: {}".format(item))
-            logger.info("List Owner: {}".format(item['listOwner']['S']))
-            list_owner_item = item['listOwner']['S']
-
-    if list_owner_item != cognito_identity_id:
-        raise Exception("User is not able to delete this list.")
-
-    return True

@@ -25,7 +25,9 @@ def update_list_main(event):
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
         attribute_details = get_attribute_details(event)
-        updated_attributes = update_list(table_name, identity['cognitoIdentityId'], list_id, attribute_details)
+        items = get_items_to_update(table_name, list_id)
+        common.confirm_owner(identity['cognitoIdentityId'], list_id, items)
+        updated_attributes = update_list(table_name, items, attribute_details)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -62,31 +64,70 @@ def get_attribute_details(event):
     return update_attributes
 
 
-def update_list(table_name, cognito_identity_id, list_id, update_attributes):
-    logger.info("Updating item in table with attribute values: " + json.dumps(update_attributes))
-
-    key = {
-        'userId': {'S': cognito_identity_id},
-        'listId': {'S': list_id}
-    }
+def get_items_to_update(table_name, list_id):
+    logger.info("Querying table {} to find all items associated with list id {}".format(table_name, list_id))
 
     try:
-        response = dynamodb.update_item(
+        response = dynamodb.query(
             TableName=table_name,
-            Key=key,
-            UpdateExpression="set title = :t, description = :d, occasion = :o",
-            ExpressionAttributeValues={
-                ':t': {'S': update_attributes["title"]},
-                ':d': {'S': update_attributes["description"]},
-                ':o': {'S': update_attributes["occasion"]}
-            },
-            ReturnValues="UPDATED_NEW"
+            KeyConditionExpression="PK = :PK",
+            ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
         )
-
+        logger.info("All items in query response. ({})".format(response['Items']))
     except Exception as e:
-        logger.info("update item exception: " + str(e))
-        raise Exception("Unexpected error when updating the list item.")
+        logger.info("Exception: " + str(e))
+        raise Exception("Unexpected error when getting lists from table.")
 
-    logger.info("update item response: " + json.dumps(response))
+    if len(response['Items']) == 0:
+        logger.info("No items for the list {} were found.".format(list_id))
+        raise Exception("No list exists with this ID.")
 
-    return response['Attributes']
+    items = []
+    for item in response['Items']:
+        if item['SK']['S'].startswith("USER") or item['SK']['S'].startswith("SHARE") or item['SK']['S'].startswith("PENDING"):
+            logger.info("Adding item to list of items to update: {}".format(item))
+            items.append(item)
+
+    return items
+
+
+def update_list(table_name, items, new_attribute_values):
+    update_results = []
+    for item in items:
+        logger.info("Updating item with PK ({}), SK ({}) with attribute values: {}".format(item['PK']['S'], item['SK']['S'], json.dumps(new_attribute_values)))
+
+        key = {
+            'PK': {'S': item['PK']['S']},
+            'SK': {'S': item['SK']['S']}
+        }
+
+        try:
+            response = dynamodb.update_item(
+                TableName=table_name,
+                Key=key,
+                UpdateExpression="set title = :t, description = :d, occasion = :o",
+                ExpressionAttributeValues={
+                    ':t': {'S': new_attribute_values["title"]},
+                    ':d': {'S': new_attribute_values["description"]},
+                    ':o': {'S': new_attribute_values["occasion"]}
+                },
+                ReturnValues="UPDATED_NEW"
+            )
+
+        except Exception as e:
+            logger.info("update item exception: " + str(e))
+            raise Exception("Unexpected error when updating the list item.")
+
+        logger.info("Attributes updated: " + json.dumps(response['Attributes']))
+
+        updates = {}
+        for attribute in response['Attributes']:
+            updates[attribute] = response['Attributes'][attribute]['S']
+
+        update_results.append({
+            'PK': item['PK']['S'],
+            'SK': item['SK']['S'],
+            'updates': updates
+        })
+
+    return update_results

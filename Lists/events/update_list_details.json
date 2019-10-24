@@ -1,8 +1,8 @@
 {
     "resource": "/lists/{id}",
-    "path": "/lists/cf19fb62",
+    "path": "/lists/a37ad504-145e-4944-9c5f-92014e56d617",
     "httpMethod": "PUT",
-    "body": "{\n    \"attribute_name\": \"title\",\n    \"attribute_value\": \"My new title\"\n}",
+    "body": "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"Updated description for the list.\",\n    \"occasion\": \"Christmas\"\n}",
     "headers": {
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate",
@@ -29,7 +29,7 @@
     "queryStringParameters": null,
     "multiValueQueryStringParameters": null,
     "pathParameters": {
-        "id": "cf19fb62"
+        "id": "a37ad504-145e-4944-9c5f-92014e56d617"
     },
     "stageVariables": null,
     "requestContext": {
@@ -38,7 +38,7 @@
         "httpMethod": "PUT",
         "extendedRequestId": "BMwexGf4DoEFoJA=",
         "requestTime": "07/Oct/2019:16:00:43 +0000",
-        "path": "/test/lists/cf19fb62",
+        "path": "/test/lists/a37ad504-145e-4944-9c5f-92014e56d617",
         "accountId": "123456789012",
         "protocol": "HTTP/1.1",
         "stage": "test",

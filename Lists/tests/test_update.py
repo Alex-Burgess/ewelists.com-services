@@ -20,7 +20,7 @@ def api_gateway_update_event():
 
     return {
         "resource": "/lists/{id}",
-        "path": "/lists/1234abcd",
+        "path": "/lists/76a2fe57-9fac-4a0d-9225-1942949889ba",
         "httpMethod": "PUT",
         "body": "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"Updated description for the list.\",\n    \"occasion\": \"Christmas\"\n}",
         "headers": {
@@ -49,7 +49,7 @@ def api_gateway_update_event():
         "queryStringParameters": "null",
         "multiValueQueryStringParameters": "null",
         "pathParameters": {
-            "id": "1234abcd"
+            "id": "76a2fe57-9fac-4a0d-9225-1942949889ba"
         },
         "stageVariables": "null",
         "requestContext": {
@@ -58,7 +58,7 @@ def api_gateway_update_event():
             "httpMethod": "PUT",
             "extendedRequestId": "BMwexGf4DoEFoJA=",
             "requestTime": "07/Oct/2019:16:00:43 +0000",
-            "path": "/test/lists/1234abcd",
+            "path": "/test/lists/76a2fe57-9fac-4a0d-9225-1942949889ba",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
@@ -99,21 +99,21 @@ def dynamodb_mock():
             TableName=table_name,
             KeySchema=[
                 {
-                    'AttributeName': 'userId',
+                    'AttributeName': 'PK',
                     'KeyType': 'HASH'
                 },
                 {
-                    'AttributeName': 'listId',
+                    'AttributeName': 'SK',
                     'KeyType': 'RANGE'
                 }
             ],
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'userId',
+                    'AttributeName': 'PK',
                     'AttributeType': 'S'
                 },
                 {
-                    'AttributeName': 'listId',
+                    'AttributeName': 'SK',
                     'AttributeType': 'S'
                 }
             ],
@@ -123,17 +123,19 @@ def dynamodb_mock():
             }
         )
 
-    item = {
-        'userId': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c',
-        'userPoolSub': '42cf26f5-407c-47cf-bcb6-f70cd63ac119',
-        'listId': '1234abcd',
-        'title': 'My Test List',
-        'description': 'Test description for the list.',
-        'occasion': 'Birthday',
-        'createdAt': 1570552083
-    }
+    items = [
+        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "email": "test.user@gmail.com", "name": "Test User", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"},
+        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684"},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PENDING#new.user@gmail.com", "email": "new.user@gmail.com", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "userId": "eu-west-1:1234250a-0fb0-4b32-9842-041c69be1234", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PRODUCT#1009", "quantity": 1, "reserved": 0},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PRODUCT#1010", "quantity": 2, "reserved": 1, "reservedDetails": {"userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "name": "Test User2", "reserved": 1, "timestamp": "2018-11-01T10:00:00"}}
+    ]
 
-    table.put_item(TableName=table_name, Item=item)
+    for item in items:
+        table.put_item(TableName=table_name, Item=item)
 
     yield
     # teardown: stop moto server
@@ -171,59 +173,66 @@ class TestGetAttributeDetails:
         assert str(e.value) == "API Event did not contain a valid body.", "Exception not as expected."
 
 
+class TestGetItemsToUpdate:
+    def test_get_items_to_update(self, dynamodb_mock):
+        items = update.get_items_to_update('lists-unittest', '76a2fe57-9fac-4a0d-9225-1942949889ba')
+        assert len(items) == 4
+        assert items[0]['SK']['S'] == 'PENDING#new.user@gmail.com'
+        assert items[1]['SK']['S'] == 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684'
+        assert items[2]['SK']['S'] == 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        assert items[3]['SK']['S'] == 'USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+
+
 class TestUpdateList:
     def test_update_list_with_one_attribute(self, api_gateway_update_event, dynamodb_mock):
-        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
-        list_id = "1234abcd"
-        api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"Test description for the list.\",\n    \"occasion\": \"Birthday\"\n}"
-
+        api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"A gift list for Oscars birthday.\",\n    \"occasion\": \"Birthday\"\n}"
         update_attributes = json.loads(api_gateway_update_event['body'])
-        response = update.update_list('lists-unittest', cognito_identity_id, list_id, update_attributes)
+        items = [
+            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'userId': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}},
+            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'userId': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}}
+        ]
 
-        assert len(response) == 1, "Update response did not contain expected number of updated attributes."
-        assert response['title']['S'] == "My Updated Title", "Update response did not contain expected value for title."
+        updates = update.update_list('lists-unittest', items, update_attributes)
 
-    def test_update_list_with_wrong_table(self, api_gateway_update_event, dynamodb_mock):
-        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
-        list_id = "1234abcd"
-        api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\"\n}"
-        update_attributes = json.loads(api_gateway_update_event['body'])
-
-        with pytest.raises(Exception) as e:
-            update.update_list('lists-unittet', cognito_identity_id, list_id, update_attributes)
-        assert str(e.value) == "Unexpected error when updating the list item.", "Exception not as expected."
+        assert len(updates) == 2, "Update response did not contain expected number of updated attributes."
+        assert updates[0]['SK'] == 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        assert updates[0]['updates'] == {'title': 'My Updated Title'}
+        assert updates[1]['SK'] == 'USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        assert updates[1]['updates'] == {'title': 'My Updated Title'}
 
     def test_update_list_with_multiple_attributes(self, api_gateway_update_event, dynamodb_mock):
-        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
-        list_id = "1234abcd"
+        api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"Updated.\",\n    \"occasion\": \"Christmas\"\n}"
         update_attributes = json.loads(api_gateway_update_event['body'])
-        response = update.update_list('lists-unittest', cognito_identity_id, list_id, update_attributes)
+        items = [
+            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'userId': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}},
+            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'userId': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}}
+        ]
 
-        assert len(response) == 3, "Update response did not contain expected number of updated attributes."
-        assert response['title']['S'] == "My Updated Title", "Update response did not contain expected value for title."
+        updates = update.update_list('lists-unittest', items, update_attributes)
+
+        assert len(updates) == 2, "Update response did not contain expected number of updated attributes."
+        assert updates[0]['SK'] == 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        assert updates[0]['updates'] == {'title': 'My Updated Title', 'description': 'Updated.', 'occasion': 'Christmas'}
+        assert updates[1]['SK'] == 'USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        assert updates[1]['updates'] == {'title': 'My Updated Title', 'description': 'Updated.', 'occasion': 'Christmas'}
 
 
 class TestUpdateListMain:
-    def test_update_list_main(self, api_gateway_update_event, monkeypatch, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        response = update.update_list_main(api_gateway_update_event)
-        body = json.loads(response['body'])
-
-        expected_body = {"title": {"S": "My Updated Title"}, "description": {"S": "Updated description for the list."}, "occasion": {"S": "Christmas"}}
-
-        assert len(body.keys()) == 3, "Update main response did not contain expected number of updated attributes."
-        assert body == expected_body, "Updated attributes from response were not as expected."
-
     def test_update_list_main_with_just_title(self, api_gateway_update_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"Test description for the list.\",\n    \"occasion\": \"Birthday\"\n}"
+        api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"A gift list for Oscars birthday.\",\n    \"occasion\": \"Birthday\"\n}"
         response = update.update_list_main(api_gateway_update_event)
         body = json.loads(response['body'])
 
-        expected_body = {"title": {"S": "My Updated Title"}}
+        expected_body = [
+            {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PENDING#new.user@gmail.com", "updates": {"title": "My Updated Title"}},
+            {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "updates": {"title": "My Updated Title"}},
+            {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "updates": {"title": "My Updated Title"}},
+            {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "updates": {"title": "My Updated Title"}}
+        ]
 
-        assert len(body.keys()) == 1, "Update main response did not contain expected number of updated attributes."
-        assert body == expected_body, "Updated attributes from response were not as expected."
+        assert len(body) == 4, "Update main response did not contain expected number of updated items."
+        assert body == expected_body, "Updates from response were not as expected."
 
     def test_update_list_main_with_empty_body(self, monkeypatch, api_gateway_update_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
@@ -232,10 +241,44 @@ class TestUpdateListMain:
         body = json.loads(response['body'])
         assert body['error'] == 'API Event Body was empty.', "Update main response did not contain the correct error message."
 
+    def test_update_list_that_does_not_exist(self, monkeypatch, api_gateway_update_event, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_update_event['pathParameters']['id'] = "76a2fe57-9fac-4a0d-9225-1942949889ba-missing"
+
+        response = update.update_list_main(api_gateway_update_event)
+        body = json.loads(response['body'])
+        assert body['error'] == 'No list exists with this ID.', "Update main response did not contain the correct error message."
+
+    def test_update_list_with_bad_table(self, monkeypatch, api_gateway_update_event, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
+        api_gateway_update_event['pathParameters']['id'] = "76a2fe57-9fac-4a0d-9225-1942949889ba-missing"
+
+        response = update.update_list_main(api_gateway_update_event)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Unexpected error when getting lists from table.', "Update main response did not contain the correct error message."
+
+    def test_update_list_with_requestor_not_owner(self, monkeypatch, api_gateway_update_event, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_update_event['requestContext']['identity']['cognitoIdentityId'] = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c-diff"
+
+        response = update.update_list_main(api_gateway_update_event)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Owner of List ID 76a2fe57-9fac-4a0d-9225-1942949889ba did not match user id of requestor: eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c-diff.', "Update main response did not contain the correct error message."
+
 
 def test_handler(api_gateway_update_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
     response = update.handler(api_gateway_update_event, None)
+    body = json.loads(response['body'])
+
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
-    assert re.match('{"title": .*}', response['body'])
+
+    expected_body = [
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PENDING#new.user@gmail.com", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}}
+    ]
+
+    assert body == expected_body

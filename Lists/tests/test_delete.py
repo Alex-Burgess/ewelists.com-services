@@ -190,27 +190,6 @@ class TestGetItemsAssociatedWithList:
         assert len(items) == 6, "Number of items deleted was not as expected."
 
 
-class TestCheckRequestUserOwnsList:
-    def test_check_request_user_owns_list(self, dynamodb_mock):
-        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
-        items = [
-            {"PK": {'S': "LIST#12345678-abcd-abcd-123456789112"}, 'SK': {'S': "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}, 'listOwner': {'S': "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}}
-        ]
-
-        result = delete.check_request_user_owns_list(cognito_identity_id, items)
-        assert result, "User did not own list."
-
-    def test_check_request_user_does_not_own_list(self, dynamodb_mock):
-        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d123'
-        items = [
-            {"PK": {'S': "LIST#12345678-abcd-abcd-123456789112"}, 'SK': {'S': "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}, 'listOwner': {'S': "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"}}
-        ]
-
-        with pytest.raises(Exception) as e:
-            delete.check_request_user_owns_list(cognito_identity_id, items)
-        assert str(e.value) == "User is not able to delete this list.", "Exception not as expected."
-
-
 class TestDeleteMain:
     def test_delete_main(self, api_gateway_delete_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
@@ -234,7 +213,7 @@ class TestDeleteMain:
         api_gateway_delete_event['requestContext']['identity']['cognitoIdentityId'] = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d681"
         response = delete.delete_main(api_gateway_delete_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'User is not able to delete this list.', "Create main response did not contain the correct error message."
+        assert body['error'] == 'Owner of List ID 12345678-abcd-abcd-123456789112 did not match user id of requestor: eu-west-1:db9476fd-de77-4977-839f-4f943ff5d681.', "Create main response did not contain the correct error message."
 
     def test_delete_main_with_bad_list(self, api_gateway_delete_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
