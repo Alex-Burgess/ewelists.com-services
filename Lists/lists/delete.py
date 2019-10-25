@@ -28,8 +28,8 @@ def delete_main(event):
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
         items = get_items_associated_with_list(table_name, list_id)
-        common.confirm_owner(identity['cognitoIdentityId'], list_id, items)
-        message = delete_items(table_name, identity['cognitoIdentityId'], list_id, items)
+        common.confirm_owner(identity['userPoolSub'], list_id, items)
+        message = delete_items(table_name, identity['userPoolSub'], list_id, items)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))

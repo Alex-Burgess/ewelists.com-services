@@ -2,15 +2,16 @@ class User:
 
     def __init__(self, item):
         self.user_id = item.get('userId').get('S')
-        self.name = item.get('name').get('S')
+        # self.name = item.get('name').get('S')
         self.email = item.get('email').get('S')
 
     def __repr__(self):
-        return "User<{} -- {} -- {}>".format(self.username, self.name, self.email)
+        # return "User<{} -- {} -- {}>".format(self.username, self.name, self.email)
+        return "User<{} -- {} -- {}>".format(self.username, self.email)
 
     def get_basic_details(self):
         user = {
-            'name': self.name,
+            # 'name': self.name,
             'email': self.email
         }
 

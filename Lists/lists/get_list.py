@@ -25,8 +25,8 @@ def get_list_main(event):
         table_name = common.get_table_name(os.environ)
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
-        response_items = get_list_query(table_name, identity['cognitoIdentityId'], list_id)
-        common.confirm_owner(identity['cognitoIdentityId'], list_id, response_items)
+        response_items = get_list_query(table_name, identity['userPoolSub'], list_id)
+        common.confirm_owner(identity['userPoolSub'], list_id, response_items)
         list_object = common.generate_list_object(response_items)
     except Exception as e:
         logger.error("Exception: {}".format(e))

@@ -25,7 +25,8 @@ def list_main(event):
         table_name = common.get_table_name(os.environ)
         index_name = "userId-index"
         identity = common.get_identity(event, os.environ)
-        usersLists = get_lists(table_name, index_name, identity['cognitoIdentityId'])
+        # usersLists = get_lists(table_name, index_name, identity['cognitoIdentityId'])
+        usersLists = get_lists(table_name, index_name, identity['userPoolSub'])
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))

@@ -177,6 +177,22 @@ Resources:
             Path: /lists/{id}
             Method: DELETE
 
+  SignUpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ServiceName}-signup-${Environment}'
+      Handler: lists/signup.handler
+      Runtime: python3.6
+      MemorySize: 512
+      Timeout: 3
+      Description: Creates a user in the lists table.
+      Role: !GetAtt SignUpFunctionRole.Arn
+      # Environment:
+      #   Variables:
+      #     TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+      #     POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
+      #     POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
+
   FunctionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -208,6 +224,44 @@ Resources:
                   - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}"
                   - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}/*"
 
+  SignUpFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ServiceName}-${Environment}-Signup-Role'
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: CognitoPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'cognito-idp:*'
+                Resource: '*'
+        - PolicyName: ListsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:UpdateItem'
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:DeleteItem'
+                Resource:
+                  - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}"
+                  - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}/*"
 
   Api:
     Type: AWS::Serverless::Api

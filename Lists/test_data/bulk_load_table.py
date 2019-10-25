@@ -3,7 +3,8 @@ import json
 import boto3
 
 table_name = 'lists-test'
-file_name = 'items.json'
+# file_name = 'items.json'
+file_name = 'items_subids.json'
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(table_name)

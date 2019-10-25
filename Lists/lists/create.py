@@ -25,9 +25,11 @@ def create_main(event):
     try:
         table_name = common.get_table_name(os.environ)
         identity = common.get_identity(event, os.environ)
-        listId = generate_list_id(identity['cognitoIdentityId'], table_name)
+        # listId = generate_list_id(identity['cognitoIdentityId'], table_name)
+        listId = generate_list_id(identity['userPoolSub'], table_name)
         attributes = get_attribute_details(event)
-        message = put_item_in_table(table_name, identity['cognitoIdentityId'], listId, attributes)
+        # message = put_item_in_table(table_name, identity['cognitoIdentityId'], listId, attributes)
+        message = put_item_in_table(table_name, identity['userPoolSub'], listId, attributes)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))

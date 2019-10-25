@@ -1,0 +1,2 @@
+{"PK": "USER#eu-west-1:e371f5fc-14ef-404f-bca8-ab9a55cbee6e", "SK": "USER#eu-west-1:e371f5fc-14ef-404f-bca8-ab9a55cbee6e", "email": "burgess.alexander@gmail.com", "name": "Alex Burgess", "userId": "eu-west-1:e371f5fc-14ef-404f-bca8-ab9a55cbee6e"  }
+{"PK": "USER#eu-west-1:ae617d08-1127-4066-87ec-b6df345793b8", "SK": "USER#eu-west-1:ae617d08-1127-4066-87ec-b6df345793b8", "email": "burgess.alexander+apitestuser@gmail.com", "name": "Api User", "userId": "eu-west-1:ae617d08-1127-4066-87ec-b6df345793b8"  }
