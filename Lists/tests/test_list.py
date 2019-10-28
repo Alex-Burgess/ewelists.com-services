@@ -20,33 +20,28 @@ def api_gateway_listall_event():
 
     return {
         "resource": "/lists",
-        "path": "/lists/",
+        "path": "/lists",
         "httpMethod": "GET",
         "headers": {
-            "Accept": "application/json, text/plain, */*",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
-            "cache-control": "no-cache",
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "Cache-Control": "no-cache",
             "CloudFront-Forwarded-Proto": "https",
-            "CloudFront-Is-Desktop-Viewer": "false",
-            "CloudFront-Is-Mobile-Viewer": "true",
+            "CloudFront-Is-Desktop-Viewer": "true",
+            "CloudFront-Is-Mobile-Viewer": "false",
             "CloudFront-Is-SmartTV-Viewer": "false",
             "CloudFront-Is-Tablet-Viewer": "false",
             "CloudFront-Viewer-Country": "GB",
-            "content-type": "application/x-www-form-urlencoded",
+            "Content-Type": "text/plain",
             "Host": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
-            "origin": "http://localhost:3000",
-            "pragma": "no-cache",
-            "Referer": "http://localhost:3000/",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "cross-site",
-            "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
-            "Via": "2.0 5f8ce6fad85064c6a8d3486ad2c8e170.cloudfront.net (CloudFront)",
-            "X-Amz-Cf-Id": "Eohcm5xlRayoVmO49AJOQS-1PBFSbLdPBT76JPTRWiAkHenB39WxwA==",
-            "x-amz-date": "20191003T101607Z",
-            "x-amz-security-token": "AgoJb3JpZ2luX2VjECoaCWV1LXdlc3QtMSJGMEQCIBiEv5QsTdXMr9UDmSsNs6heGHDhdqiZy0F995DDDbOfAiBgSnJJXIEKkAyS3KLqUNmuYqYrd1JXrzUnd8HKW0NKYCqmBQgTEAAaDDY2MTc5MjE4Njk2NyIM72PFfjza89L2YYq4KoMFuyociqlW6d5GiRrGsZrjGokiKKhJOu5Jw9V0sucAENKFgZ6Rzh5e17m0dolVQ1tIUYV72LEhtqQwivkzt40dUlIkfL6Mlf78iABzZEACOKzq7EN82osFxl9kqCu74b7E+A/Pifo2dWpiwLS+MaZS6FtbsGL5Oq6LGa0NF+T/doRdqbVjhCC2M5odaFG/ujosWihUvckhNa0j/QS90UdQgIrzSYQV79H9RExtTzLX/u4lt4LuCl4TY3MFnwHTk0HnaRHS+9g2XzyFyjplVq66G9dCGJN1X/fMTq/T1BgBn9jvaeKgNY4hQyK+yfypOTbY1SUMTT31tvJiHecjzXOQWcD+Uvnx2x+6Q9kK4Ad8121N4qQ2ZBMjMi4dlPqzDV5XhE9eLPQe2koeadsK1B8QdyyFNn0K0tt9Ewtg9ugbrzSlCIjvcT+BrmyyPpAp6oLeMQCvbsY9gJm6e06l9MwOe7BpNMFPgVW7qE9P3cAgXuqQEL0F9SMqn7LP9HbUFTbV9diufGhYu2ojSoOOJNmmMv1WIhuteTfz6Xab+cNrBAHCc24EZn9uYQwO0o5oNnyvM9XaVrYJSRKhhh8ffSiO63s3sohsy9Mjlpg331Q/wYeP03JOr9As9nowOGt1mDHN3I8Onsnzy8QocsK9vuRhGYnTFcaUxkkaVXrVs4R9sWWMVPBdmlH5j4uCbj7Bhz9ue2vYIPJKitf3ImycrHruyKBFdcuwWoUad+6NqH5IGTHGlNQ+8Wf/85dfSOXuzc8bio/pxY5pC7RhYMbH9snboXdanJRrJGuNIyMWW6kpMrlWXf/X/ZCsGGQNsKAxV55RmMR/Ppx3rwumgqtk1/SxI05qSjC7ktfsBTq1AVs+Xn7AU0Zr86d1MaDvYOA+PGGc0zzv7Xfy8R+tCw3lBUzdgTVKOU3wISCznw/eEv9xVEU5A7crYH0K9VnkTzDH1WzNFZ2FiYyZZfTY2aD6Y7gqK5pLjmSZqQzDWOCkoKG8cGU7Zh/N/ip82g6wTzW0TJBoY+cr3w1Rzy+v8AWS8Z/JPmxWSRZFPW2RNdf9Mww9cr/9DB+YO+HZ2HHdkWLQazVBqbGF3pCpTRFYRhBI8K4cuPc=",
-            "X-Amzn-Trace-Id": "Root=1-5d95ca67-d4538cd8541a09a03641f6e8",
-            "X-Forwarded-For": "31.49.230.217, 130.176.6.159",
+            "Postman-Token": "512388b6-c036-4d11-a6c9-adf8e07e1da0",
+            "User-Agent": "PostmanRuntime/7.15.2",
+            "Via": "1.1 a1cb6e97bccd4899987b343ae5d4c252.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Id": "zJgUVrLX5O4d-B43SVe4Bs6YVpSTWXxrAVtWjeF0FcAnXJ8dARKQRA==",
+            "x-amz-content-sha256": "b9d4c66e0ae3c09af8a6ce4c99518f244c3db701a196021c79f094b51e9b49d4",
+            "x-amz-date": "20191008T162240Z",
+            "X-Amzn-Trace-Id": "Root=1-5d9cb7d0-6965798907570a0728570212",
+            "X-Forwarded-For": "5.81.150.55, 70.132.38.104",
             "X-Forwarded-Port": "443",
             "X-Forwarded-Proto": "https"
         },
@@ -58,15 +53,15 @@ def api_gateway_listall_event():
             "resourceId": "sgzmgr",
             "resourcePath": "/lists",
             "httpMethod": "GET",
-            "extendedRequestId": "A-yQJG9qjoEF8ug=",
-            "requestTime": "03/Oct/2019:10:16:07 +0000",
-            "path": "/test/lists/",
+            "extendedRequestId": "BQGojGkBjoEFsTw=",
+            "requestTime": "08/Oct/2019:16:22:40 +0000",
+            "path": "/test/lists",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
             "domainPrefix": "4sdcvv0n2e",
-            "requestTimeEpoch": 1570097767237,
-            "requestId": "377d5056-a813-4c75-9c9a-1a0c59a25e03",
+            "requestTimeEpoch": 1570551760227,
+            "requestId": "a3d965cd-a79b-4249-867a-a03eb858a839",
             "identity": {
                 "cognitoIdentityPoolId": "eu-west-1:2208d797-dfc9-40b4-8029-827c9e76e029",
                 "accountId": "123456789012",
@@ -149,12 +144,12 @@ def dynamodb_mock():
         )
 
     items = [
-        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "email": "test.user@gmail.com", "name": "Test User", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"},
-        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-efgh-efgh-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-efgh-efgh-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:1234250a-0fb0-4b32-9842-041c69be1234", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
-        {"PK": "LIST#87654321-axyz-axyz-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "87654321-axyz-axyz-123456789112", "createdAt": "2019-09-01T10:00:00", "listOwner": "eu-west-1:6789250a-0fb0-4b32-9842-041c69be6789", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "2019-10-31"}
+        {"PK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "email": "test.user@gmail.com", "name": "Test User", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119"},
+        {"PK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "db9476fd-de77-4977-839f-4f943ff5d684"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-efgh-efgh-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-efgh-efgh-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "1234250a-0fb0-4b32-9842-041c69be1234", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#87654321-axyz-axyz-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "87654321-axyz-axyz-123456789112", "createdAt": "2019-09-01T10:00:00", "listOwner": "6789250a-0fb0-4b32-9842-041c69be6789", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "2019-10-31"}
     ]
 
     for item in items:
@@ -167,10 +162,10 @@ def dynamodb_mock():
 
 class TestGetLists:
     def test_get_lists(self, dynamodb_mock):
-        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
-        lists_response = list.get_lists('lists-unittest', 'userId-index', cognito_identity_id)
+        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
+        lists_response = list.get_lists('lists-unittest', 'userId-index', cognito_user_id)
 
-        test_user = {"email": "test.user@gmail.com", "name": "Test User"}
+        test_user = {"email": "test.user@gmail.com"}
         assert lists_response['user'] == test_user, "Test user was not as expected."
 
         owned_list = {"listId": "12345678-abcd-abcd-123456789112", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Api Childs birthday."}
@@ -184,22 +179,22 @@ class TestGetLists:
         assert lists_response['shared'][1] == shared_list2, "Details of the list shared with user was not as expected."
 
     def test_get_lists_bad_table_name(self, dynamodb_mock):
-        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
 
         with pytest.raises(Exception) as e:
-            list.get_lists('lists-unittes', 'userId-index', cognito_identity_id)
+            list.get_lists('lists-unittes', 'userId-index', cognito_user_id)
         assert str(e.value) == "Unexpected error when getting lists from table.", "Exception not as expected."
 
     def test_get_lists_bad_index_name(self, dynamodb_mock):
-        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
 
         with pytest.raises(Exception) as e:
-            list.get_lists('lists-unittest', 'userId-inde', cognito_identity_id)
+            list.get_lists('lists-unittest', 'userId-inde', cognito_user_id)
         assert str(e.value) == "Unexpected error when getting lists from table.", "Exception not as expected."
 
     def test_get_lists_for_user_with_no_lists(self, dynamodb_mock):
-        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684'
-        lists_response = list.get_lists('lists-unittest', 'userId-index', cognito_identity_id)
+        cognito_user_id = 'db9476fd-de77-4977-839f-4f943ff5d684'
+        lists_response = list.get_lists('lists-unittest', 'userId-index', cognito_user_id)
         assert len(lists_response['owned']) == 0, "Number of lists was not 0."
         assert len(lists_response['shared']) == 0, "Number of lists was not 0."
 
@@ -222,7 +217,8 @@ class TestListMain:
 
     def test_list_main_no_lists(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_listall_event['requestContext']['identity']['cognitoIdentityId'] = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684'
+        # api_gateway_listall_event['requestContext']['identity']['cognitoIdentityId'] = 'db9476fd-de77-4977-839f-4f943ff5d684'
+        api_gateway_listall_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:db9476fd-de77-4977-839f-4f943ff5d684"
         response = list.list_main(api_gateway_listall_event)
         body = json.loads(response['body'])
 

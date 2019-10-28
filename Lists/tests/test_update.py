@@ -35,14 +35,14 @@ def api_gateway_update_event():
             "CloudFront-Viewer-Country": "GB",
             "Content-Type": "text/plain",
             "Host": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
-            "Postman-Token": "d38bfa3c-26b3-4a42-acfa-ecc30a12d767",
+            "Postman-Token": "512388b6-c036-4d11-a6c9-adf8e07e1da0",
             "User-Agent": "PostmanRuntime/7.15.2",
-            "Via": "1.1 f76142b838785e2eec49408a3d9d8285.cloudfront.net (CloudFront)",
-            "X-Amz-Cf-Id": "pUhW1u14GSPTlHCQed4C5eTsM3Biv_ca3cDVCh9hbcnZ3_e4z0CgVw==",
-            "x-amz-content-sha256": "51f3f8790f9b06462165164ab5e1bf33fd64f8230e962c445681a63555e04429",
-            "x-amz-date": "20191007T160043Z",
-            "X-Amzn-Trace-Id": "Root=1-5d9b612b-c2a6fbd0452771f0b0155f70",
-            "X-Forwarded-For": "5.81.150.55, 70.132.15.71",
+            "Via": "1.1 a1cb6e97bccd4899987b343ae5d4c252.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Id": "zJgUVrLX5O4d-B43SVe4Bs6YVpSTWXxrAVtWjeF0FcAnXJ8dARKQRA==",
+            "x-amz-content-sha256": "b9d4c66e0ae3c09af8a6ce4c99518f244c3db701a196021c79f094b51e9b49d4",
+            "x-amz-date": "20191008T162240Z",
+            "X-Amzn-Trace-Id": "Root=1-5d9cb7d0-6965798907570a0728570212",
+            "X-Forwarded-For": "5.81.150.55, 70.132.38.104",
             "X-Forwarded-Port": "443",
             "X-Forwarded-Proto": "https"
         },
@@ -53,18 +53,18 @@ def api_gateway_update_event():
         },
         "stageVariables": "null",
         "requestContext": {
-            "resourceId": "4j13uq",
+            "resourceId": "sgzmgr",
             "resourcePath": "/lists/{id}",
             "httpMethod": "PUT",
-            "extendedRequestId": "BMwexGf4DoEFoJA=",
-            "requestTime": "07/Oct/2019:16:00:43 +0000",
+            "extendedRequestId": "BQGojGkBjoEFsTw=",
+            "requestTime": "08/Oct/2019:16:22:40 +0000",
             "path": "/test/lists/76a2fe57-9fac-4a0d-9225-1942949889ba",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
             "domainPrefix": "4sdcvv0n2e",
-            "requestTimeEpoch": 1570464043231,
-            "requestId": "c410dfa4-713a-4ac3-afe5-2e3ab3d4066f",
+            "requestTimeEpoch": 1570551760227,
+            "requestId": "a3d965cd-a79b-4249-867a-a03eb858a839",
             "identity": {
                 "cognitoIdentityPoolId": "eu-west-1:2208d797-dfc9-40b4-8029-827c9e76e029",
                 "accountId": "123456789012",
@@ -124,14 +124,14 @@ def dynamodb_mock():
         )
 
     items = [
-        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "email": "test.user@gmail.com", "name": "Test User", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"},
-        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684"},
-        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
-        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
-        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PENDING#new.user@gmail.com", "email": "new.user@gmail.com", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
-        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "userId": "eu-west-1:1234250a-0fb0-4b32-9842-041c69be1234", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "email": "test.user@gmail.com", "name": "Test User", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119"},
+        {"PK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "db9476fd-de77-4977-839f-4f943ff5d684"},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PENDING#new.user@gmail.com", "email": "new.user@gmail.com", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#db9476fd-de77-4977-839f-4f943ff5d684", "userId": "1234250a-0fb0-4b32-9842-041c69be1234", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "76a2fe57-9fac-4a0d-9225-1942949889ba", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
         {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PRODUCT#1009", "quantity": 1, "reserved": 0},
-        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PRODUCT#1010", "quantity": 2, "reserved": 1, "reservedDetails": {"userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "name": "Test User2", "reserved": 1, "timestamp": "2018-11-01T10:00:00"}}
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PRODUCT#1010", "quantity": 2, "reserved": 1, "reservedDetails": {"userId": "db9476fd-de77-4977-839f-4f943ff5d684", "name": "Test User2", "reserved": 1, "timestamp": "2018-11-01T10:00:00"}}
     ]
 
     for item in items:
@@ -178,9 +178,9 @@ class TestGetItemsToUpdate:
         items = update.get_items_to_update('lists-unittest', '76a2fe57-9fac-4a0d-9225-1942949889ba')
         assert len(items) == 4
         assert items[0]['SK']['S'] == 'PENDING#new.user@gmail.com'
-        assert items[1]['SK']['S'] == 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684'
-        assert items[2]['SK']['S'] == 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
-        assert items[3]['SK']['S'] == 'USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        assert items[1]['SK']['S'] == 'SHARE#db9476fd-de77-4977-839f-4f943ff5d684'
+        assert items[2]['SK']['S'] == 'SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119'
+        assert items[3]['SK']['S'] == 'USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119'
 
 
 class TestUpdateList:
@@ -188,32 +188,32 @@ class TestUpdateList:
         api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"A gift list for Oscars birthday.\",\n    \"occasion\": \"Birthday\"\n}"
         update_attributes = json.loads(api_gateway_update_event['body'])
         items = [
-            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'userId': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}},
-            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'userId': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}}
+            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'userId': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}},
+            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'userId': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}}
         ]
 
         updates = update.update_list('lists-unittest', items, update_attributes)
 
         assert len(updates) == 2, "Update response did not contain expected number of updated attributes."
-        assert updates[0]['SK'] == 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        assert updates[0]['SK'] == 'SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119'
         assert updates[0]['updates'] == {'title': 'My Updated Title'}
-        assert updates[1]['SK'] == 'USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        assert updates[1]['SK'] == 'USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119'
         assert updates[1]['updates'] == {'title': 'My Updated Title'}
 
     def test_update_list_with_multiple_attributes(self, api_gateway_update_event, dynamodb_mock):
         api_gateway_update_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"Updated.\",\n    \"occasion\": \"Christmas\"\n}"
         update_attributes = json.loads(api_gateway_update_event['body'])
         items = [
-            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'userId': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}},
-            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'userId': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}}
+            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'userId': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}},
+            {'PK': {'S': 'LIST#76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'SK': {'S': 'USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'userId': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'title': {'S': "Oscar's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '76a2fe57-9fac-4a0d-9225-1942949889ba'}, 'listOwner': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Oscars birthday.'}, 'eventDate': {'S': '2018-10-31'}}
         ]
 
         updates = update.update_list('lists-unittest', items, update_attributes)
 
         assert len(updates) == 2, "Update response did not contain expected number of updated attributes."
-        assert updates[0]['SK'] == 'SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        assert updates[0]['SK'] == 'SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119'
         assert updates[0]['updates'] == {'title': 'My Updated Title', 'description': 'Updated.', 'occasion': 'Christmas'}
-        assert updates[1]['SK'] == 'USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        assert updates[1]['SK'] == 'USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119'
         assert updates[1]['updates'] == {'title': 'My Updated Title', 'description': 'Updated.', 'occasion': 'Christmas'}
 
 
@@ -226,9 +226,9 @@ class TestUpdateListMain:
 
         expected_body = [
             {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PENDING#new.user@gmail.com", "updates": {"title": "My Updated Title"}},
-            {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "updates": {"title": "My Updated Title"}},
-            {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "updates": {"title": "My Updated Title"}},
-            {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "updates": {"title": "My Updated Title"}}
+            {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#db9476fd-de77-4977-839f-4f943ff5d684", "updates": {"title": "My Updated Title"}},
+            {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "updates": {"title": "My Updated Title"}},
+            {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "updates": {"title": "My Updated Title"}}
         ]
 
         assert len(body) == 4, "Update main response did not contain expected number of updated items."
@@ -259,11 +259,11 @@ class TestUpdateListMain:
 
     def test_update_list_with_requestor_not_owner(self, monkeypatch, api_gateway_update_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_update_event['requestContext']['identity']['cognitoIdentityId'] = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c-diff"
+        api_gateway_update_event['requestContext']['identity']['cognitoIdentityId'] = "42cf26f5-407c-47cf-bcb6-f70cd63ac119-diff"
 
         response = update.update_list_main(api_gateway_update_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'Owner of List ID 76a2fe57-9fac-4a0d-9225-1942949889ba did not match user id of requestor: eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c-diff.', "Update main response did not contain the correct error message."
+        assert body['error'] == 'Owner of List ID 76a2fe57-9fac-4a0d-9225-1942949889ba did not match user id of requestor: 42cf26f5-407c-47cf-bcb6-f70cd63ac119-diff.', "Update main response did not contain the correct error message."
 
 
 def test_handler(api_gateway_update_event, monkeypatch, dynamodb_mock):
@@ -276,9 +276,9 @@ def test_handler(api_gateway_update_event, monkeypatch, dynamodb_mock):
 
     expected_body = [
         {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "PENDING#new.user@gmail.com", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}},
-        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}},
-        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}},
-        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}}
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#db9476fd-de77-4977-839f-4f943ff5d684", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}},
+        {"PK": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list."}}
     ]
 
     assert body == expected_body

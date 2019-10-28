@@ -38,8 +38,8 @@ def get_list_main(event):
     return response
 
 
-def get_list_query(table_name, cognito_identity_id, list_id):
-    logger.info("Querying table {} for list ID {} owned by user ID {} .".format(table_name, cognito_identity_id, list_id))
+def get_list_query(table_name, cognito_user_id, list_id):
+    logger.info("Querying table {} for list ID {} owned by user ID {} .".format(table_name, cognito_user_id, list_id))
 
     try:
         response = dynamodb.query(
@@ -53,7 +53,7 @@ def get_list_query(table_name, cognito_identity_id, list_id):
         raise Exception("Unexpected error when getting list item from table.")
 
     if len(response['Items']) == 0:
-        logger.info("No query results for List ID {} and user: {}.".format(list_id, cognito_identity_id))
-        raise Exception("No query results for List ID {} and user: {}.".format(list_id, cognito_identity_id))
+        logger.info("No query results for List ID {} and user: {}.".format(list_id, cognito_user_id))
+        raise Exception("No query results for List ID {} and user: {}.".format(list_id, cognito_user_id))
 
     return response['Items']

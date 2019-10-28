@@ -32,14 +32,16 @@ def api_gateway_get_list_event():
             "CloudFront-Is-SmartTV-Viewer": "false",
             "CloudFront-Is-Tablet-Viewer": "false",
             "CloudFront-Viewer-Country": "GB",
+            "Content-Type": "text/plain",
             "Host": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
-            "Postman-Token": "68cd6f41-1d8a-420d-95ae-d46612ee8d54",
+            "Postman-Token": "512388b6-c036-4d11-a6c9-adf8e07e1da0",
             "User-Agent": "PostmanRuntime/7.15.2",
-            "Via": "1.1 5eade7e5ebbbd665bf0f8d23a84cc713.cloudfront.net (CloudFront)",
-            "X-Amz-Cf-Id": "OgLVkBcert4ANwvUz3GBUX2aGDY_iiDv4QrQFFqha7v3y1gglIRm4g==",
-            "x-amz-date": "20191007T153345Z",
-            "X-Amzn-Trace-Id": "Root=1-5d9b5ad9-9cc41570632adb90a8ba3800",
-            "X-Forwarded-For": "5.81.150.55, 70.132.15.85",
+            "Via": "1.1 a1cb6e97bccd4899987b343ae5d4c252.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Id": "zJgUVrLX5O4d-B43SVe4Bs6YVpSTWXxrAVtWjeF0FcAnXJ8dARKQRA==",
+            "x-amz-content-sha256": "b9d4c66e0ae3c09af8a6ce4c99518f244c3db701a196021c79f094b51e9b49d4",
+            "x-amz-date": "20191008T162240Z",
+            "X-Amzn-Trace-Id": "Root=1-5d9cb7d0-6965798907570a0728570212",
+            "X-Forwarded-For": "5.81.150.55, 70.132.38.104",
             "X-Forwarded-Port": "443",
             "X-Forwarded-Proto": "https"
         },
@@ -50,18 +52,18 @@ def api_gateway_get_list_event():
         },
         "stageVariables": "null",
         "requestContext": {
-            "resourceId": "4j13uq",
+            "resourceId": "sgzmgr",
             "resourcePath": "/lists/{id}",
             "httpMethod": "GET",
-            "extendedRequestId": "BMsiDFARjoEFgOg=",
-            "requestTime": "07/Oct/2019:15:33:45 +0000",
+            "extendedRequestId": "BQGojGkBjoEFsTw=",
+            "requestTime": "08/Oct/2019:16:22:40 +0000",
             "path": "/test/lists/12345678-abcd-abcd-123456789112",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
             "domainPrefix": "4sdcvv0n2e",
-            "requestTimeEpoch": 1570462425886,
-            "requestId": "4fa38ad5-1706-4bdb-b0e2-6a5519cc12fa",
+            "requestTimeEpoch": 1570551760227,
+            "requestId": "a3d965cd-a79b-4249-867a-a03eb858a839",
             "identity": {
                 "cognitoIdentityPoolId": "eu-west-1:2208d797-dfc9-40b4-8029-827c9e76e029",
                 "accountId": "123456789012",
@@ -122,12 +124,12 @@ def dynamodb_mock():
         )
 
     items = [
-        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "email": "test.user@gmail.com", "name": "Test User", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"},
-        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d684", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#49d47a66-8825-4872-85c2-e15a12d19aed", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Oscar's 2019 Christmas List", "occasion": "Christmas", "listId": "49d47a66-8825-4872-85c2-e15a12d19aed", "listOwner": "eu-west-1:1234250a-0fb0-4b32-9842-041c69be1234", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas.", "eventDate": "2019-12-25"},
+        {"PK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "email": "test.user@gmail.com", "name": "Test User", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119"},
+        {"PK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "db9476fd-de77-4977-839f-4f943ff5d684"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#db9476fd-de77-4977-839f-4f943ff5d684", "userId": "db9476fd-de77-4977-839f-4f943ff5d684", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#49d47a66-8825-4872-85c2-e15a12d19aed", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Oscar's 2019 Christmas List", "occasion": "Christmas", "listId": "49d47a66-8825-4872-85c2-e15a12d19aed", "listOwner": "1234250a-0fb0-4b32-9842-041c69be1234", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas.", "eventDate": "2019-12-25"},
         {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0},
         {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1001", "quantity": 2, "reserved": 0},
         {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1}
@@ -143,23 +145,23 @@ def dynamodb_mock():
 
 class TestGetListQuery:
     def test_get_list_query(self, dynamodb_mock):
-        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
-        items = get_list.get_list_query('lists-unittest', cognito_identity_id, "12345678-abcd-abcd-123456789112")
+        cognito_user_id = "42cf26f5-407c-47cf-bcb6-f70cd63ac119"
+        items = get_list.get_list_query('lists-unittest', cognito_user_id, "12345678-abcd-abcd-123456789112")
         assert len(items) == 6, "Number of items deleted was not as expected."
 
     def test_get_list_query_no_table_name(self, dynamodb_mock):
-        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
+        cognito_user_id = "42cf26f5-407c-47cf-bcb6-f70cd63ac119"
 
         with pytest.raises(Exception) as e:
-            get_list.get_list_query('lists-unittes', cognito_identity_id, "12345678-abcd-abcd-123456789112")
+            get_list.get_list_query('lists-unittes', cognito_user_id, "12345678-abcd-abcd-123456789112")
         assert str(e.value) == "Unexpected error when getting list item from table.", "Exception not as expected."
 
     def test_get_list_query_for_item_that_does_not_exist(self, dynamodb_mock):
-        cognito_identity_id = "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"
+        cognito_user_id = "42cf26f5-407c-47cf-bcb6-f70cd63ac119"
 
         with pytest.raises(Exception) as e:
-            get_list.get_list_query('lists-unittest', cognito_identity_id, "12345678-abcd-abcd-123456789112-diff")
-        assert str(e.value) == "No query results for List ID 12345678-abcd-abcd-123456789112-diff and user: eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c.", "Exception not as expected."
+            get_list.get_list_query('lists-unittest', cognito_user_id, "12345678-abcd-abcd-123456789112-diff")
+        assert str(e.value) == "No query results for List ID 12345678-abcd-abcd-123456789112-diff and user: 42cf26f5-407c-47cf-bcb6-f70cd63ac119.", "Exception not as expected."
 
 
 class TestGetListMain:
@@ -201,7 +203,7 @@ class TestGetListMain:
         response = get_list.get_list_main(api_gateway_get_list_event)
         body = json.loads(response['body'])
 
-        assert body['error'] == "Owner of List ID 49d47a66-8825-4872-85c2-e15a12d19aed did not match user id of requestor: eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c.", "Get list response did not contain the correct error message."
+        assert body['error'] == "Owner of List ID 49d47a66-8825-4872-85c2-e15a12d19aed did not match user id of requestor: 42cf26f5-407c-47cf-bcb6-f70cd63ac119.", "Get list response did not contain the correct error message."
 
 
 def test_handler(api_gateway_get_list_event, monkeypatch, dynamodb_mock):
