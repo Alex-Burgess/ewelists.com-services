@@ -42,8 +42,8 @@ def delete_main(event):
     return response
 
 
-def delete_items(table_name, cognito_identity_id, list_id, items):
-    logger.info("Deleting List ID: {} for user: {}.".format(list_id, cognito_identity_id))
+def delete_items(table_name, cognito_user_id, list_id, items):
+    logger.info("Deleting List ID: {} for user: {}.".format(list_id, cognito_user_id))
 
     for item in items:
         logger.info("Deleting item with key: PK={}, SK={}".format(item['PK']['S'], item['SK']['S']))
@@ -62,13 +62,13 @@ def delete_items(table_name, cognito_identity_id, list_id, items):
             logger.info("Delete response: {}".format(response))
         except ClientError as e:
             if e.response['Error']['Code'] == "ConditionalCheckFailedException":
-                logger.info("Delete request failed for List ID: {} and user {} as condition check for List ID failed.  List does not exist.".format(list_id, cognito_identity_id))
+                logger.info("Delete request failed for List ID: {} and user {} as condition check for List ID failed.  List does not exist.".format(list_id, cognito_user_id))
                 raise Exception("List does not exist.")
             else:
                 raise
 
-    logger.info("Deleted all items [{}] for List ID: {} and user: {}.".format(len(items), list_id, cognito_identity_id)),
-    message = "Deleted all items [{}] for List ID: {} and user: {}.".format(len(items), list_id, cognito_identity_id)
+    logger.info("Deleted all items [{}] for List ID: {} and user: {}.".format(len(items), list_id, cognito_user_id)),
+    message = "Deleted all items [{}] for List ID: {} and user: {}.".format(len(items), list_id, cognito_user_id)
     return message
 
 

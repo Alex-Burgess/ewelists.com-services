@@ -123,9 +123,9 @@ def dynamodb_mock():
         )
 
     items = [
-        {"PK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "email": "test.user@gmail.com", "name": "Test User", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "userId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "email": "test.user@gmail.com", "name": "Test User", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
     ]
 
     for item in items:
@@ -154,15 +154,15 @@ class TestGetAttributeDetails:
 
 class TestGenerateListId:
     def test_generate_list_id(self, dynamodb_mock, api_gateway_create_event):
-        cognito_identity_id = api_gateway_create_event['requestContext']['identity']['cognitoIdentityId']
-        list_id = create.generate_list_id(cognito_identity_id, 'lists-unittest')
+        cognito_user_id = api_gateway_create_event['requestContext']['identity']['cognitoIdentityId']
+        list_id = create.generate_list_id(cognito_user_id, 'lists-unittest')
         assert len(list_id) == 36, "List ID not 36 characters long."
         assert list_id != '12345678-abcd-abcd-123456789112', "List ID shouldn't match the ID of the list already in the table (Pretty Unlikely)."
 
 
 class TestPutItemInTable:
     def test_put_item_in_table(self, dynamodb_mock):
-        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
         listId = 'b2ed81b0-67eb-4599-98b9-60c0e739de2d'
 
         attributes = {
@@ -171,7 +171,7 @@ class TestPutItemInTable:
             'occasion': 'Birthday',
         }
 
-        message = create.put_item_in_table('lists-unittest', cognito_identity_id, listId, attributes)
+        message = create.put_item_in_table('lists-unittest', cognito_user_id, listId, attributes)
         assert message == "List was created.", "Put item message not as expected."
 
         # Check the table was updated with right number of items
@@ -185,7 +185,7 @@ class TestPutItemInTable:
         assert len(test_response['Items']) == 2, "Number of items for new list should be 2."
 
     def test_put_item_in_table_with_bad_name(self, dynamodb_mock):
-        cognito_identity_id = 'eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c'
+        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
         listId = '9500f915-df8f-46b7-bc3f-7ea6a2bc0f84'
 
         attributes = {
@@ -195,7 +195,7 @@ class TestPutItemInTable:
         }
 
         with pytest.raises(Exception) as e:
-            create.put_item_in_table('lists-unittes', cognito_identity_id, listId, attributes)
+            create.put_item_in_table('lists-unittes', cognito_user_id, listId, attributes)
         assert str(e.value) == "List could not be created.", "Exception not as expected."
 
 

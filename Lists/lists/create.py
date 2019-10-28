@@ -25,10 +25,8 @@ def create_main(event):
     try:
         table_name = common.get_table_name(os.environ)
         identity = common.get_identity(event, os.environ)
-        # listId = generate_list_id(identity['cognitoIdentityId'], table_name)
         listId = generate_list_id(identity['userPoolSub'], table_name)
         attributes = get_attribute_details(event)
-        # message = put_item_in_table(table_name, identity['cognitoIdentityId'], listId, attributes)
         message = put_item_in_table(table_name, identity['userPoolSub'], listId, attributes)
     except Exception as e:
         logger.error("Exception: {}".format(e))
@@ -42,13 +40,13 @@ def create_main(event):
     return response
 
 
-def put_item_in_table(table_name, cognito_identity_id, listId, attributes):
+def put_item_in_table(table_name, cognito_user_id, listId, attributes):
     item = {
         'PK': {'S': "LIST#{}".format(listId)},
-        'SK': {'S': "USER#{}".format(cognito_identity_id)},
+        'SK': {'S': "USER#{}".format(cognito_user_id)},
         'listId': {'S': listId},
-        "listOwner": {'S': cognito_identity_id},
-        'userId': {'S': cognito_identity_id},
+        "listOwner": {'S': cognito_user_id},
+        'userId': {'S': cognito_user_id},
         'title': {'S': attributes['title']},
         'occasion': {'S': attributes['occasion']},
         'description': {'S': attributes['description']},
@@ -63,7 +61,7 @@ def put_item_in_table(table_name, cognito_identity_id, listId, attributes):
         raise Exception('List could not be created.')
 
     try:
-        item['SK']['S'] = "SHARE#{}".format(cognito_identity_id)
+        item['SK']['S'] = "SHARE#{}".format(cognito_user_id)
         logger.info("Put shared item for lists table: {}".format(item))
         dynamodb.put_item(TableName=table_name, Item=item)
     except Exception as e:
@@ -75,7 +73,7 @@ def put_item_in_table(table_name, cognito_identity_id, listId, attributes):
     return message
 
 
-def generate_list_id(cognito_identity_id, table_name):
+def generate_list_id(cognito_user_id, table_name):
     # Generate a random uid
     newlistId = str(uuid.uuid4())
     logger.info("Generated List ID: {}".format(newlistId))
