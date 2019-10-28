@@ -378,6 +378,18 @@ class TestGetTableName:
         assert str(e.value) == "TABLE_NAME environment variable not set correctly.", "Exception not as expected."
 
 
+class TestGetUserpoolId:
+    def test_get_userpool_id(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'USERPOOL_ID', 'ewelists-test')
+        userpool_id = common.get_userpool_id(os.environ)
+        assert userpool_id == "ewelists-test", "Table name from os environment variables was not as expected."
+
+    def test_get_userpool_name_os_var_not_set(self):
+        with pytest.raises(Exception) as e:
+            common.get_userpool_id(os.environ)
+        assert str(e.value) == "USERPOOL_ID environment variable not set correctly.", "Exception not as expected."
+
+
 class TestConfirmOwner:
     def test_confirm_owner(self, response_items):
         cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04'

@@ -21,6 +21,17 @@ def get_table_name(osenv):
     return table_name
 
 
+def get_userpool_id(osenv):
+    try:
+        userpool_id = osenv['USERPOOL_ID']
+        logger.info("USERPOOL_ID environment variable value: " + userpool_id)
+    except KeyError:
+        logger.error('USERPOOL_ID environment variable not set correctly.')
+        raise Exception('USERPOOL_ID environment variable not set correctly.')
+
+    return userpool_id
+
+
 def confirm_owner(cognito_identity_id, list_id, response_items):
     list_owner_id = None
     for item in response_items:

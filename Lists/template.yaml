@@ -187,11 +187,12 @@ Resources:
       Timeout: 3
       Description: Creates a user in the lists table.
       Role: !GetAtt SignUpFunctionRole.Arn
-      # Environment:
-      #   Variables:
-      #     TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
-      #     POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
-      #     POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          USERPOOL_ID: !Sub '{{resolve:ssm:/CognitoUserPoolId/${Environment}:1}}'
+          POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
+          POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
 
   FunctionRole:
     Type: AWS::IAM::Role
