@@ -1,5 +1,4 @@
 import os
-import uuid
 import boto3
 import json
 import logging
@@ -97,6 +96,7 @@ def create_new_cognito_user(user_pool_id, email):
         raise Exception('Account could not be created.')
 
     logger.info("Link response: " + json.dumps(response['User']['Username']))
+    logger.info("Link response: " + json.dumps(response['User']['Attributes']))
 
     result['created'] = True
     result['user_id'] = response['User']['Username']
@@ -194,17 +194,3 @@ def get_user_from_userpool(user_pool_id, email):
         check_result['exists'] = False
 
     return check_result
-
-#
-# def get_user_sub(username):
-#     logger.info("Get sub for user: " + username)
-#
-#     response = client.admin_get_user(
-#         UserPoolId='eu-west-1_vqox9Z8q7',
-#         Username=username
-#     )
-#
-#     logger.info("User entry returned.  sub: " + json.dumps(response['UserAttributes']))
-#     # logger.info("User entry returned.  sub: " + response['UserAttributes']['sub'])
-#
-#     return response

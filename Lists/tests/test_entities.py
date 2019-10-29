@@ -11,9 +11,9 @@ logger.addHandler(stream_handler)
 @pytest.fixture()
 def response_items():
     response_items = [
-        {'PK': {'S': 'USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'SK': {'S': 'USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'email': {'S': 'test.user@gmail.com'}, 'name': {'S': 'Test User'}, 'userId': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}},
-        {'PK': {'S': 'LIST#12345678-abcd-abcd-123456789112'}, 'SK': {'S': 'USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'userId': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'title': {'S': "Api Child's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-abcd-abcd-123456789112'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'listOwner': {'S': '42cf26f5-407c-47cf-bcb6-f70cd63ac119'}, 'description': {'S': 'A gift list for Api Childs birthday.'}, 'eventDate': {'S': '2019-09-01'}},
-        {"quantity": {"N": "1"}, "reserved": {"N": "0"}, "SK": {"S": "PRODUCT#1009"}, "PK": {"S": "LIST#12345678-abcd-abcd-123456789112"}}
+        {'PK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'email': {'S': 'test.user@gmail.com'}, 'name': {'S': 'Test User'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}},
+        {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Api Child's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'description': {'S': 'A gift list for Api Childs birthday.'}, 'eventDate': {'S': '2019-09-01'}},
+        {"quantity": {"N": "1"}, "reserved": {"N": "0"}, "SK": {"S": "PRODUCT#1009"}, "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}}
     ]
 
     return response_items
@@ -31,7 +31,7 @@ class TestList:
     def test_get_details(self, response_items):
         list = List(response_items[1]).get_details()
 
-        assert list['listId'] == '12345678-abcd-abcd-123456789112', "List ID was not 12345678-abcd-abcd-123456789112."
+        assert list['listId'] == '12345678-list-0001-1234-abcdefghijkl', "List ID was not 12345678-list-0001-1234-abcdefghijkl."
         assert list['title'] == "Api Child's 1st Birthday", "List Title was not as expected."
         assert list['description'] == "A gift list for Api Childs birthday.", "List description was not as expected."
         assert list['occasion'] == 'Birthday', "List occasion was not Birthday."

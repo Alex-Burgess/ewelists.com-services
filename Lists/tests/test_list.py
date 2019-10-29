@@ -71,7 +71,7 @@ def api_gateway_listall_event():
                 "principalOrgId": "o-d8jj6dyqv2",
                 "accessKey": "ABCDEFGPDMJL4EB35H6H",
                 "cognitoAuthenticationType": "authenticated",
-                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:42cf26f5-407c-47cf-bcb6-f70cd63ac119",
+                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl",
                 "userArn": "arn:aws:sts::123456789012:assumed-role/Ewelists-test-CognitoAuthRole/CognitoIdentityCredentials",
                 "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
                 "user": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials"
@@ -143,13 +143,19 @@ def dynamodb_mock():
             ]
         )
 
+    # 3 users. User 1, owns list 1, which is not shared.  user 2, owns list 2 and 3 which are shared with user 1.  User 3 has no lists.
     items = [
-        {"PK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "email": "test.user@gmail.com", "name": "Test User", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119"},
-        {"PK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "db9476fd-de77-4977-839f-4f943ff5d684"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-efgh-efgh-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-efgh-efgh-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "1234250a-0fb0-4b32-9842-041c69be1234", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
-        {"PK": "LIST#87654321-axyz-axyz-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "87654321-axyz-axyz-123456789112", "createdAt": "2019-09-01T10:00:00", "listOwner": "6789250a-0fb0-4b32-9842-041c69be6789", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "2019-10-31"}
+        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
+        {"PK": "USER#12345678-user-0002-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl"},
+        {"PK": "USER#12345678-user-0003-1234-abcdefghijkl", "SK": "USER#12345678-user-0003-1234-abcdefghijkl", "email": "test.user3@gmail.com", "name": "Test User3", "userId": "12345678-user-0003-1234-abcdefghijkl"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0002-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0002-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0002-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars birthday.", "eventDate": "2018-10-31"},
+        {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "12345678-list-0003-1234-abcdefghijkl", "createdAt": "2019-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "2019-10-31"},
+        {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "12345678-list-0003-1234-abcdefghijkl", "createdAt": "2019-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "2019-10-31"},
+        {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "12345678-list-0003-1234-abcdefghijkl", "createdAt": "2019-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "2019-10-31"}
     ]
 
     for item in items:
@@ -161,40 +167,40 @@ def dynamodb_mock():
 
 
 class TestGetLists:
-    def test_get_lists(self, dynamodb_mock):
-        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
-        lists_response = list.get_lists('lists-unittest', 'userId-index', cognito_user_id)
+    def test_get_lists_for_requestor(self, dynamodb_mock):
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        lists_response = list.get_lists('lists-unittest', 'userId-index', user_id)
 
         test_user = {"email": "test.user@gmail.com"}
         assert lists_response['user'] == test_user, "Test user was not as expected."
 
-        owned_list = {"listId": "12345678-abcd-abcd-123456789112", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Api Childs birthday."}
+        owned_list = {"listId": "12345678-list-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Api Childs birthday."}
         assert len(lists_response['owned']) == 1, "User should only own 1 list."
         assert lists_response['owned'][0] == owned_list, "Details of the list owned by user was not as expected."
 
-        shared_list1 = {"listId": "12345678-efgh-efgh-123456789112", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Oscars birthday."}
-        shared_list2 = {"listId": "87654321-axyz-axyz-123456789112", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "description": "A gift list for Oscars 2nd Birthday."}
+        shared_list1 = {"listId": "12345678-list-0002-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Oscars birthday."}
+        shared_list2 = {"listId": "12345678-list-0003-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "description": "A gift list for Oscars 2nd Birthday."}
         assert len(lists_response['shared']) == 2, "User should only have 2 lists shared with them."
         assert lists_response['shared'][0] == shared_list1, "Details of the list shared with user was not as expected."
         assert lists_response['shared'][1] == shared_list2, "Details of the list shared with user was not as expected."
 
     def test_get_lists_bad_table_name(self, dynamodb_mock):
-        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
 
         with pytest.raises(Exception) as e:
-            list.get_lists('lists-unittes', 'userId-index', cognito_user_id)
+            list.get_lists('lists-unittes', 'userId-index', user_id)
         assert str(e.value) == "Unexpected error when getting lists from table.", "Exception not as expected."
 
     def test_get_lists_bad_index_name(self, dynamodb_mock):
-        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
 
         with pytest.raises(Exception) as e:
-            list.get_lists('lists-unittest', 'userId-inde', cognito_user_id)
+            list.get_lists('lists-unittest', 'userId-inde', user_id)
         assert str(e.value) == "Unexpected error when getting lists from table.", "Exception not as expected."
 
     def test_get_lists_for_user_with_no_lists(self, dynamodb_mock):
-        cognito_user_id = 'db9476fd-de77-4977-839f-4f943ff5d684'
-        lists_response = list.get_lists('lists-unittest', 'userId-index', cognito_user_id)
+        user_id = '12345678-user-0003-1234-abcdefghijkl'
+        lists_response = list.get_lists('lists-unittest', 'userId-index', user_id)
         assert len(lists_response['owned']) == 0, "Number of lists was not 0."
         assert len(lists_response['shared']) == 0, "Number of lists was not 0."
 
@@ -215,10 +221,9 @@ class TestListMain:
 
         assert body['error'] == 'Unexpected error when getting lists from table.', "Exception was not as expected."
 
-    def test_list_main_no_lists(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
+    def test_list_main_user_with_no_lists(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        # api_gateway_listall_event['requestContext']['identity']['cognitoIdentityId'] = 'db9476fd-de77-4977-839f-4f943ff5d684'
-        api_gateway_listall_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:db9476fd-de77-4977-839f-4f943ff5d684"
+        api_gateway_listall_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
         response = list.list_main(api_gateway_listall_event)
         body = json.loads(response['body'])
 

@@ -20,7 +20,7 @@ def api_gateway_delete_event():
 
     return {
         "resource": "/lists/{id}",
-        "path": "/lists/12345678-abcd-abcd-123456789112",
+        "path": "/lists/12345678-list-0001-1234-abcdefghijkl",
         "httpMethod": "DELETE",
         "headers": {
             "Accept": "*/*",
@@ -48,7 +48,7 @@ def api_gateway_delete_event():
         "queryStringParameters": "null",
         "multiValueQueryStringParameters": "null",
         "pathParameters": {
-            "id": "12345678-abcd-abcd-123456789112"
+            "id": "12345678-list-0001-1234-abcdefghijkl"
         },
         "stageVariables": "null",
         "requestContext": {
@@ -57,7 +57,7 @@ def api_gateway_delete_event():
             "httpMethod": "DELETE",
             "extendedRequestId": "BQGojGkBjoEFsTw=",
             "requestTime": "08/Oct/2019:16:22:40 +0000",
-            "path": "/test/lists/12345678-abcd-abcd-123456789112",
+            "path": "/test/lists/12345678-list-0001-1234-abcdefghijkl",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
@@ -73,7 +73,7 @@ def api_gateway_delete_event():
                 "principalOrgId": "o-d8jj6dyqv2",
                 "accessKey": "ABCDEFGPDMJL4EB35H6H",
                 "cognitoAuthenticationType": "authenticated",
-                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:42cf26f5-407c-47cf-bcb6-f70cd63ac119",
+                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl",
                 "userArn": "arn:aws:sts::123456789012:assumed-role/Ewelists-test-CognitoAuthRole/CognitoIdentityCredentials",
                 "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
                 "user": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials"
@@ -123,16 +123,16 @@ def dynamodb_mock():
             }
         )
 
+    # 2 Users, 1 List with 3 products and shared with owner and 1 other user.
     items = [
-        {"PK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "email": "test.user@gmail.com", "name": "Test User", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119"},
-        {"PK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "db9476fd-de77-4977-839f-4f943ff5d684"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#db9476fd-de77-4977-839f-4f943ff5d684", "userId": "db9476fd-de77-4977-839f-4f943ff5d684", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#49d47a66-8825-4872-85c2-e15a12d19aed", "SK": "USER#1234250a-0fb0-4b32-9842-041c69be1234", "userId": "1234250a-0fb0-4b32-9842-041c69be1234", "title": "Oscar's 2019 Christmas List", "occasion": "Christmas", "listId": "49d47a66-8825-4872-85c2-e15a12d19aed", "listOwner": "1234250a-0fb0-4b32-9842-041c69be1234", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas.", "eventDate": "2019-12-25"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1001", "quantity": 2, "reserved": 0},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1}
+        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
+        {"PK": "USER#12345678-user-0002-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1001", "quantity": 2, "reserved": 0},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1}
     ]
 
     for item in items:
@@ -145,49 +145,49 @@ def dynamodb_mock():
 
 class TestDeleteItems:
     def test_delete_list_item(self, dynamodb_mock):
-        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
-        list_id = '12345678-abcd-abcd-123456789112'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
         items = [
             {"PK": {'S': "LIST#{}".format(list_id)}, 'SK': {'S': "USER#{}".format(list_id)}},
         ]
 
-        message = delete.delete_items('lists-unittest', cognito_user_id, list_id, items)
-        assert message == 'Deleted all items [1] for List ID: 12345678-abcd-abcd-123456789112 and user: 42cf26f5-407c-47cf-bcb6-f70cd63ac119.', "Delete message was not as expected."
+        message = delete.delete_items('lists-unittest', user_id, list_id, items)
+        assert message == 'Deleted all items [1] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete message was not as expected."
 
     def test_delete_product_item(self, dynamodb_mock):
-        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
-        list_id = '12345678-abcd-abcd-123456789112'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
         items = [
             {"PK": {'S': "LIST#{}".format(list_id)}, 'SK': {'S': "PRODUCT#1000"}, "quantity": 1, "reserved": 0}
         ]
 
-        message = delete.delete_items('lists-unittest', cognito_user_id, list_id, items)
-        assert message == 'Deleted all items [1] for List ID: 12345678-abcd-abcd-123456789112 and user: 42cf26f5-407c-47cf-bcb6-f70cd63ac119.', "Delete message was not as expected."
+        message = delete.delete_items('lists-unittest', user_id, list_id, items)
+        assert message == 'Deleted all items [1] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete message was not as expected."
 
-    def test_delete_items(self, dynamodb_mock):
-        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
-        list_id = '12345678-abcd-abcd-123456789112'
+    def test_delete_multiple_list_items(self, dynamodb_mock):
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
         item_keys = [
             {"PK": {'S': "LIST#{}".format(list_id)}, 'SK': {'S': "USER#{}".format(list_id)}},
             {"PK": {'S': "LIST#{}".format(list_id)}, 'SK': {'S': "SHARED#{}".format(list_id)}}
         ]
 
-        message = delete.delete_items('lists-unittest', cognito_user_id, list_id, item_keys)
-        assert message == 'Deleted all items [2] for List ID: 12345678-abcd-abcd-123456789112 and user: 42cf26f5-407c-47cf-bcb6-f70cd63ac119.', "Delete message was not as expected."
+        message = delete.delete_items('lists-unittest', user_id, list_id, item_keys)
+        assert message == 'Deleted all items [2] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete message was not as expected."
 
     @pytest.mark.skip(reason="Moto is not throwing an exception when deleting with ConditionExpression")
     def test_delete_item_no_list(self, dynamodb_mock):
-        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
-        list_id = '1234abce'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0009-1234-abcdefghijkl'
 
         with pytest.raises(Exception) as e:
-            delete.delete_item('lists-unittest', cognito_user_id, list_id)
+            delete.delete_item('lists-unittest', user_id, list_id)
         assert str(e.value) == "List does not exist.", "Exception not as expected."
 
 
 class TestGetItemsAssociatedWithList:
     def test_get_items_associated_with_list(self, dynamodb_mock):
-        list_id = '12345678-abcd-abcd-123456789112'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
         items = delete.get_items_associated_with_list('lists-unittest', list_id)
         assert len(items) == 6, "Number of items deleted was not as expected."
 
@@ -200,8 +200,8 @@ class TestDeleteMain:
         body = json.loads(response['body'])
 
         assert body['deleted'], "Delete main response did not contain the correct status."
-        assert len(body['listId']) == 31, "Create main response did not contain a listId."
-        assert body['message'] == 'Deleted all items [6] for List ID: 12345678-abcd-abcd-123456789112 and user: 42cf26f5-407c-47cf-bcb6-f70cd63ac119.', "Delete main response did not contain the correct message."
+        assert len(body['listId']) == 36, "Create main response did not contain a listId."
+        assert body['message'] == 'Deleted all items [6] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete main response did not contain the correct message."
 
     def test_delete_main_with_bad_table_name(self, api_gateway_delete_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
@@ -212,14 +212,14 @@ class TestDeleteMain:
 
     def test_delete_main_with_bad_user(self, api_gateway_delete_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_delete_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:db9476fd-de77-4977-839f-4f943ff5d681"
+        api_gateway_delete_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
         response = delete.delete_main(api_gateway_delete_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'Owner of List ID 12345678-abcd-abcd-123456789112 did not match user id of requestor: db9476fd-de77-4977-839f-4f943ff5d681.', "Create main response did not contain the correct error message."
+        assert body['error'] == 'Owner of List ID 12345678-list-0001-1234-abcdefghijkl did not match user id of requestor: 12345678-user-0003-1234-abcdefghijkl.', "Create main response did not contain the correct error message."
 
     def test_delete_main_with_bad_list(self, api_gateway_delete_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_delete_event['pathParameters']['id'] = "12345678-nolist"
+        api_gateway_delete_event['pathParameters']['id'] = "12345678-list-0003-1234-abcdefghijkl"
 
         response = delete.delete_main(api_gateway_delete_event)
         body = json.loads(response['body'])

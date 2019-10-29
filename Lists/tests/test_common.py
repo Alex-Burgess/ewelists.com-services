@@ -15,7 +15,7 @@ def api_gateway_with_id_event():
 
     return {
       "resource": "/lists/{id}",
-      "path": "/lists/cf19fb62",
+      "path": "/lists/12345678-list-0001-1234-abcdefghijkl",
       "httpMethod": "GET",
       "headers": {
           "Accept": "*/*",
@@ -41,7 +41,7 @@ def api_gateway_with_id_event():
       "queryStringParameters": "null",
       "multiValueQueryStringParameters": "null",
       "pathParameters": {
-          "id": "cf19fb62"
+          "id": "12345678-list-0001-1234-abcdefghijkl"
       },
       "stageVariables": "null",
       "requestContext": {
@@ -50,7 +50,7 @@ def api_gateway_with_id_event():
           "httpMethod": "GET",
           "extendedRequestId": "BMsiDFARjoEFgOg=",
           "requestTime": "07/Oct/2019:15:33:45 +0000",
-          "path": "/test/lists/cf19fb62",
+          "path": "/test/lists/12345678-list-0001-1234-abcdefghijkl",
           "accountId": "123456789012",
           "protocol": "HTTP/1.1",
           "stage": "test",
@@ -66,7 +66,7 @@ def api_gateway_with_id_event():
               "principalOrgId": "o-d8jj6dyqv2",
               "accessKey": "ABCDEFGPDMJL4EB35H6H",
               "cognitoAuthenticationType": "authenticated",
-              "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:42cf26f5-407c-47cf-bcb6-f70cd63ac119",
+              "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl",
               "userArn": "arn:aws:sts::123456789012:assumed-role/Ewelists-test-CognitoAuthRole/CognitoIdentityCredentials",
               "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
               "user": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials"
@@ -80,7 +80,7 @@ def api_gateway_with_id_event():
 
 
 @pytest.fixture()
-def api_gateway_without_id_event():
+def api_gateway_event_with_no_list_id():
     """ Generates API GW Event"""
 
     return {
@@ -136,7 +136,7 @@ def api_gateway_without_id_event():
                 "principalOrgId": "o-d8jj6dyqv2",
                 "accessKey": "ABCDEFGPDMJL4EB35H6H",
                 "cognitoAuthenticationType": "authenticated",
-                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:42cf26f5-407c-47cf-bcb6-f70cd63ac119",
+                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl",
                 "userArn": "arn:aws:sts::123456789012:assumed-role/Ewelists-test-CognitoAuthRole/CognitoIdentityCredentials",
                 "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
                 "user": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials"
@@ -155,7 +155,7 @@ def api_gateway_postman_event():
 
     return {
       "resource": "/lists/{id}",
-      "path": "/lists/cf19fb62",
+      "path": "/lists/12345678-list-0001-1234-abcdefghijkl",
       "httpMethod": "GET",
       "headers": {
           "Accept": "*/*",
@@ -181,7 +181,7 @@ def api_gateway_postman_event():
       "queryStringParameters": "null",
       "multiValueQueryStringParameters": "null",
       "pathParameters": {
-          "id": "cf19fb62"
+          "id": "12345678-list-0001-1234-abcdefghijkl"
       },
       "stageVariables": "null",
       "requestContext": {
@@ -190,7 +190,7 @@ def api_gateway_postman_event():
           "httpMethod": "GET",
           "extendedRequestId": "BMsiDFARjoEFgOg=",
           "requestTime": "07/Oct/2019:15:33:45 +0000",
-          "path": "/test/lists/cf19fb62",
+          "path": "/test/lists/12345678-list-0001-1234-abcdefghijkl",
           "accountId": "123456789012",
           "protocol": "HTTP/1.1",
           "stage": "test",
@@ -220,12 +220,12 @@ def api_gateway_postman_event():
 
 
 @pytest.fixture()
-def api_gateway_noid_event():
+def api_gateway_event_with_no_identity():
     """ Generates API GW Event"""
 
     return {
       "resource": "/lists/{id}",
-      "path": "/lists/cf19fb62",
+      "path": "/lists/12345678-list-0001-1234-abcdefghijkl",
       "httpMethod": "GET",
       "headers": {
           "Accept": "*/*",
@@ -251,7 +251,7 @@ def api_gateway_noid_event():
       "queryStringParameters": "null",
       "multiValueQueryStringParameters": "null",
       "pathParameters": {
-          "id": "cf19fb62"
+          "id": "12345678-list-0001-1234-abcdefghijkl"
       },
       "stageVariables": "null",
       "requestContext": {
@@ -260,7 +260,7 @@ def api_gateway_noid_event():
           "httpMethod": "GET",
           "extendedRequestId": "BMsiDFARjoEFgOg=",
           "requestTime": "07/Oct/2019:15:33:45 +0000",
-          "path": "/test/lists/cf19fb62",
+          "path": "/test/lists/12345678-list-0001-1234-abcdefghijkl",
           "accountId": "123456789012",
           "protocol": "HTTP/1.1",
           "stage": "test",
@@ -277,19 +277,20 @@ def api_gateway_noid_event():
 
 
 @pytest.fixture()
-def response_items():
-    response_items = [
-        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "PENDING#new.user@gmail.com"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "email": {"S": "new.user@gmail.com"}, "title": {"S": "Oscar's 1st Birthday"}},
-        {"quantity": {"N": "1"}, "reserved": {"N": "0"}, "SK": {"S": "PRODUCT#1009"}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}},
-        {"quantity": {"N": "2"}, "reserved": {"N": "1"}, "SK": {"S": "PRODUCT#1010"}, "reservedDetails": {"M": {"name": {"S": "Azara-Jane Higgins"}, "userId": {"S": "eu-west-1:6789250a-0fb0-4b32-9842-041c69be6789"}, "reserved": {"N": "1"}, "timestamp": {"S": "2018-11-01T10:00:00"}}}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}},
-        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "userId": {"S": "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "title": {"S": "Oscar's 1st Birthday"}},
-        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "userId": {"S": "eu-west-1:1234250a-0fb0-4b32-9842-041c69be1234"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#eu-west-1:1234250a-0fb0-4b32-9842-041c69be1234"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "title": {"S": "Oscar's 1st Birthday"}},
-        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "userId": {"S": "eu-west-1:6789250a-0fb0-4b32-9842-041c69be6789"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#eu-west-1:6789250a-0fb0-4b32-9842-041c69be6789"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "title": {"S": "Oscar's 1st Birthday"}},
-        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "userId": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "title": {"S": "Oscar's 1st Birthday"}},
-        {"occasion": {"S": "Birthday"}, "listId": {"S": "76a2fe57-9fac-4a0d-9225-1942949889ba"}, "userId": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "USER#eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#76a2fe57-9fac-4a0d-9225-1942949889ba"}, "title": {"S": "Oscar's 1st Birthday"}}
+def example_response():
+    # Example response for a list, with user 2 as owner, shared with users 3, 4 and 5 and a pending user 6. 1 product not reserved, 1 product reserved by user 5.
+    example_response = [
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0002-1234-abcdefghijkl"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "PENDING#test.user6@gmail.com"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}, "email": {"S": "test.user6@gmail.com"}, "title": {"S": "Oscar's 1st Birthday"}},
+        {"quantity": {"N": "1"}, "reserved": {"N": "0"}, "SK": {"S": "PRODUCT#1009"}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}},
+        {"quantity": {"N": "2"}, "reserved": {"N": "1"}, "SK": {"S": "PRODUCT#1010"}, "reservedDetails": {"M": {"name": {"S": "Azara-Jane Higgins"}, "userId": {"S": "12345678-user-0005-1234-abcdefghijkl"}, "reserved": {"N": "1"}, "timestamp": {"S": "2018-11-01T10:00:00"}}}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}},
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0003-1234-abcdefghijkl"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#12345678-user-0003-1234-abcdefghijkl"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}, "title": {"S": "Oscar's 1st Birthday"}},
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0004-1234-abcdefghijkl"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#12345678-user-0004-1234-abcdefghijkl"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}, "title": {"S": "Oscar's 1st Birthday"}},
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0005-1234-abcdefghijkl"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#12345678-user-0005-1234-abcdefghijkl"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}, "title": {"S": "Oscar's 1st Birthday"}},
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#12345678-user-0002-1234-abcdefghijkl"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}, "title": {"S": "Oscar's 1st Birthday"}},
+        {"occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "eventDate": {"S": "2018-10-31"}, "listOwner": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "USER#12345678-user-0002-1234-abcdefghijkl"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}, "title": {"S": "Oscar's 1st Birthday"}}
     ]
 
-    return response_items
+    return example_response
 
 
 def test_create_response():
@@ -307,22 +308,22 @@ def test_create_response():
 class TestGetListIdFromPath:
     def test_get_list_id(self, api_gateway_with_id_event):
         list_id = common.get_list_id(api_gateway_with_id_event)
-        assert list_id == "cf19fb62", "List ID returned from API event was not as expected."
+        assert list_id == "12345678-list-0001-1234-abcdefghijkl", "List ID returned from API event was not as expected."
 
-    def test_get_list_id_when_not_present(self, api_gateway_without_id_event):
+    def test_get_list_id_when_not_present(self, api_gateway_event_with_no_list_id):
         with pytest.raises(Exception) as e:
-            common.get_list_id(api_gateway_without_id_event)
+            common.get_list_id(api_gateway_event_with_no_list_id)
         assert str(e.value) == "API Event did not contain a List ID in the path parameters.", "Exception not as expected."
 
 
 class TestGetPostmanIdentity:
     def test_get_postman_identity(self, monkeypatch):
-        monkeypatch.setitem(os.environ, 'POSTMAN_IDENTITY_ID', 'eu-west-1:1234abcd-1234-abcd-efgh-1234abcd5678')
-        monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB', '1234efgh-1234-abcd-efgh-1234abcd5678')
+        monkeypatch.setitem(os.environ, 'POSTMAN_IDENTITY_ID', 'eu-west-1:12345678-user-fed1-1234-abcdefghijkl')
+        monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB', '12345678-user-api1-1234-abcdefghijkl')
 
         identity = common.get_postman_identity(os.environ)
-        assert identity['POSTMAN_IDENTITY_ID'] == 'eu-west-1:1234abcd-1234-abcd-efgh-1234abcd5678', "POSTMAN_IDENTITY_ID not as expected."
-        assert identity['POSTMAN_USERPOOL_SUB'] == '1234efgh-1234-abcd-efgh-1234abcd5678', "POSTMAN_USERPOOL_SUB not as expected."
+        assert identity['POSTMAN_IDENTITY_ID'] == 'eu-west-1:12345678-user-fed1-1234-abcdefghijkl', "POSTMAN_IDENTITY_ID not as expected."
+        assert identity['POSTMAN_USERPOOL_SUB'] == '12345678-user-api1-1234-abcdefghijkl', "POSTMAN_USERPOOL_SUB not as expected."
 
     def test_get_postman_identity_when_both_osvars_missing(self):
         with pytest.raises(Exception) as e:
@@ -330,13 +331,13 @@ class TestGetPostmanIdentity:
         assert str(e.value) == "POSTMAN_IDENTITY_ID and POSTMAN_USERPOOL_SUB environment variables not set correctly.", "Exception not as expected."
 
     def test_get_postman_identity_when_userpool_missing(self, monkeypatch):
-        monkeypatch.setitem(os.environ, 'POSTMAN_IDENTITY_ID', 'eu-west-1:1234abcd-1234-abcd-efgh-1234abcd5678')
+        monkeypatch.setitem(os.environ, 'POSTMAN_IDENTITY_ID', 'eu-west-1:12345678-user-fed1-1234-abcdefghijkl')
         with pytest.raises(Exception) as e:
             common.get_postman_identity(os.environ)
         assert str(e.value) == "POSTMAN_IDENTITY_ID and POSTMAN_USERPOOL_SUB environment variables not set correctly.", "Exception not as expected."
 
     def test_get_postman_identity_when_identity_id_missing(self, monkeypatch):
-        monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB', '1234efgh-1234-abcd-efgh-1234abcd5678')
+        monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB', '12345678-user-api1-1234-abcdefghijkl')
         with pytest.raises(Exception) as e:
             common.get_postman_identity(os.environ)
         assert str(e.value) == "POSTMAN_IDENTITY_ID and POSTMAN_USERPOOL_SUB environment variables not set correctly.", "Exception not as expected."
@@ -346,18 +347,18 @@ class TestGetIdentity:
     def test_get_identity(self, api_gateway_with_id_event):
         identity = common.get_identity(api_gateway_with_id_event, os.environ)
         assert identity["cognitoIdentityId"] == "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c", "cognitoIdentityId not as expected."
-        assert identity["userPoolSub"] == "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userPoolSub not as expected."
+        assert identity["userPoolSub"] == "12345678-user-0001-1234-abcdefghijkl", "userPoolSub not as expected."
 
     def test_get_identity_when_postman_request(self, monkeypatch, api_gateway_postman_event):
-        monkeypatch.setitem(os.environ, 'POSTMAN_IDENTITY_ID', 'eu-west-1:1234abcd-1234-abcd-efgh-1234abcd5678')
-        monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB', '1234efgh-1234-abcd-efgh-1234abcd5678')
+        monkeypatch.setitem(os.environ, 'POSTMAN_IDENTITY_ID', 'eu-west-1:12345678-user-fed1-1234-abcdefghijkl')
+        monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB', '12345678-user-api1-1234-abcdefghijkl')
         identity = common.get_identity(api_gateway_postman_event, os.environ)
-        assert identity["cognitoIdentityId"] == "eu-west-1:1234abcd-1234-abcd-efgh-1234abcd5678", "cognitoIdentityId not as expected."
-        assert identity["userPoolSub"] == "1234efgh-1234-abcd-efgh-1234abcd5678", "userPoolSub not as expected."
+        assert identity["cognitoIdentityId"] == "eu-west-1:12345678-user-fed1-1234-abcdefghijkl", "cognitoIdentityId not as expected."
+        assert identity["userPoolSub"] == "12345678-user-api1-1234-abcdefghijkl", "userPoolSub not as expected."
 
-    def test_get_identity_when_noid(self, api_gateway_noid_event):
+    def test_get_identity_when_noid(self, api_gateway_event_with_no_identity):
         with pytest.raises(Exception) as e:
-            common.get_identity(api_gateway_noid_event, os.environ)
+            common.get_identity(api_gateway_event_with_no_identity, os.environ)
         assert str(e.value) == "There was no identity context in API event.", "Exception not as expected."
 
     def test_get_identity_when_postman_request_and_with_no_osvars(self, api_gateway_postman_event):
@@ -391,39 +392,39 @@ class TestGetUserpoolId:
 
 
 class TestConfirmOwner:
-    def test_confirm_owner(self, response_items):
-        cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04'
-        list_id = '76a2fe57-9fac-4a0d-9225-1942949889ba'
-        result = common.confirm_owner(cognito_identity_id, list_id, response_items)
+    def test_confirm_owner(self, example_response):
+        cognito_identity_id = '12345678-user-0002-1234-abcdefghijkl'
+        list_id = '12345678-list-0002-1234-abcdefghijkl'
+        result = common.confirm_owner(cognito_identity_id, list_id, example_response)
         assert result, "List should be owned by user."
 
-    def test_confirm_not_owner(self, response_items):
+    def test_confirm_not_owner(self, example_response):
         cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03'
-        list_id = '76a2fe57-9fac-4a0d-9225-1942949889ba'
+        list_id = '12345678-list-0002-1234-abcdefghijkl'
         with pytest.raises(Exception) as e:
-            common.confirm_owner(cognito_identity_id, list_id, response_items)
-        assert str(e.value) == "Owner of List ID 76a2fe57-9fac-4a0d-9225-1942949889ba did not match user id of requestor: eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03.", "Exception not thrown for list not being owned by user."
+            common.confirm_owner(cognito_identity_id, list_id, example_response)
+        assert str(e.value) == "Owner of List ID 12345678-list-0002-1234-abcdefghijkl did not match user id of requestor: eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03.", "Exception not thrown for list not being owned by user."
 
 
 class TestConfirmListSharedWithUser:
-    def test_confirm_list_shared_with_user(self, response_items):
-        cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce04'
-        list_id = '76a2fe57-9fac-4a0d-9225-1942949889ba'
-        result = common.confirm_list_shared_with_user(cognito_identity_id, list_id, response_items)
+    def test_confirm_list_shared_with_user(self, example_response):
+        cognito_identity_id = '12345678-user-0002-1234-abcdefghijkl'
+        list_id = '12345678-list-0002-1234-abcdefghijkl'
+        result = common.confirm_list_shared_with_user(cognito_identity_id, list_id, example_response)
         assert result, "List should be shared with user."
 
-    def test_confirm_list_not_shared_with_user(self, response_items):
+    def test_confirm_list_not_shared_with_user(self, example_response):
         cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03'
-        list_id = '76a2fe57-9fac-4a0d-9225-1942949889ba'
+        list_id = '12345678-list-0002-1234-abcdefghijkl'
         with pytest.raises(Exception) as e:
-            common.confirm_list_shared_with_user(cognito_identity_id, list_id, response_items)
-        assert str(e.value) == "List ID 76a2fe57-9fac-4a0d-9225-1942949889ba did not have a shared item with user eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03.", "Exception not thrown for list not being shared with user."
+            common.confirm_list_shared_with_user(cognito_identity_id, list_id, example_response)
+        assert str(e.value) == "List ID 12345678-list-0002-1234-abcdefghijkl did not have a shared item with user eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03.", "Exception not thrown for list not being shared with user."
 
 
 class TestGenerateListObject:
-    def test_generate_list_object(self, response_items):
-        items = common.generate_list_object(response_items)
-        assert items['list']['listId'] == "76a2fe57-9fac-4a0d-9225-1942949889ba", "Get list response did not contain a listId."
+    def test_generate_list_object(self, example_response):
+        items = common.generate_list_object(example_response)
+        assert items['list']['listId'] == "12345678-list-0002-1234-abcdefghijkl", "Get list response did not contain a listId."
         assert items['list']['title'] == "Oscar's 1st Birthday", "Get list response did not contain a title."
         assert items['list']['description'] == "A gift list for Oscars birthday.", "Get list response did not contain a description."
         assert items['list']['occasion'] == "Birthday", "Get list response did not contain an occasion."

@@ -20,7 +20,7 @@ def api_gateway_get_list_event():
 
     return {
         "resource": "/lists/{id}",
-        "path": "/lists/12345678-abcd-abcd-123456789112",
+        "path": "/lists/12345678-list-0001-1234-abcdefghijkl",
         "httpMethod": "GET",
         "headers": {
             "Accept": "*/*",
@@ -48,7 +48,7 @@ def api_gateway_get_list_event():
         "queryStringParameters": "null",
         "multiValueQueryStringParameters": "null",
         "pathParameters": {
-            "id": "12345678-abcd-abcd-123456789112"
+            "id": "12345678-list-0001-1234-abcdefghijkl"
         },
         "stageVariables": "null",
         "requestContext": {
@@ -57,7 +57,7 @@ def api_gateway_get_list_event():
             "httpMethod": "GET",
             "extendedRequestId": "BQGojGkBjoEFsTw=",
             "requestTime": "08/Oct/2019:16:22:40 +0000",
-            "path": "/test/lists/12345678-abcd-abcd-123456789112",
+            "path": "/test/lists/12345678-list-0001-1234-abcdefghijkl",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
@@ -73,7 +73,7 @@ def api_gateway_get_list_event():
                 "principalOrgId": "o-d8jj6dyqv2",
                 "accessKey": "ABCDEFGPDMJL4EB35H6H",
                 "cognitoAuthenticationType": "authenticated",
-                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:42cf26f5-407c-47cf-bcb6-f70cd63ac119",
+                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl",
                 "userArn": "arn:aws:sts::123456789012:assumed-role/Ewelists-test-CognitoAuthRole/CognitoIdentityCredentials",
                 "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
                 "user": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials"
@@ -123,16 +123,18 @@ def dynamodb_mock():
             }
         )
 
+    # 2 Users.  User 1 owns 1 list with 3 products, that is shared with 1 other user.  user 2 owns 1 list with 0 products and is not shared with anyone.
     items = [
-        {"PK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "email": "test.user@gmail.com", "name": "Test User", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119"},
-        {"PK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "SK": "USER#db9476fd-de77-4977-839f-4f943ff5d684", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "db9476fd-de77-4977-839f-4f943ff5d684"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#db9476fd-de77-4977-839f-4f943ff5d684", "userId": "db9476fd-de77-4977-839f-4f943ff5d684", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#49d47a66-8825-4872-85c2-e15a12d19aed", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Oscar's 2019 Christmas List", "occasion": "Christmas", "listId": "49d47a66-8825-4872-85c2-e15a12d19aed", "listOwner": "1234250a-0fb0-4b32-9842-041c69be1234", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas.", "eventDate": "2019-12-25"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1001", "quantity": 2, "reserved": 0},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1}
+        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
+        {"PK": "USER#12345678-user-0002-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 2019 Christmas List", "occasion": "Christmas", "listId": "12345678-list-0002-1234-abcdefghijkl", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas.", "eventDate": "2019-12-25"},
+        {"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 2019 Christmas List", "occasion": "Christmas", "listId": "12345678-list-0002-1234-abcdefghijkl", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas.", "eventDate": "2019-12-25"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1001", "quantity": 2, "reserved": 0},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1}
     ]
 
     for item in items:
@@ -144,24 +146,27 @@ def dynamodb_mock():
 
 
 class TestGetListQuery:
-    def test_get_list_query(self, dynamodb_mock):
-        cognito_user_id = "42cf26f5-407c-47cf-bcb6-f70cd63ac119"
-        items = get_list.get_list_query('lists-unittest', cognito_user_id, "12345678-abcd-abcd-123456789112")
+    def test_get_list_with_owner(self, dynamodb_mock):
+        user_id = "12345678-user-0001-1234-abcdefghijkl"
+        list_id = "12345678-list-0001-1234-abcdefghijkl"
+        items = get_list.get_list_query('lists-unittest', user_id, list_id)
         assert len(items) == 6, "Number of items deleted was not as expected."
 
-    def test_get_list_query_no_table_name(self, dynamodb_mock):
-        cognito_user_id = "42cf26f5-407c-47cf-bcb6-f70cd63ac119"
+    def test_get_list_query_wrong_table(self, dynamodb_mock):
+        user_id = "12345678-user-0001-1234-abcdefghijkl"
+        list_id = "12345678-list-0001-1234-abcdefghijkl"
 
         with pytest.raises(Exception) as e:
-            get_list.get_list_query('lists-unittes', cognito_user_id, "12345678-abcd-abcd-123456789112")
+            get_list.get_list_query('lists-unittes', user_id, list_id)
         assert str(e.value) == "Unexpected error when getting list item from table.", "Exception not as expected."
 
-    def test_get_list_query_for_item_that_does_not_exist(self, dynamodb_mock):
-        cognito_user_id = "42cf26f5-407c-47cf-bcb6-f70cd63ac119"
+    def test_get_list_query_with_list_that_does_not_exist(self, dynamodb_mock):
+        user_id = "12345678-user-0001-1234-abcdefghijkl"
+        list_id = "12345678-list-0009-1234-abcdefghijkl"
 
         with pytest.raises(Exception) as e:
-            get_list.get_list_query('lists-unittest', cognito_user_id, "12345678-abcd-abcd-123456789112-diff")
-        assert str(e.value) == "No query results for List ID 12345678-abcd-abcd-123456789112-diff and user: 42cf26f5-407c-47cf-bcb6-f70cd63ac119.", "Exception not as expected."
+            get_list.get_list_query('lists-unittest', user_id, list_id)
+        assert str(e.value) == "No query results for List ID 12345678-list-0009-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.", "Exception not as expected."
 
 
 class TestGetListMain:
@@ -171,7 +176,7 @@ class TestGetListMain:
         response = get_list.get_list_main(api_gateway_get_list_event)
         body = json.loads(response['body'])
 
-        assert body['list']['listId'] == "12345678-abcd-abcd-123456789112", "Get list response did not contain a listId."
+        assert body['list']['listId'] == "12345678-list-0001-1234-abcdefghijkl", "Get list response did not contain a listId."
         assert body['list']['title'] == "Api Child's 1st Birthday", "Get list response did not contain a title."
         assert body['list']['description'] == "A gift list for Api Childs birthday.", "Get list response did not contain a description."
         assert body['list']['occasion'] == "Birthday", "Get list response did not contain an occasion."
@@ -188,7 +193,7 @@ class TestGetListMain:
         assert body['products'][2]['quantity'] == 2, "Quantity of product was not correct."
         assert body['products'][2]['reserved'] == 1, "Reserved quantity of product was not correct."
 
-    def test_get_list_main_no_table(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
+    def test_get_list_main_wrong_table(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
 
         response = get_list.get_list_main(api_gateway_get_list_event)
@@ -198,12 +203,12 @@ class TestGetListMain:
 
     def test_get_list_that_requestor_does_not_own(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_get_list_event['pathParameters']['id'] = "49d47a66-8825-4872-85c2-e15a12d19aed"
+        api_gateway_get_list_event['pathParameters']['id'] = "12345678-list-0002-1234-abcdefghijkl"
 
         response = get_list.get_list_main(api_gateway_get_list_event)
         body = json.loads(response['body'])
 
-        assert body['error'] == "Owner of List ID 49d47a66-8825-4872-85c2-e15a12d19aed did not match user id of requestor: 42cf26f5-407c-47cf-bcb6-f70cd63ac119.", "Get list response did not contain the correct error message."
+        assert body['error'] == "Owner of List ID 12345678-list-0002-1234-abcdefghijkl did not match user id of requestor: 12345678-user-0001-1234-abcdefghijkl.", "Get list response did not contain the correct error message."
 
 
 def test_handler(api_gateway_get_list_event, monkeypatch, dynamodb_mock):

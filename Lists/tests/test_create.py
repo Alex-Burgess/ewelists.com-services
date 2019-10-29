@@ -72,7 +72,7 @@ def api_gateway_create_event():
                 "principalOrgId": "o-d8jj6dyqv2",
                 "accessKey": "ABCDEFGPDMJL4EB35H6H",
                 "cognitoAuthenticationType": "authenticated",
-                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:42cf26f5-407c-47cf-bcb6-f70cd63ac119",
+                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl",
                 "userArn": "arn:aws:sts::123456789012:assumed-role/Ewelists-test-CognitoAuthRole/CognitoIdentityCredentials",
                 "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
                 "user": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials"
@@ -122,10 +122,11 @@ def dynamodb_mock():
             }
         )
 
+    # 1 User, with 1 list.
     items = [
-        {"PK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "email": "test.user@gmail.com", "name": "Test User", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "USER#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
-        {"PK": "LIST#12345678-abcd-abcd-123456789112", "SK": "SHARE#42cf26f5-407c-47cf-bcb6-f70cd63ac119", "userId": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-abcd-abcd-123456789112", "createdAt": "2018-09-01T10:00:00", "listOwner": "42cf26f5-407c-47cf-bcb6-f70cd63ac119", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "2019-09-01"},
     ]
 
     for item in items:
@@ -154,16 +155,16 @@ class TestGetAttributeDetails:
 
 class TestGenerateListId:
     def test_generate_list_id(self, dynamodb_mock, api_gateway_create_event):
-        cognito_user_id = api_gateway_create_event['requestContext']['identity']['cognitoIdentityId']
-        list_id = create.generate_list_id(cognito_user_id, 'lists-unittest')
+        user_id = api_gateway_create_event['requestContext']['identity']['cognitoIdentityId']
+        list_id = create.generate_list_id(user_id, 'lists-unittest')
         assert len(list_id) == 36, "List ID not 36 characters long."
-        assert list_id != '12345678-abcd-abcd-123456789112', "List ID shouldn't match the ID of the list already in the table (Pretty Unlikely)."
+        assert list_id != '12345678-list-0001-1234-abcdefghijkl', "List ID shouldn't match the ID of the list already in the table (Pretty Unlikely)."
 
 
 class TestPutItemInTable:
     def test_put_item_in_table(self, dynamodb_mock):
-        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
-        listId = 'b2ed81b0-67eb-4599-98b9-60c0e739de2d'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0002-1234-abcdefghijkl'
 
         attributes = {
             'title': 'My Test List',
@@ -171,7 +172,7 @@ class TestPutItemInTable:
             'occasion': 'Birthday',
         }
 
-        message = create.put_item_in_table('lists-unittest', cognito_user_id, listId, attributes)
+        message = create.put_item_in_table('lists-unittest', user_id, list_id, attributes)
         assert message == "List was created.", "Put item message not as expected."
 
         # Check the table was updated with right number of items
@@ -180,13 +181,13 @@ class TestPutItemInTable:
         test_response = dynamodb.query(
             TableName='lists-unittest',
             KeyConditionExpression="PK = :PK",
-            ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(listId)}}
+            ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
         )
         assert len(test_response['Items']) == 2, "Number of items for new list should be 2."
 
     def test_put_item_in_table_with_bad_name(self, dynamodb_mock):
-        cognito_user_id = '42cf26f5-407c-47cf-bcb6-f70cd63ac119'
-        listId = '9500f915-df8f-46b7-bc3f-7ea6a2bc0f84'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0002-1234-abcdefghijkl'
 
         attributes = {
             'title': 'My Test List',
@@ -195,7 +196,7 @@ class TestPutItemInTable:
         }
 
         with pytest.raises(Exception) as e:
-            create.put_item_in_table('lists-unittes', cognito_user_id, listId, attributes)
+            create.put_item_in_table('lists-unittes', user_id, list_id, attributes)
         assert str(e.value) == "List could not be created.", "Exception not as expected."
 
 
