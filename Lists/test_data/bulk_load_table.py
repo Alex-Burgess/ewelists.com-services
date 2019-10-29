@@ -1,9 +1,13 @@
 import json
-
+import sys
 import boto3
 
-table_name = 'lists-test'
-file_name = 'items.json'
+# table_name = 'lists-test'
+# file_name = 'items.json'
+table_name = sys.argv[1]
+file_name = sys.argv[2]
+# usage: python bulk_load_table.py lists-test items-test.json
+# usage: python bulk_load_table.py lists-staging items-staging.json
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(table_name)
