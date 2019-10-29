@@ -1,6 +1,6 @@
 {
     "resource": "/lists/{id}",
-    "path": "/lists/a37ad504-145e-4944-9c5f-92014e56d617",
+    "path": "/lists/12345678-list-0002-1234-abcdefghijkl",
     "httpMethod": "GET",
     "headers": {
         "Accept": "*/*",
@@ -26,7 +26,7 @@
     "queryStringParameters": null,
     "multiValueQueryStringParameters": null,
     "pathParameters": {
-        "id": "a37ad504-145e-4944-9c5f-92014e56d617"
+        "id": "12345678-list-0002-1234-abcdefghijkl"
     },
     "stageVariables": null,
     "requestContext": {
@@ -35,7 +35,7 @@
         "httpMethod": "GET",
         "extendedRequestId": "BMsiDFARjoEFgOg=",
         "requestTime": "07/Oct/2019:15:33:45 +0000",
-        "path": "/test/lists/a37ad504-145e-4944-9c5f-92014e56d617",
+        "path": "/test/lists/12345678-list-0002-1234-abcdefghijkl",
         "accountId": "123456789012",
         "protocol": "HTTP/1.1",
         "stage": "test",
@@ -51,7 +51,7 @@
             "principalOrgId": "o-d8jj6dyqv2",
             "accessKey": "ABCDEFGPDMJL4EB35H6H",
             "cognitoAuthenticationType": "authenticated",
-            "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:42cf26f5-407c-47cf-bcb6-f70cd63ac119",
+            "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl",
             "userArn": "arn:aws:sts::123456789012:assumed-role/Ewelists-test-CognitoAuthRole/CognitoIdentityCredentials",
             "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
             "user": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials"

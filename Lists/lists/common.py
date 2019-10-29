@@ -32,7 +32,7 @@ def get_userpool_id(osenv):
     return userpool_id
 
 
-def confirm_owner(cognito_identity_id, list_id, response_items):
+def confirm_owner(cognito_user_id, list_id, response_items):
     list_owner_id = None
     for item in response_items:
         if item['SK']['S'].startswith("USER"):
@@ -40,22 +40,22 @@ def confirm_owner(cognito_identity_id, list_id, response_items):
             logger.info("List Owner: {}".format(item['listOwner']['S']))
             list_owner_id = item['listOwner']['S']
 
-    if list_owner_id != cognito_identity_id:
-        logger.info("Owner of List ID {} did not match user id of requestor: {}.".format(list_id, cognito_identity_id))
-        raise Exception("Owner of List ID {} did not match user id of requestor: {}.".format(list_id, cognito_identity_id))
+    if list_owner_id != cognito_user_id:
+        logger.info("Owner of List ID {} did not match user id of requestor: {}.".format(list_id, cognito_user_id))
+        raise Exception("Owner of List ID {} did not match user id of requestor: {}.".format(list_id, cognito_user_id))
 
     return True
 
 
-def confirm_list_shared_with_user(cognito_identity_id, list_id, response_items):
-    shared_user = 'SHARE#' + cognito_identity_id
+def confirm_list_shared_with_user(cognito_user_id, list_id, response_items):
+    shared_user = 'SHARE#' + cognito_user_id
     for item in response_items:
         if item['SK']['S'] == shared_user:
-            logger.info("Confirmed list {} is shared with user {}".format(list_id, cognito_identity_id))
+            logger.info("Confirmed list {} is shared with user {}".format(list_id, cognito_user_id))
             return True
 
-    logger.info("List ID {} did not have a shared item with user {}.".format(list_id, cognito_identity_id))
-    raise Exception("List ID {} did not have a shared item with user {}.".format(list_id, cognito_identity_id))
+    logger.info("List ID {} did not have a shared item with user {}.".format(list_id, cognito_user_id))
+    raise Exception("List ID {} did not have a shared item with user {}.".format(list_id, cognito_user_id))
 
 
 def generate_list_object(response_items):
@@ -78,7 +78,7 @@ def get_identity(event, osenv):
 
     try:
         userArn = event['requestContext']['identity']['userArn']
-        cognito_identity_id = event['requestContext']['identity']['cognitoIdentityId']
+        cognito_user_id = event['requestContext']['identity']['cognitoIdentityId']
         cognito_authentication_provider = event['requestContext']['identity']['cognitoAuthenticationProvider']
     except KeyError:
         logger.error("There was no identity context in API event.")
@@ -92,10 +92,10 @@ def get_identity(event, osenv):
         identity["cognitoIdentityId"] = os_identity["POSTMAN_IDENTITY_ID"]
         identity["userPoolSub"] = os_identity["POSTMAN_USERPOOL_SUB"]
     else:
-        if cognito_identity_id is None:
+        if cognito_user_id is None:
             raise Exception("There was no cognitoIdentityId in the API event.")
 
-        identity["cognitoIdentityId"] = cognito_identity_id
+        identity["cognitoIdentityId"] = cognito_user_id
         identity["userPoolSub"] = cognito_authentication_provider.split(':')[-1]
 
         logger.info('cognitoIdentityId was retrieved from event.')

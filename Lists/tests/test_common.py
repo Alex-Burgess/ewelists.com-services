@@ -393,31 +393,31 @@ class TestGetUserpoolId:
 
 class TestConfirmOwner:
     def test_confirm_owner(self, example_response):
-        cognito_identity_id = '12345678-user-0002-1234-abcdefghijkl'
+        cognito_user_id = '12345678-user-0002-1234-abcdefghijkl'
         list_id = '12345678-list-0002-1234-abcdefghijkl'
-        result = common.confirm_owner(cognito_identity_id, list_id, example_response)
+        result = common.confirm_owner(cognito_user_id, list_id, example_response)
         assert result, "List should be owned by user."
 
     def test_confirm_not_owner(self, example_response):
-        cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03'
+        cognito_user_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03'
         list_id = '12345678-list-0002-1234-abcdefghijkl'
         with pytest.raises(Exception) as e:
-            common.confirm_owner(cognito_identity_id, list_id, example_response)
+            common.confirm_owner(cognito_user_id, list_id, example_response)
         assert str(e.value) == "Owner of List ID 12345678-list-0002-1234-abcdefghijkl did not match user id of requestor: eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03.", "Exception not thrown for list not being owned by user."
 
 
 class TestConfirmListSharedWithUser:
     def test_confirm_list_shared_with_user(self, example_response):
-        cognito_identity_id = '12345678-user-0002-1234-abcdefghijkl'
+        cognito_user_id = '12345678-user-0002-1234-abcdefghijkl'
         list_id = '12345678-list-0002-1234-abcdefghijkl'
-        result = common.confirm_list_shared_with_user(cognito_identity_id, list_id, example_response)
+        result = common.confirm_list_shared_with_user(cognito_user_id, list_id, example_response)
         assert result, "List should be shared with user."
 
     def test_confirm_list_not_shared_with_user(self, example_response):
-        cognito_identity_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03'
+        cognito_user_id = 'eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03'
         list_id = '12345678-list-0002-1234-abcdefghijkl'
         with pytest.raises(Exception) as e:
-            common.confirm_list_shared_with_user(cognito_identity_id, list_id, example_response)
+            common.confirm_list_shared_with_user(cognito_user_id, list_id, example_response)
         assert str(e.value) == "List ID 12345678-list-0002-1234-abcdefghijkl did not have a shared item with user eu-west-1:dc7b5ba3-835f-4859-ae67-06af31c2ce03.", "Exception not thrown for list not being shared with user."
 
 
