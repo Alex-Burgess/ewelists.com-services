@@ -55,7 +55,7 @@ def get_attribute_details(event):
         logger.error("API Event did not contain a valid body.")
         raise Exception('API Event did not contain a valid body.')
 
-    expected_keys = ["title", "description", "occasion"]
+    expected_keys = ["title", "description", "eventDate", "occasion"]
 
     if list(update_attributes.keys()) != expected_keys:
         logger.error("Event body did not contain the expected keys " + str(expected_keys) + ".")
@@ -101,14 +101,20 @@ def update_list(table_name, items, new_attribute_values):
             'SK': {'S': item['SK']['S']}
         }
 
+        if new_attribute_values["eventDate"]:
+            eventDate = new_attribute_values["eventDate"]
+        else:
+            eventDate = 'None'
+
         try:
             response = dynamodb.update_item(
                 TableName=table_name,
                 Key=key,
-                UpdateExpression="set title = :t, description = :d, occasion = :o",
+                UpdateExpression="set title = :t, description = :d, eventDate = :e, occasion = :o",
                 ExpressionAttributeValues={
                     ':t': {'S': new_attribute_values["title"]},
                     ':d': {'S': new_attribute_values["description"]},
+                    ':e': {'S': eventDate},
                     ':o': {'S': new_attribute_values["occasion"]}
                 },
                 ReturnValues="UPDATED_NEW"
