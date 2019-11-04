@@ -25,7 +25,8 @@ class List:
         self.title = item.get('title').get('S')
         self.description = item.get('description').get('S')
         self.occasion = item.get('occasion').get('S')
-        # self.eventDate = item.get('eventDate').get('S')
+        if item.get('eventDate'):
+            self.eventDate = item.get('eventDate').get('S')
 
     def __repr__(self):
         return "List<{} -- {} -- {}>".format(self.listId, self.title, self.occasion)
@@ -36,8 +37,10 @@ class List:
             'title': self.title,
             'description': self.description,
             'occasion': self.occasion,
-            # 'eventDate': self.eventDate
         }
+
+        if hasattr(self, 'eventDate'):
+            list['eventDate'] = self.eventDate
 
         return list
 
