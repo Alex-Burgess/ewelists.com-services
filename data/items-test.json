@@ -17,14 +17,14 @@
 {"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "12345678-list-0004-1234-abcdefghijkl", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "createdAt": "2019-09-01T10:00:00", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "31 October 2019" }
 {"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "12345678-list-0004-1234-abcdefghijkl", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "createdAt": "2019-09-01T10:00:00", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "31 October 2019"}
 {"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0003-1234-abcdefghijkl", "userId": "12345678-user-0003-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "12345678-list-0004-1234-abcdefghijkl", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "createdAt": "2019-09-01T10:00:00", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "31 October 2019"}
-{"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0}
-{"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "PRODUCT#1001", "quantity": 2, "reserved": 0}
-{"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1}
-{"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "PRODUCT#1003", "quantity": 1, "reserved": 1}
-{"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "PRODUCT#1004", "quantity": 1, "reserved": 0}
-{"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "PRODUCT#1005", "quantity": 2, "reserved": 0}
-{"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "PRODUCT#1006", "quantity": 2, "reserved": 1}
-{"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "PRODUCT#1007", "quantity": 1, "reserved": 0}
-{"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "PRODUCT#1008", "quantity": 2, "reserved": 0}
-{"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1009", "quantity": 1, "reserved": 0}
+{"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "PRODUCTS#12345678-prod-0001-1234-abcdefghijkl", "quantity": 1, "reserved": 0}
+{"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "PRODUCTS#12345678-prod-0002-1234-abcdefghijkl", "quantity": 2, "reserved": 0}
+{"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "PRODUCTS#12345678-prod-0003-1234-abcdefghijkl", "quantity": 2, "reserved": 1}
+{"PK": "LIST#12345678-list-0004-1234-abcdefghijkl", "SK": "PRODUCTS#12345678-prod-0004-1234-abcdefghijkl", "quantity": 1, "reserved": 1}
+{"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "PRODUCTS#12345678-prod-0005-1234-abcdefghijkl", "quantity": 1, "reserved": 0}
+{"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "PRODUCTS#12345678-prod-0006-1234-abcdefghijkl", "quantity": 2, "reserved": 0}
+{"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "PRODUCTS#12345678-prod-0007-1234-abcdefghijkl", "quantity": 2, "reserved": 1}
+{"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "NOTFOUND#12345678-notf-0012-1234-abcdefghijkl", "quantity": 1, "reserved": 0}
+{"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "NOTFOUND#12345678-notf-0011-1234-abcdefghijkl", "quantity": 2, "reserved": 0}
+{"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "NOTFOUND#12345678-notf-0010-1234-abcdefghijkl", "quantity": 1, "reserved": 0}
 {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1010", "quantity": 2, "reserved": 1, "reservedDetails": {"userId": "12345678-user-0003-1234-abcdefghijkl", "name": "Azara-Jane Higgins", "reserved": 1, "timestamp": "2018-11-01T10:00:00" }}
