@@ -154,9 +154,8 @@ class TestGetAttributeDetails:
 
 
 class TestGenerateListId:
-    def test_generate_list_id(self, dynamodb_mock, api_gateway_create_event):
-        user_id = api_gateway_create_event['requestContext']['identity']['cognitoIdentityId']
-        list_id = create.generate_list_id(user_id, 'lists-unittest')
+    def test_generate_list_id(self):
+        list_id = create.generate_list_id()
         assert len(list_id) == 36, "List ID not 36 characters long."
         assert list_id != '12345678-list-0001-1234-abcdefghijkl', "List ID shouldn't match the ID of the list already in the table (Pretty Unlikely)."
 

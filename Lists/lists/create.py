@@ -25,7 +25,7 @@ def create_main(event):
     try:
         table_name = common.get_table_name(os.environ)
         identity = common.get_identity(event, os.environ)
-        listId = generate_list_id(identity['userPoolSub'], table_name)
+        listId = generate_list_id()
         attributes = get_attribute_details(event)
         message = put_item_in_table(table_name, identity['userPoolSub'], listId, attributes)
     except Exception as e:
@@ -73,7 +73,7 @@ def put_item_in_table(table_name, cognito_user_id, listId, attributes):
     return message
 
 
-def generate_list_id(cognito_user_id, table_name):
+def generate_list_id():
     # Generate a random uid
     newlistId = str(uuid.uuid4())
     logger.info("Generated List ID: {}".format(newlistId))
