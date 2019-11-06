@@ -71,3 +71,14 @@ def get_postman_identity(osenv):
         raise Exception('POSTMAN_IDENTITY_ID and POSTMAN_USERPOOL_SUB environment variables not set correctly.')
 
     return os_identity
+
+
+def get_product_id(event):
+    try:
+        product_id = event['pathParameters']['id']
+        logger.info("Product ID: " + product_id)
+    except Exception:
+        logger.error("API Event did not contain a Product ID in the path parameters.")
+        raise Exception('API Event did not contain a Product ID in the path parameters.')
+
+    return product_id
