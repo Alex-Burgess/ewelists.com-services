@@ -65,7 +65,7 @@ def put_product(table_name, cognito_user_id, product_info):
         'productId': {'S': product_id},
         'brand': {'S': product_info['brand']},
         'details': {'S': product_info['details']},
-        'url': {'S': product_info['url']},
+        'productUrl': {'S': product_info['url']},
         "createdBy": {'S': cognito_user_id},
         'createdAt': {'N': str(int(time.time()))}
     }

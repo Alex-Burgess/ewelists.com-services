@@ -113,7 +113,7 @@ def dynamodb_mock():
 
     # 1 User, with 1 list.
     items = [
-        {"productId": "12345678-notf-0010-1234-abcdefghijkl", "brand": "John Lewis", "details": "John Lewis & Partners Safari Mobile", "url": "https://www.johnlewis.com/john-lewis-partners-safari-mobile/p3439165"},
+        {"productId": "12345678-notf-0010-1234-abcdefghijkl", "brand": "John Lewis", "details": "John Lewis & Partners Safari Mobile", "productUrl": "https://www.johnlewis.com/john-lewis-partners-safari-mobile/p3439165"},
     ]
 
     for item in items:
