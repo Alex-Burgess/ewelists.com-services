@@ -83,7 +83,7 @@ def api_gateway_add_product_event():
             "domainName": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
             "apiId": "4sdcvv0n2e"
         },
-        "body": "{\n    \"quantity\": 1,\n    \"type\": \"products\"\n}",
+        "body": "{\n    \"quantity\": 1,\n    \"productType\": \"products\"\n}",
         "isBase64Encoded": "false"
     }
 
@@ -154,35 +154,99 @@ class TestCreateProductItem:
     def test_create_product_item(self, dynamodb_mock):
         product_id = '12345678-prod-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
-        type = 'products'
-        quantity = 1
-
-        result = add_product.create_product_item('lists-unittest', list_id, product_id, type, quantity)
+        result = add_product.create_product_item('lists-unittest', list_id, product_id, 'products', 1)
         assert result, "Product was not added to table."
-        # test search for product, compare against expected item
 
-    # def test_create_product_item_with_no_table
-    # def test_with_quantity 2
+        # Check the table was updated with right number of items
+        dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
+
+        test_response = dynamodb.get_item(
+            TableName='lists-unittest',
+            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "PRODUCT#" + product_id}}
+        )
+
+        assert test_response['Item']['PK']['S'] == 'LIST#12345678-list-0001-1234-abcdefghijkl', "List ID not as expected."
+        assert test_response['Item']['SK']['S'] == 'PRODUCT#12345678-prod-0001-1234-abcdefghijkl', "Product Id not as expected."
+        assert test_response['Item']['type']['S'] == 'products', "Product type not as expected."
+        assert test_response['Item']['quantity']['N'] == '1', "Quantity not as expected."
+        assert test_response['Item']['reserved']['N'] == '0', "Quantity not as expected."
+
+    def test_with_quantity_2(self, dynamodb_mock):
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        result = add_product.create_product_item('lists-unittest', list_id, product_id, 'products', 2)
+        assert result, "Product was not added to table."
+
+        # Check the table was updated with right number of items
+        dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
+
+        test_response = dynamodb.get_item(
+            TableName='lists-unittest',
+            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "PRODUCT#" + product_id}}
+        )
+
+        assert test_response['Item']['quantity']['N'] == '2', "Quantity not as expected."
+
+    def test_create_product_item_with_no_table(self, dynamodb_mock):
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+
+        with pytest.raises(Exception) as e:
+            add_product.create_product_item('lists-unittes', list_id, product_id, 'products', 1)
+        assert str(e.value) == "Product could not be created.", "Exception not as expected."
 
 
 class TestCreatedProductMain:
-    # def test_create_product_for_products
-    # def test_create_product_for_notfound
-    # def test_with_wrong_type
-    # def test_with_no_quantity
-    # def test_add_when_not_list_owner
-    # def test_add_with_bad_table_name
-    # def test_add_product_with_no_list_id
-    # def test_add_product_with_no_product_id
+    def test_create_product_for_products(self, api_gateway_add_product_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        response = add_product.add_product_main(api_gateway_add_product_event)
+        body = json.loads(response['body'])
+        assert body['message'], "Add product main response did not contain the correct status."
+
+    def test_create_product_with_wrong_type(self, api_gateway_add_product_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_add_product_event['body'] = '{\n    \"quantity\": 1,\n    \"productType\": \"wrong\"\n}'
+
+        with pytest.raises(Exception) as e:
+            add_product.add_product_main(api_gateway_add_product_event)
+        assert str(e.value) == "API Event did not contain a product type of products or notfound.", "Exception not as expected."
+
+    def test_create_product_with_no_quantity(self, api_gateway_add_product_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_add_product_event['body'] = '{\n    \"productType\": \"products\"\n}'
+
+        with pytest.raises(Exception) as e:
+            add_product.add_product_main(api_gateway_add_product_event)
+        assert str(e.value) == "API Event did not contain the quantity in the body.", "Exception not as expected."
+
+    def test_create_product_with_not_owner(self, api_gateway_add_product_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_add_product_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
+
+        with pytest.raises(Exception) as e:
+            add_product.add_product_main(api_gateway_add_product_event)
+        assert str(e.value) == "No list exists with this ID.", "Exception not as expected."
+
+    def test_add_product_with_no_list_id(self, api_gateway_add_product_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_add_product_event['pathParameters']['id'] = '12345678-list-0002-1234-abcdefghijkl'
+
+        with pytest.raises(Exception) as e:
+            add_product.add_product_main(api_gateway_add_product_event)
+        assert str(e.value) == "No list exists with this ID.", "Exception not as expected."
+
+    def test_add_product_with_no_product_id(self, api_gateway_add_product_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_add_product_event['pathParameters']['productid'] = None
+
+        with pytest.raises(Exception) as e:
+            add_product.add_product_main(api_gateway_add_product_event)
+        assert str(e.value) == "API Event did not contain a Product ID in the path parameters.", "Exception not as expected."
 
 
-
-# def test_handler(api_gateway_delete_event, monkeypatch, dynamodb_mock):
-#     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-#     response = delete.handler(api_gateway_delete_event, None)
-#     assert response['statusCode'] == 200, "Response statusCode was not as expected."
-#     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, "Response headers were not as expected."
-#     assert re.match('{"deleted": .*}', response['body']), "Response body was not as expected."
-#
-#     body = json.loads(response['body'])
-#     assert body['count'] == 6, "Number of items deleted was not as expected."
+def test_handler(api_gateway_add_product_event, monkeypatch, dynamodb_mock):
+    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    response = add_product.handler(api_gateway_add_product_event, None)
+    assert response['statusCode'] == 200, "Response statusCode was not as expected."
+    assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, "Response headers were not as expected."
+    assert re.match('{"message": .*}', response['body']), "Response body was not as expected."

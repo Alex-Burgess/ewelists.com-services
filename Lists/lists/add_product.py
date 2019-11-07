@@ -26,12 +26,12 @@ def add_product_main(event):
     identity = common.get_identity(event, os.environ)
     list_id = common.get_list_id(event)
     product_id = common.get_product_id(event)
-    quantity = common.get_product_id(event)
-    type = "products"       # Add method that gets this from body.  Type can only be products or notfound.
+    quantity = common.get_quantity(event)
+    type = common.get_product_type(event)
 
     list_item = get_list(table_name, identity['userPoolSub'], list_id)
 
-    common.confirm_owner(identity['userPoolSub'], list_id, list_item)
+    common.confirm_owner(identity['userPoolSub'], list_id, [list_item])
 
     message = create_product_item(table_name, list_id, product_id, type, quantity)
 

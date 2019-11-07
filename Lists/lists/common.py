@@ -161,6 +161,22 @@ def get_quantity(event):
     return quantity
 
 
+def get_product_type(event):
+    try:
+        body_object = json.loads(event['body'])
+        product_type = body_object['productType']
+        logger.info("Product type: " + str(product_type))
+    except Exception:
+        logger.error("API Event did not contain the product type in the body.")
+        raise Exception('API Event did not contain the product type in the body.')
+
+    if (product_type != 'notfound') and (product_type != 'products'):
+        logger.error("API Event did not contain a product type of products or notfound.")
+        raise Exception('API Event did not contain a product type of products or notfound.')
+
+    return product_type
+
+
 def create_response(code, body):
     logger.info("Creating response with status code ({}) and body ({})".format(code, body))
     response = {'statusCode': code,

@@ -2,6 +2,7 @@ import pytest
 import os
 from lists import common
 import sys
+import copy
 import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -344,7 +345,7 @@ def api_gateway_add_product_event():
             "domainName": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
             "apiId": "4sdcvv0n2e"
         },
-        "body": "{\n    \"quantity\": 1\n}",
+        "body": "{\n    \"quantity\": 1,\n    \"productType\": \"products\"\n}",
         "isBase64Encoded": "false"
     }
 
@@ -409,6 +410,30 @@ class TestGetQuantity:
         with pytest.raises(Exception) as e:
             common.get_quantity(api_gateway_event_with_no_list_id)
         assert str(e.value) == "API Event did not contain the quantity in the body.", "Exception not as expected."
+
+
+class TestGetProductType:
+    def test_get_product_type(self, api_gateway_add_product_event):
+        product = common.get_product_type(api_gateway_add_product_event)
+        assert product == 'products', "Product type returned from API event was not as expected."
+
+    def test_get_product_type_of_notfound(self, api_gateway_add_product_event):
+        notfound_body = copy.deepcopy(api_gateway_add_product_event)
+        notfound_body['body'] = '{\n    \"quantity\": 1,\n    \"productType\": \"notfound\"\n}'
+        product = common.get_product_type(notfound_body)
+        assert product == 'notfound', "Product type returned from API event was not as expected."
+
+    def test_get_wrong_product_type(self, api_gateway_add_product_event):
+        wrong_body = copy.deepcopy(api_gateway_add_product_event)
+        wrong_body['body'] = '{\n    \"quantity\": 1,\n    \"productType\": \"wrong\"\n}'
+        with pytest.raises(Exception) as e:
+            common.get_product_type(wrong_body)
+        assert str(e.value) == "API Event did not contain a product type of products or notfound.", "Exception not as expected."
+
+    def test_get_product_type_when_not_present(self, api_gateway_event_with_no_list_id):
+        with pytest.raises(Exception) as e:
+            common.get_product_type(api_gateway_event_with_no_list_id)
+        assert str(e.value) == "API Event did not contain the product type in the body.", "Exception not as expected."
 
 
 class TestGetPostmanIdentity:
