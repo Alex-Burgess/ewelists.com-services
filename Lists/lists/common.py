@@ -21,6 +21,17 @@ def get_table_name(osenv):
     return table_name
 
 
+def get_table_index(osenv):
+    try:
+        index_name = osenv['INDEX_NAME']
+        logger.info("INDEX_NAME environment variable value: " + index_name)
+    except KeyError:
+        logger.error('INDEX_NAME environment variable not set correctly.')
+        raise Exception('INDEX_NAME environment variable not set correctly.')
+
+    return index_name
+
+
 def get_userpool_id(osenv):
     try:
         userpool_id = osenv['USERPOOL_ID']

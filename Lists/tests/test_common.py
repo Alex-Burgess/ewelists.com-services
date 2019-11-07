@@ -379,6 +379,18 @@ class TestGetTableName:
         assert str(e.value) == "TABLE_NAME environment variable not set correctly.", "Exception not as expected."
 
 
+class TestGetTableIndex:
+    def test_get_table_index(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'index-test')
+        index_name = common.get_table_index(os.environ)
+        assert index_name == "index-test", "Index name from os environment variables was not as expected."
+
+    def test_get_table_index_os_var_not_set(self):
+        with pytest.raises(Exception) as e:
+            common.get_table_index(os.environ)
+        assert str(e.value) == "INDEX_NAME environment variable not set correctly.", "Exception not as expected."
+
+
 class TestGetUserpoolId:
     def test_get_userpool_id(self, monkeypatch):
         monkeypatch.setitem(os.environ, 'USERPOOL_ID', 'ewelists-test')

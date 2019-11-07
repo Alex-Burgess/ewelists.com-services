@@ -208,6 +208,7 @@ class TestGetLists:
 class TestListMain:
     def test_list_main(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'userId-index')
         response = list.list_main(api_gateway_listall_event)
         body = json.loads(response['body'])
 
@@ -216,6 +217,7 @@ class TestListMain:
 
     def test_list_main_no_table(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'userId-index')
         response = list.list_main(api_gateway_listall_event)
         body = json.loads(response['body'])
 
@@ -223,6 +225,7 @@ class TestListMain:
 
     def test_list_main_user_with_no_lists(self, api_gateway_listall_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'userId-index')
         api_gateway_listall_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
         response = list.list_main(api_gateway_listall_event)
         body = json.loads(response['body'])
@@ -233,6 +236,7 @@ class TestListMain:
 
 def test_handler(api_gateway_listall_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    monkeypatch.setitem(os.environ, 'INDEX_NAME', 'userId-index')
     response = list.handler(api_gateway_listall_event, None)
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
