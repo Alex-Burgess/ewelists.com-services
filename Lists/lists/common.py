@@ -1,6 +1,7 @@
 # A collection of methods that are common across all modules.
 import logging
 import re
+import json
 from lists.entities import List, Product
 
 logger = logging.getLogger()
@@ -135,6 +136,29 @@ def get_list_id(event):
         raise Exception('API Event did not contain a List ID in the path parameters.')
 
     return list_id
+
+
+def get_product_id(event):
+    try:
+        product_id = event['pathParameters']['productid']
+        logger.info("Product ID: " + product_id)
+    except Exception:
+        logger.error("API Event did not contain a Product ID in the path parameters.")
+        raise Exception('API Event did not contain a Product ID in the path parameters.')
+
+    return product_id
+
+
+def get_quantity(event):
+    try:
+        body_object = json.loads(event['body'])
+        quantity = body_object['quantity']
+        logger.info("Quantity: " + str(quantity))
+    except Exception:
+        logger.error("API Event did not contain the quantity in the body.")
+        raise Exception('API Event did not contain the quantity in the body.')
+
+    return quantity
 
 
 def create_response(code, body):

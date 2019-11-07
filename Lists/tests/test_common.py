@@ -276,6 +276,79 @@ def api_gateway_event_with_no_identity():
     }
 
 
+@pytest.fixture
+def api_gateway_add_product_event():
+    """ Generates API GW Event"""
+
+    return {
+        "resource": "/lists/{id}/product/{productid}",
+        "path": "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl",
+        "httpMethod": "POST",
+        "headers": {
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "Cache-Control": "no-cache",
+            "CloudFront-Forwarded-Proto": "https",
+            "CloudFront-Is-Desktop-Viewer": "true",
+            "CloudFront-Is-Mobile-Viewer": "false",
+            "CloudFront-Is-SmartTV-Viewer": "false",
+            "CloudFront-Is-Tablet-Viewer": "false",
+            "CloudFront-Viewer-Country": "GB",
+            "Content-Type": "text/plain",
+            "Host": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
+            "Postman-Token": "512388b6-c036-4d11-a6c9-adf8e07e1da0",
+            "User-Agent": "PostmanRuntime/7.15.2",
+            "Via": "1.1 a1cb6e97bccd4899987b343ae5d4c252.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Id": "zJgUVrLX5O4d-B43SVe4Bs6YVpSTWXxrAVtWjeF0FcAnXJ8dARKQRA==",
+            "x-amz-content-sha256": "b9d4c66e0ae3c09af8a6ce4c99518f244c3db701a196021c79f094b51e9b49d4",
+            "x-amz-date": "20191008T162240Z",
+            "X-Amzn-Trace-Id": "Root=1-5d9cb7d0-6965798907570a0728570212",
+            "X-Forwarded-For": "5.81.150.55, 70.132.38.104",
+            "X-Forwarded-Port": "443",
+            "X-Forwarded-Proto": "https"
+        },
+        "queryStringParameters": "null",
+        "multiValueQueryStringParameters": "null",
+        "pathParameters": {
+            "productid": "12345678-prod-0001-1234-abcdefghijkl",
+            "id": "12345678-list-0001-1234-abcdefghijkl"
+        },
+        "stageVariables": "null",
+        "requestContext": {
+            "resourceId": "sgzmgr",
+            "resourcePath": "/lists/{id}/product/{productid}",
+            "httpMethod": "POST",
+            "extendedRequestId": "BQGojGkBjoEFsTw=",
+            "requestTime": "08/Oct/2019:16:22:40 +0000",
+            "path": "/test/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl",
+            "accountId": "123456789012",
+            "protocol": "HTTP/1.1",
+            "stage": "test",
+            "domainPrefix": "4sdcvv0n2e",
+            "requestTimeEpoch": 1570551760227,
+            "requestId": "a3d965cd-a79b-4249-867a-a03eb858a839",
+            "identity": {
+                "cognitoIdentityPoolId": "eu-west-1:2208d797-dfc9-40b4-8029-827c9e76e029",
+                "accountId": "123456789012",
+                "cognitoIdentityId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c",
+                "caller": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials",
+                "sourceIp": "31.49.230.217",
+                "principalOrgId": "o-d8jj6dyqv2",
+                "accessKey": "ABCDEFGPDMJL4EB35H6H",
+                "cognitoAuthenticationType": "authenticated",
+                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl",
+                "userArn": "arn:aws:sts::123456789012:assumed-role/Ewelists-test-CognitoAuthRole/CognitoIdentityCredentials",
+                "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
+                "user": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials"
+            },
+            "domainName": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
+            "apiId": "4sdcvv0n2e"
+        },
+        "body": "{\n    \"quantity\": 1\n}",
+        "isBase64Encoded": "false"
+    }
+
+
 @pytest.fixture()
 def example_response():
     # Example response for a list, with user 2 as owner, shared with users 3, 4 and 5 and a pending user 6. 1 product not reserved, 1 product reserved by user 5.
@@ -314,6 +387,28 @@ class TestGetListIdFromPath:
         with pytest.raises(Exception) as e:
             common.get_list_id(api_gateway_event_with_no_list_id)
         assert str(e.value) == "API Event did not contain a List ID in the path parameters.", "Exception not as expected."
+
+
+class TestGetProductIdFromPath:
+    def test_get_product_id(self, api_gateway_add_product_event):
+        product_id = common.get_product_id(api_gateway_add_product_event)
+        assert product_id == "12345678-prod-0001-1234-abcdefghijkl", "Product ID returned from API event was not as expected."
+
+    def test_get_product_id_when_not_present(self, api_gateway_event_with_no_list_id):
+        with pytest.raises(Exception) as e:
+            common.get_product_id(api_gateway_event_with_no_list_id)
+        assert str(e.value) == "API Event did not contain a Product ID in the path parameters.", "Exception not as expected."
+
+
+class TestGetQuantity:
+    def test_get_quantity(self, api_gateway_add_product_event):
+        quantity = common.get_quantity(api_gateway_add_product_event)
+        assert quantity == 1, "Quantity returned from API event was not as expected."
+
+    def test_get_quantity_when_not_present(self, api_gateway_event_with_no_list_id):
+        with pytest.raises(Exception) as e:
+            common.get_quantity(api_gateway_event_with_no_list_id)
+        assert str(e.value) == "API Event did not contain the quantity in the body.", "Exception not as expected."
 
 
 class TestGetPostmanIdentity:
