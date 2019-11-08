@@ -16,23 +16,21 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    response = add_product_main(event)
+    response = delete_product_main(event)
     return response
 
 
-def add_product_main(event):
+def delete_product_main(event):
     try:
         table_name = common.get_table_name(os.environ)
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
         product_id = common.get_product_id(event)
-        quantity = common.get_quantity(event)
-        type = common.get_product_type(event)
 
         list_item = common_product.get_list(table_name, identity['userPoolSub'], list_id)
         common.confirm_owner(identity['userPoolSub'], list_id, [list_item])
 
-        message = create_product_item(table_name, list_id, product_id, type, quantity)
+        message = delete_product_item(table_name, list_id, product_id)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -44,22 +42,19 @@ def add_product_main(event):
     return response
 
 
-def create_product_item(table_name, list_id, product_id, type, quantity):
-    item = {
+def delete_product_item(table_name, list_id, product_id):
+    key = {
         'PK': {'S': "LIST#{}".format(list_id)},
-        'SK': {'S': "PRODUCT#{}".format(product_id)},
-        'type': {'S': type},
-        'quantity': {'N': str(quantity)},
-        'reserved': {'N': str(0)}
+        'SK': {'S': "PRODUCT#{}".format(product_id)}
     }
 
     try:
-        logger.info("Put product item: {}".format(item))
-        response = dynamodb.put_item(TableName=table_name, Item=item)
+        logger.info("Deleting product item: {}".format(key))
+        response = dynamodb.delete_item(TableName=table_name, Key=key)
     except Exception as e:
-        logger.error("Product could not be created: {}".format(e))
-        raise Exception('Product could not be created.')
+        logger.error("Product could not be deleted: {}".format(e))
+        raise Exception('Product could not be deleted.')
 
-    logger.info("Add response: {}".format(response))
+    logger.info("Delete response: {}".format(response))
 
     return True

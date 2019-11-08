@@ -389,6 +389,12 @@ class TestGetListIdFromPath:
             common.get_list_id(api_gateway_event_with_no_list_id)
         assert str(e.value) == "API Event did not contain a List ID in the path parameters.", "Exception not as expected."
 
+    def test_get_list_id_empty(self, api_gateway_with_id_event):
+        api_gateway_with_id_event['pathParameters']['id'] = ''
+        with pytest.raises(Exception) as e:
+            common.get_list_id(api_gateway_with_id_event)
+        assert str(e.value) == "API Event did not contain a List ID in the path parameters.", "Exception not as expected."
+
 
 class TestGetProductIdFromPath:
     def test_get_product_id(self, api_gateway_add_product_event):
@@ -398,6 +404,12 @@ class TestGetProductIdFromPath:
     def test_get_product_id_when_not_present(self, api_gateway_event_with_no_list_id):
         with pytest.raises(Exception) as e:
             common.get_product_id(api_gateway_event_with_no_list_id)
+        assert str(e.value) == "API Event did not contain a Product ID in the path parameters.", "Exception not as expected."
+
+    def test_get_product_id_empty(self, api_gateway_add_product_event):
+        api_gateway_add_product_event['pathParameters']['productid'] = ''
+        with pytest.raises(Exception) as e:
+            common.get_product_id(api_gateway_add_product_event)
         assert str(e.value) == "API Event did not contain a Product ID in the path parameters.", "Exception not as expected."
 
 

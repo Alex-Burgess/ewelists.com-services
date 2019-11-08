@@ -135,6 +135,10 @@ def get_list_id(event):
         logger.error("API Event did not contain a List ID in the path parameters.")
         raise Exception('API Event did not contain a List ID in the path parameters.')
 
+    if len(list_id) == 0:
+        logger.error("List ID was empty.")
+        raise Exception('API Event did not contain a List ID in the path parameters.')
+
     return list_id
 
 
@@ -144,6 +148,10 @@ def get_product_id(event):
         logger.info("Product ID: " + product_id)
     except Exception:
         logger.error("API Event did not contain a Product ID in the path parameters.")
+        raise Exception('API Event did not contain a Product ID in the path parameters.')
+
+    if len(product_id) == 0:
+        logger.error("Product ID was empty.")
         raise Exception('API Event did not contain a Product ID in the path parameters.')
 
     return product_id
