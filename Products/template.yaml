@@ -38,15 +38,15 @@ Conditions:
 
 
 Resources:
-  CreateProductFunction:
+  GetProductFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub '${ServiceName}-createproduct-${Environment}'
-      Handler: products/create.handler
+      FunctionName: !Sub '${ServiceName}-getproduct-${Environment}'
+      Handler: products/product.handler
       Runtime: python3.6
       MemorySize: 512
       Timeout: 3
-      Description: Creates an item for a product in products table
+      Description: Gets a product from the products table
       Role: !GetAtt FunctionRole.Arn
       Environment:
         Variables:
@@ -58,8 +58,8 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref Api
-            Path: /products
-            Method: POST
+            Path: /products/{id}
+            Method: GET
 
   SearchUrlFunction:
     Type: AWS::Serverless::Function
@@ -134,8 +134,8 @@ Resources:
         schemes:
         - "https"
         paths:
-          "/products":
-            post:
+          "/products/{id}":
+            get:
               responses:
                 "200":
                   description: "200 response"
@@ -145,7 +145,7 @@ Resources:
               security:
               - sigv4: []
               x-amazon-apigateway-integration:
-                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateProductFunction.Arn}/invocations'
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetProductFunction.Arn}/invocations'
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 type: "aws_proxy"

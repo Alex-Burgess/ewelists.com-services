@@ -2,9 +2,10 @@ import pytest
 import os
 import re
 import json
+import copy
 import boto3
 from moto import mock_dynamodb2
-from notfound import delete
+from products import product
 
 import sys
 import logging
@@ -15,13 +16,13 @@ logger.addHandler(stream_handler)
 
 
 @pytest.fixture
-def api_gateway_delete_event():
+def api_gateway_search_event():
     """ Generates API GW Event"""
 
     return {
-        "resource": "/notfound/{id}",
-        "path": "/notfound/12345678-notf-0010-1234-abcdefghijkl",
-        "httpMethod": "DELETE",
+        "resource": "/products/{id}",
+        "path": "/products/12345678-prod-0001-1234-abcdefghijkl",
+        "httpMethod": "GET",
         "headers": {
             "Accept": "*/*",
             "Accept-Encoding": "gzip, deflate",
@@ -48,16 +49,16 @@ def api_gateway_delete_event():
         "queryStringParameters": "null",
         "multiValueQueryStringParameters": "null",
         "pathParameters": {
-            "id": "12345678-notf-0010-1234-abcdefghijkl"
+            "id": "12345678-prod-0001-1234-abcdefghijkl"
         },
         "stageVariables": "null",
         "requestContext": {
             "resourceId": "sgzmgr",
-            "resourcePath": "/notfound/{id}",
-            "httpMethod": "DELETE",
+            "resourcePath": "/products",
+            "httpMethod": "GET",
             "extendedRequestId": "BQGojGkBjoEFsTw=",
             "requestTime": "08/Oct/2019:16:22:40 +0000",
-            "path": "/test/notfound/12345678-notf-0010-1234-abcdefghijkl",
+            "path": "/test/notfound",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
@@ -88,7 +89,7 @@ def api_gateway_delete_event():
 
 @pytest.fixture
 def dynamodb_mock():
-    table_name = 'notfound-unittest'
+    table_name = 'products-unittest'
 
     mock = mock_dynamodb2()
     mock.start()
@@ -114,7 +115,13 @@ def dynamodb_mock():
 
     # 1 User, with 1 list.
     items = [
-        {"productId": "12345678-notf-0010-1234-abcdefghijkl", "brand": "John Lewis", "details": "John Lewis & Partners Safari Mobile", "productUrl": "https://www.johnlewis.com/john-lewis-partners-safari-mobile/p3439165"},
+        {
+            "productId": "12345678-prod-0001-1234-abcdefghijkl",
+            "brand": "BABYBJÖRN",
+            "details": "Travel Cot Easy Go, Anthracite, with transport bag",
+            "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
+            "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58"
+        },
     ]
 
     for item in items:
@@ -123,38 +130,3 @@ def dynamodb_mock():
     yield
     # teardown: stop moto server
     mock.stop()
-
-
-class TestDeleteProduct:
-    def test_delete_product(self, dynamodb_mock):
-        cognito_user_id = '12345678-user-0001-1234-abcdefghijkl'
-        product_id = '12345678-notf-0010-1234-abcdefghijkl'
-        result = delete.delete_product('notfound-unittest', cognito_user_id, product_id)
-        assert result, "Delete result was not true"
-
-    @pytest.mark.skip(reason="Moto is not throwing an exception when deleting with ConditionExpression")
-    def test_delete_product_not_present(self, dynamodb_mock):
-        cognito_user_id = '12345678-user-0001-1234-abcdefghijkl'
-        product_id = '12345678-notf-0010-1234-abcdefghijkl-bad'
-
-        with pytest.raises(Exception) as e:
-            delete.delete_product('notfound-unittest', cognito_user_id, product_id)
-        assert str(e.value) == "Product can not be deleted.", "Exception not as expected."
-
-    @pytest.mark.skip(reason="Moto is not throwing an exception when deleting with ConditionExpression")
-    def test_delete_product_not_createdby_user(self, dynamodb_mock):
-        cognito_user_id = '12345678-user-0002-1234-abcdefghijkl'
-        product_id = '12345678-notf-0010-1234-abcdefghijkl'
-
-        with pytest.raises(Exception) as e:
-            delete.delete_product('notfound-unittest', cognito_user_id, product_id)
-        assert str(e.value) == "Product can not be deleted.", "Exception not as expected."
-
-
-def test_handler(api_gateway_delete_event, monkeypatch, dynamodb_mock):
-    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'notfound-unittest')
-    response = delete.handler(api_gateway_delete_event, None)
-    assert response['statusCode'] == 200, "Response statusCode was not as expected."
-    assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, "Response headers were not as expected."
-    body = json.loads(response['body'])
-    assert body['deleted'], "Response body was not as expected."

@@ -69,7 +69,7 @@ Resources:
       Runtime: python3.6
       MemorySize: 512
       Timeout: 3
-      Description: Deletes a list item for a given user in the table
+      Description: Deletes a product item from the notfound table
       Role: !GetAtt FunctionRole.Arn
       Environment:
         Variables:
@@ -83,6 +83,29 @@ Resources:
             RestApiId: !Ref Api
             Path: /notfound/{id}
             Method: DELETE
+
+  GetProductFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ServiceName}-getproduct-${Environment}'
+      Handler: notfound/product.handler
+      Runtime: python3.6
+      MemorySize: 512
+      Timeout: 3
+      Description: Gets a product from the notfound table
+      Role: !GetAtt FunctionRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
+          POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
+      Events:
+        CreateList:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /notfound/{id}
+            Method: GET
 
   FunctionRole:
     Type: AWS::IAM::Role
@@ -180,34 +203,20 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 type: "mock"
           "/notfound/{id}":
-            # get:
-            #   responses:
-            #     "200":
-            #       description: "200 response"
-            #       headers:
-            #         Access-Control-Allow-Origin:
-            #           type: "string"
-            #   security:
-            #   - sigv4: []
-            #   x-amazon-apigateway-integration:
-            #     uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetListFunction.Arn}/invocations'
-            #     passthroughBehavior: "when_no_match"
-            #     httpMethod: "POST"
-            #     type: "aws_proxy"
-            # put:
-            #   responses:
-            #     "200":
-            #       description: "200 response"
-            #       headers:
-            #         Access-Control-Allow-Origin:
-            #           type: "string"
-            #   security:
-            #   - sigv4: []
-            #   x-amazon-apigateway-integration:
-            #     uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateListFunction.Arn}/invocations'
-            #     passthroughBehavior: "when_no_match"
-            #     httpMethod: "POST"
-            #     type: "aws_proxy"
+            get:
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - sigv4: []
+              x-amazon-apigateway-integration:
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetProductFunction.Arn}/invocations'
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                type: "aws_proxy"
             delete:
               responses:
                 "200":
