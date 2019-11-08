@@ -81,10 +81,10 @@
 					"raw": "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\"\n}"
 				},
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -175,10 +175,10 @@
 					"raw": "{\n    \"title\": \"My Christmas List\",\n    \"description\": \"A gift wish list for Christmas.\",\n    \"occasion\": \"Christmas\"\n}"
 				},
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -257,10 +257,10 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -348,10 +348,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -440,10 +440,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/shared",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/shared",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -531,10 +531,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/1234abcd",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/1234abcd",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -633,10 +633,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -645,6 +645,291 @@
 					"path": [
 						"{{env}}",
 						"lists"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
+			"name": "add product to list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"Response message should be created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var message = jsonData['message'];",
+							"    pm.expect(message).to.eql(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+						"exec": [
+							"pm.environment.get(\"list_id\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"quantity\": 1,\n    \"productType\": \"products\"\n}"
+				},
+				"url": {
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/product/12345678-prod-0001-1234-abcdefghijkl",
+					"protocol": "https",
+					"host": [
+						"{{lists_url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"lists",
+						"{{list_id}}",
+						"product",
+						"12345678-prod-0001-1234-abcdefghijkl"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
+			"name": "update product added to list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"Response message should be created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var quantity = jsonData['quantity'];",
+							"    pm.expect(quantity).to.eql(2);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+						"exec": [
+							"pm.environment.get(\"list_id\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"quantity\": 2\n}"
+				},
+				"url": {
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/product/12345678-prod-0001-1234-abcdefghijkl",
+					"protocol": "https",
+					"host": [
+						"{{lists_url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"lists",
+						"{{list_id}}",
+						"product",
+						"12345678-prod-0001-1234-abcdefghijkl"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
+			"name": "delete product from list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"Response message should be created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var message = jsonData['message'];",
+							"    pm.expect(message).to.eql(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+						"exec": [
+							"pm.environment.get(\"list_id\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/product/12345678-prod-0001-1234-abcdefghijkl",
+					"protocol": "https",
+					"host": [
+						"{{lists_url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"lists",
+						"{{list_id}}",
+						"product",
+						"12345678-prod-0001-1234-abcdefghijkl"
 					]
 				},
 				"description": "Create list"
@@ -683,9 +968,12 @@
 							"    pm.expect(jsonData[0]['updates']['occasion']).to.eql(\"Birthday\");",
 							"    pm.expect(jsonData[0]['updates']['description']).to.eql(\"A gift wish list for my birthday.\");",
 							"    pm.expect(jsonData[0]['updates']['title']).to.eql(\"My Updated Title\");",
+							"    pm.expect(jsonData[0]['updates']['eventDate']).to.eql(\"None\");",
 							"    pm.expect(jsonData[1]['updates']['occasion']).to.eql(\"Birthday\");",
 							"    pm.expect(jsonData[1]['updates']['description']).to.eql(\"A gift wish list for my birthday.\");",
 							"    pm.expect(jsonData[1]['updates']['title']).to.eql(\"My Updated Title\");",
+							"    pm.expect(jsonData[1]['updates']['eventDate']).to.eql(\"None\");",
+							"    ",
 							"});",
 							""
 						],
@@ -733,13 +1021,13 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\"\n}"
+					"raw": "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"eventDate\": \"\",\n    \"occasion\": \"Birthday\"\n}"
 				},
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -799,9 +1087,10 @@
 							"    pm.expect(jsonData[0]['updates']['occasion']).to.eql(\"Christmas\");",
 							"    pm.expect(jsonData[0]['updates']['description']).to.eql(\"Updated description for the list.\");",
 							"    pm.expect(jsonData[0]['updates']['title']).to.eql(\"My Updated Title2\");",
+							"    pm.expect(jsonData[0]['updates']['eventDate']).to.eql(\"31 October 2019\");",
 							"    pm.expect(jsonData[1]['updates']['occasion']).to.eql(\"Christmas\");",
 							"    pm.expect(jsonData[1]['updates']['description']).to.eql(\"Updated description for the list.\");",
-							"    pm.expect(jsonData[1]['updates']['title']).to.eql(\"My Updated Title2\");",
+							"    pm.expect(jsonData[1]['updates']['eventDate']).to.eql(\"31 October 2019\");",
 							"});",
 							""
 						],
@@ -849,13 +1138,317 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"title\": \"My Updated Title2\",\n    \"description\": \"Updated description for the list.\",\n    \"occasion\": \"Christmas\"\n}"
+					"raw": "{\n    \"title\": \"My Updated Title2\",\n    \"description\": \"Updated description for the list.\",\n    \"eventDate\": \"31 October 2019\",\n    \"occasion\": \"Christmas\"\n}"
 				},
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"lists",
+						"{{list_id}}"
+					],
+					"query": [
+						{
+							"key": "attribute_name",
+							"value": "title",
+							"disabled": true
+						},
+						{
+							"key": "attribute_value",
+							"value": "My new title",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Update list with an attribute"
+			},
+			"response": []
+		},
+		{
+			"name": "get list with date",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"The returned object should contain the correct list details\", function () {",
+							"    var list_obj = pm.response.json();",
+							"    pm.expect(list_obj.list.listId.length).to.eql(36);",
+							"    pm.expect(list_obj.list.title).to.eql(\"My Updated Title2\");",
+							"    pm.expect(list_obj.list.description).to.eql(\"Updated description for the list.\");",
+							"    pm.expect(list_obj.list.eventDate).to.eql(\"31 October 2019\");",
+							"    pm.expect(list_obj.list.occasion).to.eql(\"Christmas\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
+						"exec": [
+							"pm.environment.get(\"list_id\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
+					"protocol": "https",
+					"host": [
+						"{{lists_url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"lists",
+						"{{list_id}}"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
+			"name": "get shared list with date",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"The returned object should contain the correct list details\", function () {",
+							"    var list_obj = pm.response.json();",
+							"    pm.expect(list_obj.list.listId.length).to.eql(36);",
+							"    pm.expect(list_obj.list.title).to.eql(\"My Updated Title2\");",
+							"    pm.expect(list_obj.list.description).to.eql(\"Updated description for the list.\");",
+							"    pm.expect(list_obj.list.eventDate).to.eql(\"31 October 2019\");",
+							"    pm.expect(list_obj.list.occasion).to.eql(\"Christmas\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
+						"exec": [
+							"pm.environment.get(\"list_id\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/shared",
+					"protocol": "https",
+					"host": [
+						"{{lists_url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"lists",
+						"{{list_id}}",
+						"shared"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
+			"name": "remove date",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"The returned object should contain the correct number of updated items\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var keys = Object.keys(jsonData)",
+							"    pm.expect(keys.length).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"Check that returned attributes contain the values we expect\", function () {",
+							"    var jsonData = pm.response.json();",
+							"",
+							"    pm.expect(jsonData[0]['updates']['occasion']).to.eql(\"Christmas\");",
+							"    pm.expect(jsonData[0]['updates']['description']).to.eql(\"Updated description for the list.\");",
+							"    pm.expect(jsonData[0]['updates']['title']).to.eql(\"My Updated Title2\");",
+							"    pm.expect(jsonData[0]['updates']['eventDate']).to.eql(\"None\");",
+							"    pm.expect(jsonData[1]['updates']['occasion']).to.eql(\"Christmas\");",
+							"    pm.expect(jsonData[1]['updates']['description']).to.eql(\"Updated description for the list.\");",
+							"    pm.expect(jsonData[1]['updates']['eventDate']).to.eql(\"None\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
+						"exec": [
+							"pm.environment.get(\"list_id\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"My Updated Title2\",\n    \"description\": \"Updated description for the list.\",\n    \"eventDate\": \"\",\n    \"occasion\": \"Christmas\"\n}"
+				},
+				"url": {
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
+					"protocol": "https",
+					"host": [
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -965,10 +1558,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -1066,10 +1659,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id2}}",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id2}}",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -1145,10 +1738,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/1234abcd",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/1234abcd",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -1224,10 +1817,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/12345678-list-0001-1234-abcdefghijkl",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/12345678-list-0001-1234-abcdefghijkl",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
@@ -1304,10 +1897,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
+					"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
 					"protocol": "https",
 					"host": [
-						"{{url_id}}",
+						"{{lists_url_id}}",
 						"execute-api",
 						"eu-west-1",
 						"amazonaws",
