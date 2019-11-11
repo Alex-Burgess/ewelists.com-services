@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import boto3
 import logging
 from products import common
@@ -25,7 +26,8 @@ def search_main(event):
         table_name = common.get_table_name(os.environ)
         index_name = common.get_table_index(os.environ)
         product_url = get_url(event)
-        product = url_query(table_name, index_name, product_url)
+        parsed_url = parse_url(product_url)
+        product = url_query(table_name, index_name, parsed_url)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -80,3 +82,19 @@ def url_query(table_name, index_name, url):
     product['productUrl'] = response['Items'][0]['productUrl']['S']
 
     return product
+
+
+def parse_url(url):
+    # General -  Chop off anything after and including ?
+    url = url.split('?')[0]
+
+    # Amazon
+    if 'www.amazon.co.uk' in url:
+        # Get product code of /dp/ABCDEFGHIJ
+        p = re.compile('https://www.amazon.co.uk.*(/dp/[A-Z0-9]{10}).*')
+        product_code = p.search(url)
+        product_code = product_code.group(1)
+        url = 'https://www.amazon.co.uk' + product_code
+
+    logger.info("Parsed URL: " + url)
+    return url

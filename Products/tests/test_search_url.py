@@ -226,3 +226,15 @@ def test_handler(api_gateway_search_event, monkeypatch, dynamodb_mock):
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
     assert re.match('{"product": .*}', response['body'])
+
+
+class TestAmazonUrls:
+    def test_remove_url_params(self):
+        query_url = 'https://www.amazon.co.uk/dp/B01H24LM58?ref_=ams_ad_dp_asin_img'
+        url = search_url.parse_url(query_url)
+        assert url == "https://www.amazon.co.uk/dp/B01H24LM58", "Parsed url was not as expected."
+
+    def test_remove_url_params2(self):
+        query_url = 'https://www.amazon.co.uk/BABYBJ%C3%96RN-Travel-Easy-Anthracite-transport/dp/B07DJ5KX53/ref=pd_bxgy_75_img_2/257-8649096-9647520?_encoding=UTF8&pd_rd_i=B07DJ5KX53&pd_rd_r=cff83e81-8002-4ed1-8b75-d88d7ac71ed6&pd_rd_w=OTmbK&pd_rd_wg=FGU6l&pf_rd_p=655b7c7d-a17d-4637-9a0a-72a813e0d2cb&pf_rd_r=E53ZAGTW3PSQ3PJ6YQQR&psc=1&refRID=E53ZAGTW3PSQ3PJ6YQQR'
+        url = search_url.parse_url(query_url)
+        assert url == "https://www.amazon.co.uk/dp/B07DJ5KX53", "Parsed url was not as expected."
