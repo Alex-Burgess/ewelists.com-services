@@ -160,6 +160,15 @@ class TestDeleteProductItem:
             delete_product.delete_product_item('lists-unittes', list_id, product_id)
         assert str(e.value) == "Product could not be deleted.", "Exception not as expected."
 
+    @pytest.mark.skip(reason="Moto is not throwing an exception when deleting with ConditionExpression")
+    def test_delete_non_existent_product_item(self, dynamodb_mock):
+        product_id = '112345678-prod-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+
+        with pytest.raises(Exception) as e:
+            delete_product.delete_product_item('lists-unittest', list_id, product_id)
+        assert str(e.value) == "Product could not be deleted.", "Exception not as expected."
+
 
 class TestDeleteProductMain:
     def test_delete_product(self, api_gateway_delete_product_event, monkeypatch, dynamodb_mock):
@@ -188,7 +197,6 @@ class TestDeleteProductMain:
         response = delete_product.delete_product_main(api_gateway_delete_product_event)
         body = json.loads(response['body'])
         assert body['error'] == "API Event did not contain a Product ID in the path parameters.", "Error not as expected."
-
 
 def test_handler(api_gateway_delete_product_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

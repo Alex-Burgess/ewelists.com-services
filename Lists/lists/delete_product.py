@@ -48,9 +48,19 @@ def delete_product_item(table_name, list_id, product_id):
         'SK': {'S': "PRODUCT#{}".format(product_id)}
     }
 
+    condition = {
+        ':PK': {'S': "LIST#{}".format(list_id)},
+        ':SK': {'S': "PRODUCT#{}".format(product_id)}
+    }
+
     try:
         logger.info("Deleting product item: {}".format(key))
-        response = dynamodb.delete_item(TableName=table_name, Key=key)
+        response = dynamodb.delete_item(
+            TableName=table_name,
+            Key=key,
+            ConditionExpression="PK = :PK AND SK = :SK",
+            ExpressionAttributeValues=condition
+        )
     except Exception as e:
         logger.error("Product could not be deleted: {}".format(e))
         raise Exception('Product could not be deleted.')
