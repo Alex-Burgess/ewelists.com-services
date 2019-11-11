@@ -4,6 +4,7 @@ import boto3
 import logging
 from lists import common
 from lists import common_product
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -55,10 +56,18 @@ def create_product_item(table_name, list_id, product_id, type, quantity):
 
     try:
         logger.info("Put product item: {}".format(item))
-        response = dynamodb.put_item(TableName=table_name, Item=item)
-    except Exception as e:
-        logger.error("Product could not be created: {}".format(e))
-        raise Exception('Product could not be created.')
+        response = dynamodb.put_item(
+            TableName=table_name,
+            Item=item,
+            ConditionExpression='attribute_not_exists(PK)'
+        )
+    except ClientError as e:
+        if e.response['Error']['Code'] == "ConditionalCheckFailedException":
+            logger.info("Product {} already exists in list {}.".format(product_id, list_id))
+            raise Exception("Product already exists in list.")
+        else:
+            logger.error("Product could not be created: {}".format(e))
+            raise Exception('Product could not be created.')
 
     logger.info("Add response: {}".format(response))
 

@@ -124,6 +124,7 @@ def dynamodb_mock():
         {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
         {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019"},
         {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0010-1234-abcdefghijkl", "type": "products", "quantity": 1, "reserved": 1}
     ]
 
     for item in items:
@@ -221,6 +222,13 @@ class TestCreateProductMain:
         response = add_product.add_product_main(api_gateway_add_product_event)
         body = json.loads(response['body'])
         assert body['error'] == "API Event did not contain a Product ID in the path parameters.", "Error not as expected."
+
+    def test_add_product_which_already_exists(self, api_gateway_add_product_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_add_product_event['pathParameters']['productid'] = '12345678-prod-0010-1234-abcdefghijkl'
+        response = add_product.add_product_main(api_gateway_add_product_event)
+        body = json.loads(response['body'])
+        assert body['error'] == "Product already exists in list.", "Error not as expected."
 
 
 def test_handler(api_gateway_add_product_event, monkeypatch, dynamodb_mock):
