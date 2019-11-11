@@ -14,7 +14,7 @@ def response_items():
         {'PK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'email': {'S': 'test.user@gmail.com'}, 'name': {'S': 'Test User'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}},
         {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Api Child's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'description': {'S': 'A gift list for Api Childs birthday.'}, 'eventDate': {'S': '01 September 2019'}},
         {'PK': {'S': 'LIST#12345678-list-0002-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Api Child's 2nd Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0002-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'description': {'S': 'A gift list for Api Childs birthday.'}},
-        {"quantity": {"N": "1"}, "reserved": {"N": "0"}, "SK": {"S": "PRODUCT#1009"}, "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}}
+        {"quantity": {"N": "1"}, "reserved": {"N": "0"}, "type": {"S": "products"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}}
     ]
 
     return response_items
@@ -51,6 +51,7 @@ class TestProduct:
     def test_get_details(self, response_items):
         product = Product(response_items[3]).get_details()
 
-        assert product['productId'] == '1009', "Product ID was not 1009."
+        assert product['productId'] == '12345678-prod-0001-1234-abcdefghijkl', "Product ID was not correct."
         assert product['quantity'] == 1, "Product quanity was not 1."
         assert product['reserved'] == 0, "Product reserved quantity was not 0."
+        assert product['type'] == 'products', "Product reserved quantity was not 0."

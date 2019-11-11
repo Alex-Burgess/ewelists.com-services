@@ -355,8 +355,8 @@ def example_response():
     # Example response for a list, with user 2 as owner, shared with users 3, 4 and 5 and a pending user 6. 1 product not reserved, 1 product reserved by user 5.
     example_response = [
         {"occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0002-1234-abcdefghijkl"}, "eventDate": {"S": "31 October 2018"}, "listOwner": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "PENDING#test.user6@gmail.com"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}, "email": {"S": "test.user6@gmail.com"}, "title": {"S": "Oscar's 1st Birthday"}},
-        {"quantity": {"N": "1"}, "reserved": {"N": "0"}, "SK": {"S": "PRODUCT#1009"}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}},
-        {"quantity": {"N": "2"}, "reserved": {"N": "1"}, "SK": {"S": "PRODUCT#1010"}, "reservedDetails": {"M": {"name": {"S": "Azara-Jane Higgins"}, "userId": {"S": "12345678-user-0005-1234-abcdefghijkl"}, "reserved": {"N": "1"}, "timestamp": {"S": "2018-11-01T10:00:00"}}}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}},
+        {"quantity": {"N": "1"}, "reserved": {"N": "0"}, "type": {"S": "products"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}},
+        {"quantity": {"N": "2"}, "reserved": {"N": "1"}, "type": {"S": "notfound"}, "SK": {"S": "PRODUCT#12345678-prod-0002-1234-abcdefghijkl"}, "reservedDetails": {"M": {"name": {"S": "Azara-Jane Higgins"}, "userId": {"S": "12345678-user-0005-1234-abcdefghijkl"}, "reserved": {"N": "1"}, "timestamp": {"S": "2018-11-01T10:00:00"}}}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}},
         {"occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0003-1234-abcdefghijkl"}, "eventDate": {"S": "31 October 2018"}, "listOwner": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#12345678-user-0003-1234-abcdefghijkl"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}, "title": {"S": "Oscar's 1st Birthday"}},
         {"occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0004-1234-abcdefghijkl"}, "eventDate": {"S": "31 October 2018"}, "listOwner": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#12345678-user-0004-1234-abcdefghijkl"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}, "title": {"S": "Oscar's 1st Birthday"}},
         {"occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0005-1234-abcdefghijkl"}, "eventDate": {"S": "31 October 2018"}, "listOwner": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "createdAt": {"S": "2018-09-01T10:00:00"}, "SK": {"S": "SHARE#12345678-user-0005-1234-abcdefghijkl"}, "description": {"S": "A gift list for Oscars birthday."}, "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"}, "title": {"S": "Oscar's 1st Birthday"}},
@@ -575,10 +575,12 @@ class TestGenerateListObject:
 
         assert len(items['products']) == 2, "Number of products was not 2."
 
-        assert items['products'][0]['productId'] == "1009", "Product ID was not correct."
+        assert items['products'][0]['productId'] == "12345678-prod-0001-1234-abcdefghijkl", "Product ID was not correct."
         assert items['products'][0]['quantity'] == 1, "Quantity of product was not correct."
         assert items['products'][0]['reserved'] == 0, "Reserved quantity of product was not correct."
+        assert items['products'][0]['type'] == 'products', "Type of product was not correct."
 
-        assert items['products'][1]['productId'] == "1010", "Product ID was not correct."
+        assert items['products'][1]['productId'] == "12345678-prod-0002-1234-abcdefghijkl", "Product ID was not correct."
         assert items['products'][1]['quantity'] == 2, "Quantity of product was not correct."
         assert items['products'][1]['reserved'] == 1, "Reserved quantity of product was not correct."
+        assert items['products'][1]['type'] == 'notfound', "Type of product was not correct."

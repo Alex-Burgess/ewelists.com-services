@@ -136,9 +136,9 @@ def dynamodb_mock():
         {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's New Christmas List", "occasion": "Christmas", "listId": "12345678-list-0003-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas."},
         {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's New Christmas List", "occasion": "Christmas", "listId": "12345678-list-0003-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas."},
         {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's New Christmas List", "occasion": "Christmas", "listId": "12345678-list-0003-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas."},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1001", "quantity": 2, "reserved": 0},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1}
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "type": "products"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0002-1234-abcdefghijkl", "quantity": 2, "reserved": 0, "type": "products"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0003-1234-abcdefghijkl", "quantity": 2, "reserved": 1, "type": "notfound"}
     ]
 
     for item in items:
@@ -186,17 +186,20 @@ class TestGetSharedListMain:
         assert body['list']['eventDate'] == "01 September 2019", "Get list response did not contain a date."
         assert body['list']['occasion'] == "Birthday", "Get list response did not contain an occasion."
         assert len(body['products']) == 3, "Get list response did not contain correct number of products."
-        assert body['products'][0]['productId'] == "1000", "Product ID was not correct."
+        assert body['products'][0]['productId'] == "12345678-prod-0001-1234-abcdefghijkl", "Product ID was not correct."
         assert body['products'][0]['quantity'] == 1, "Quantity of product was not correct."
         assert body['products'][0]['reserved'] == 0, "Reserved quantity of product was not correct."
+        assert body['products'][0]['type'] == 'products', "Product type not as expected."
 
-        assert body['products'][1]['productId'] == "1001", "Product ID was not correct."
+        assert body['products'][1]['productId'] == "12345678-prod-0002-1234-abcdefghijkl", "Product ID was not correct."
         assert body['products'][1]['quantity'] == 2, "Quantity of product was not correct."
         assert body['products'][1]['reserved'] == 0, "Reserved quantity of product was not correct."
+        assert body['products'][1]['type'] == 'products', "Product type not as expected."
 
-        assert body['products'][2]['productId'] == "1002", "Product ID was not correct."
+        assert body['products'][2]['productId'] == "12345678-prod-0003-1234-abcdefghijkl", "Product ID was not correct."
         assert body['products'][2]['quantity'] == 2, "Quantity of product was not correct."
         assert body['products'][2]['reserved'] == 1, "Reserved quantity of product was not correct."
+        assert body['products'][2]['type'] == 'notfound', "Product type not as expected."
 
     def test_get_shared_list_with_no_date(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

@@ -52,15 +52,17 @@ class Product:
         self.productId = item.get('SK').get('S').split("#")[1]
         self.quantity = item.get('quantity').get('N')
         self.reserved = item.get('reserved').get('N')
+        self.type = item.get('type').get('S')
 
     def __repr__(self):
-        return "Product<{} -- {} -- {} -- {}>".format(self.productId, self.listId, self.quantity, self.reserved)
+        return "Product<{} -- {} -- {} -- {}>".format(self.productId, self.listId, self.quantity, self.reserved, self.type)
 
     def get_details(self):
         list = {
             'productId': self.productId,
             'quantity': int(self.quantity),
-            'reserved': int(self.reserved)
+            'reserved': int(self.reserved),
+            'type': self.type
         }
 
         return list
