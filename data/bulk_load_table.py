@@ -10,7 +10,8 @@ file_name = sys.argv[2]
 # usage: python bulk_load_table.py lists-staging items-staging.json
 # usage: python bulk_load_table.py products-test products-test.json
 # usage: python bulk_load_table.py notfound-test notfound-test.json
-# usage: python bulk_load_table.py products-staging items-staging.json
+# usage: python bulk_load_table.py products-staging products-test.json
+# usage: python bulk_load_table.py notfound-staging notfound-test.json
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(table_name)
