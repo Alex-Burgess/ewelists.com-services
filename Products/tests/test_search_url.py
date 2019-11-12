@@ -203,7 +203,7 @@ class TestSearchMain:
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'producturl-index')
 
         event_no_product = copy.deepcopy(api_gateway_search_event)
-        event_no_product['pathParameters']['url'] = 'https://www.amazon.co.uk/dp/B01H24LM58/missing'
+        event_no_product['pathParameters']['url'] = 'https://random.co.uk/product1234'
 
         response = search_url.search_main(event_no_product)
         body = json.loads(response['body'])
