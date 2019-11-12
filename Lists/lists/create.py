@@ -50,7 +50,8 @@ def put_item_in_table(table_name, cognito_user_id, listId, attributes):
         'title': {'S': attributes['title']},
         'occasion': {'S': attributes['occasion']},
         'description': {'S': attributes['description']},
-        'createdAt': {'N': str(int(time.time()))}
+        'createdAt': {'N': str(int(time.time()))},
+        'imageUrl': {'S': attributes['imageUrl']},
     }
 
     try:

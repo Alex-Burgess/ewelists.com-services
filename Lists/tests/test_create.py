@@ -80,7 +80,7 @@ def api_gateway_create_event():
             "domainName": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
             "apiId": "4sdcvv0n2e"
         },
-        "body": "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\"\n}",
+        "body": "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}",
         "isBase64Encoded": "false"
     }
 
@@ -125,8 +125,8 @@ def dynamodb_mock():
     # 1 User, with 1 list.
     items = [
         {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
     ]
 
     for item in items:
@@ -143,6 +143,7 @@ class TestGetAttributeDetails:
         assert attribute_details['title'] == "My Birthday List", "Attribute title was not as expected."
         assert attribute_details['description'] == "A gift wish list for my birthday.", "Attribute description was not as expected."
         assert attribute_details['occasion'] == "Birthday", "Attribute occasion was not as expected."
+        assert attribute_details['imageUrl'] == "/images/celebration-default.jpg", "Attribute imageUrl was not as expected."
 
     def test_get_attribute_details_with_empty_body(self, api_gateway_create_event):
         event_no_body = copy.deepcopy(api_gateway_create_event)
@@ -169,6 +170,7 @@ class TestPutItemInTable:
             'title': 'My Test List',
             'description': 'Test description for the list.',
             'occasion': 'Birthday',
+            'imageUrl': '/images/celebration-default.jpg'
         }
 
         message = create.put_item_in_table('lists-unittest', user_id, list_id, attributes)
@@ -183,6 +185,11 @@ class TestPutItemInTable:
             ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
         )
         assert len(test_response['Items']) == 2, "Number of items for new list should be 2."
+        assert test_response['Items'][0]['PK']['S'] == 'LIST#12345678-list-0002-1234-abcdefghijkl', "PK of item was not as expected."
+        assert test_response['Items'][0]['imageUrl']['S'] == '/images/celebration-default.jpg', "imageurl of item was not as expected."
+
+        assert test_response['Items'][1]['PK']['S'] == 'LIST#12345678-list-0002-1234-abcdefghijkl', "PK of item was not as expected."
+        assert test_response['Items'][1]['imageUrl']['S'] == '/images/celebration-default.jpg', "imageurl of item was not as expected."
 
     def test_put_item_in_table_with_bad_name(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
@@ -192,6 +199,7 @@ class TestPutItemInTable:
             'title': 'My Test List',
             'description': 'Test description for the list.',
             'occasion': 'Birthday',
+            'imageUrl': '/images/celebration-default.jpg'
         }
 
         with pytest.raises(Exception) as e:
