@@ -28,23 +28,28 @@ Local testing of the API, ensures that API and lambda function are correctly con
     ```
 1. Use local endpoint in browser or with Postman: `http://localhost:3000/solve`
 
-## Logging
-Get logs for last 10 minutes:
+## Deployment
+### Create an s3 bucket for SAM builds
 ```
-sam logs -n Function --stack-name Service-Products-Staging
+aws cloudformation create-stack --stack-name sam-builds-products-test --template-body file://sam-builds-bucket.yaml
 ```
 
-## Deployment
 ### Deploy to test environment
 ```
 sam build
 
 sam package \
     --output-template-file packaged.yaml \
-    --s3-bucket sam-builds-products
+    --s3-bucket sam-builds-products-test
 
 sam deploy \
     --template-file packaged.yaml \
     --stack-name Service-products-test \
     --capabilities CAPABILITY_NAMED_IAM
+```
+
+## Logging
+Get logs for last 10 minutes:
+```
+sam logs -n Function --stack-name Service-Products-Staging
 ```

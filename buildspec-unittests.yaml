@@ -9,3 +9,5 @@ phases:
   build:
     commands:
       - /root/.local/bin/pytest --disable-pytest-warnings Lists/tests/
+      - /root/.local/bin/pytest --disable-pytest-warnings NotFound/tests/
+      - /root/.local/bin/pytest --disable-pytest-warnings Products/tests/

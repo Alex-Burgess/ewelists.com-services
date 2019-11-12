@@ -60,6 +60,27 @@ Local testing of the API, ensures that API and lambda function are correctly con
     ```
 1. Use local endpoint in browser or with Postman: `http://localhost:3000/solve`
 
+
+## Deployment
+### Create an s3 bucket for SAM builds
+```
+aws cloudformation create-stack --stack-name sam-builds-lists-test --template-body file://sam-builds-bucket.yaml
+```
+
+### Deploy to test environment
+```
+sam build
+
+sam package \
+    --output-template-file packaged.yaml \
+    --s3-bucket sam-builds-lists-test
+
+sam deploy \
+    --template-file packaged.yaml \
+    --stack-name Service-lists-test \
+    --capabilities CAPABILITY_NAMED_IAM
+```
+
 ## Logging
 Get logs for last 10 minutes:
 ```
@@ -71,25 +92,11 @@ Tail logs, e.g. whilst executing function test:
 sam logs -n Function --stack-name Service-Solve-Staging --tail
 ```
 
-## Deployment
-### Deploy to test environment
-```
-sam build
-
-sam package \
-    --output-template-file packaged.yaml \
-    --s3-bucket sam-builds-lists
-
-sam deploy \
-    --template-file packaged.yaml \
-    --stack-name Service-lists-test \
-    --capabilities CAPABILITY_NAMED_IAM
-```
-
-
 ## Cognito Useful Commands
+```
 aws cognito-idp admin-disable-provider-for-user --user-pool-id eu-west-1_vqox9Z8q7 --user ProviderName=Google,ProviderAttributeName=Cognito_Subject,ProviderAttributeValue=109769169322789408080
 
 aws cognito-idp admin-link-provider-for-user --user-pool-id eu-west-1_vqox9Z8q7 --destination-user ProviderName=Cognito,ProviderAttributeName=Username,ProviderAttributeValue=e371f5fc-14ef-404f-bca8-ab9a55cbee6e --source-user ProviderName=Google,ProviderAttributeName=Cognito_Subject,ProviderAttributeValue=109769169322789408080
 
 aws cognito-idp list-users --user-pool-id eu-west-1_vqox9Z8q7
+```

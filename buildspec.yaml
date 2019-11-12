@@ -9,7 +9,9 @@ phases:
   build:
     commands:
       - echo "Starting build `date` in `pwd`"
-      - /root/.local/bin/sam package --template-file Lists/template.yaml --s3-bucket $BUILD_OUTPUT_BUCKET --output-template-file lists-packaged.yaml
+      - /root/.local/bin/sam package --template-file Lists/template.yaml --s3-bucket $LISTS_BUILD_OUTPUT_BUCKET --output-template-file lists-packaged.yaml
+      - /root/.local/bin/sam package --template-file NotFound/template.yaml --s3-bucket $NOTFOUND_BUILD_OUTPUT_BUCKET --output-template-file notfound-packaged.yaml
+      - /root/.local/bin/sam package --template-file Products/template.yaml --s3-bucket $PRODUCTS_BUILD_OUTPUT_BUCKET --output-template-file products-packaged.yaml
   post_build:
     commands:
       - echo "build completed on `date`"
@@ -17,4 +19,6 @@ phases:
 artifacts:
   files:
     - lists-packaged.yaml
+    - notfound-packaged.yaml
+    - products-packaged.yaml
   discard-paths: yes
