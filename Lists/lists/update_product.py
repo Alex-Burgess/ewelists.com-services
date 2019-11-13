@@ -17,7 +17,6 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    logger.info("Update product event: " + json.dumps(event))
     response = update_product_main(event)
     return response
 
