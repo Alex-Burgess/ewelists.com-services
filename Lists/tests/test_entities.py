@@ -14,7 +14,7 @@ def response_items():
         {'PK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'email': {'S': 'test.user@gmail.com'}, 'name': {'S': 'Test User'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}},
         {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Api Child's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'description': {'S': 'A gift list for Api Childs birthday.'}, 'eventDate': {'S': '01 September 2019'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
         {'PK': {'S': 'LIST#12345678-list-0002-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Api Child's 2nd Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0002-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'description': {'S': 'A gift list for Api Childs birthday.'}, 'eventDate': {'S': '01 September 2020'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
-        {"quantity": {"N": "1"}, "reserved": {"N": "0"}, "type": {"S": "products"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}}
+        {"quantity": {"N": "1"}, "reserved": {"N": "1"}, "type": {"S": "products"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "reservedDetails": {"L": [{"M": {"name": {"S": "Test User"}, "userId": {"S": "12345678-user-0005-1234-abcdefghijkl"}, "reservedNumber": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}}}]}}
     ]
 
     return response_items
@@ -54,5 +54,9 @@ class TestProduct:
 
         assert product['productId'] == '12345678-prod-0001-1234-abcdefghijkl', "Product ID was not correct."
         assert product['quantity'] == 1, "Product quanity was not 1."
-        assert product['reserved'] == 0, "Product reserved quantity was not 0."
+        assert product['reserved'] == 1, "Product reserved quantity was not 0."
         assert product['type'] == 'products', "Product reserved quantity was not 0."
+        assert len(product['reservedDetails']) == 1, "Reserved details of product was not correct."
+        assert product['reservedDetails'][0]['name'] == 'Test User', "Reserved details name is not as expected."
+        # Add tests for other attributes
+        # Add test for product with multiple reserved users in list.
