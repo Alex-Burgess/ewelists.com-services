@@ -82,7 +82,7 @@ def api_gateway_reserve_event():
             "domainName": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
             "apiId": "4sdcvv0n2e"
         },
-        "body": "{\n    \"quantity\": 1,\n    \"message\": \"Happy birthday to you!\",\n    \"userId\": \"12345678-user-0003-1234-abcdefghijkl\"\n}",
+        "body": "{\n    \"quantity\": 1,\n    \"message\": \"Happy birthday to you!\"\n}",
         "isBase64Encoded": "false"
     }
 
@@ -316,7 +316,7 @@ class TestUpdateProductMain:
     def test_over_reserve_product(self, monkeypatch, api_gateway_reserve_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
-        api_gateway_reserve_event['body'] = "{\n    \"quantity\": 2,\n    \"message\": \"Happy birthday to you!\",\n    \"userId\": \"12345678-user-0003-1234-abcdefghijkl\"\n}"
+        api_gateway_reserve_event['body'] = "{\n    \"quantity\": 2,\n    \"message\": \"Happy birthday to you!\"\n}"
 
         response = reserve.update_product_main(api_gateway_reserve_event)
         body = json.loads(response['body'])
