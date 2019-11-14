@@ -28,13 +28,22 @@ def update_product_main(event):
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
         product_id = common.get_product_id(event)
-        user_reserved_quantity = common.get_quantity(event)
+        request_reserve_q = common.get_quantity(event)
         message = 'A test message'
         users_name = get_users_name(table_name, identity['userPoolSub'])
-        quantites = get_product_quantities(table_name, list_id, product_id)
-        new_quantities = update_reserved_quantities(quantites, user_reserved_quantity)
+        current_qs = get_product_quantities(table_name, list_id, product_id)
+        new_reserved_total = update_reserved_quantities(current_qs, request_reserve_q)
 
-        add_reserved_details(table_name, list_id, product_id, identity['userPoolSub'], users_name, user_reserved_quantity, new_quantities['reserved'], message)
+        add_reserved_details(table_name,
+                             list_id,
+                             product_id,
+                             identity['userPoolSub'],
+                             users_name,
+                             request_reserve_q,
+                             current_qs['reserved'],
+                             new_reserved_total,
+                             message
+                             )
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -46,30 +55,35 @@ def update_product_main(event):
     return response
 
 
-def add_reserved_details(table_name, list_id, product_id, user_id, users_name, user_reserved, total_reserved, message):
+def add_reserved_details(table_name, list_id, product_id, user_id, users_name, request_reserve, current_reserved, total_reserved, message):
     key = {
         'PK': {'S': "LIST#{}".format(list_id)},
         'SK': {'S': "PRODUCT#{}".format(product_id)}
     }
 
-    reserved_obj = {
+    details_obj = {
         'name': {'S': users_name},
         'userId': {'S': user_id},
-        'reserved': {'N': str(user_reserved)},
+        'reserved': {'N': str(request_reserve)},
         'message': {'S': message},
         'reservedAt': {'N': str(int(time.time()))}
     }
 
+    if (current_reserved > 0):
+        update_expression = "set reservedDetails = list_append(reservedDetails, :r), reserved = :q"
+    else:
+        update_expression = "set reservedDetails = :r, reserved = :q"
+
     try:
-        logger.info("Updating product with reserved quantity ({}) and reserved data {}".format(total_reserved, reserved_obj))
+        logger.info("Updating product with reserved quantity ({}) and reserved data {}".format(total_reserved, details_obj))
         response = dynamodb.update_item(
             TableName=table_name,
             Key=key,
-            UpdateExpression="set reservedDetails = list_append(reservedDetails, :r), reserved = :q",
+            UpdateExpression=update_expression,
             ExpressionAttributeValues={
                 ':q': {'N': str(total_reserved)},
                 ':r': {'L': [
-                        {'M': reserved_obj}
+                        {'M': details_obj}
                     ]}
             },
             ReturnValues="UPDATED_NEW"
@@ -141,4 +155,4 @@ def update_reserved_quantities(quantities, reserved_quantity):
     if new_reserved_quantity > quantities['quantity']:
         raise Exception("Reserved product quantity {} exceeds quantity required {}.".format(new_reserved_quantity, quantities['quantity']))
 
-    return True
+    return new_reserved_quantity
