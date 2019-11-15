@@ -238,3 +238,8 @@ class TestAmazonUrls:
         query_url = 'https://www.amazon.co.uk/BABYBJ%C3%96RN-Travel-Easy-Anthracite-transport/dp/B07DJ5KX53/ref=pd_bxgy_75_img_2/257-8649096-9647520?_encoding=UTF8&pd_rd_i=B07DJ5KX53&pd_rd_r=cff83e81-8002-4ed1-8b75-d88d7ac71ed6&pd_rd_w=OTmbK&pd_rd_wg=FGU6l&pf_rd_p=655b7c7d-a17d-4637-9a0a-72a813e0d2cb&pf_rd_r=E53ZAGTW3PSQ3PJ6YQQR&psc=1&refRID=E53ZAGTW3PSQ3PJ6YQQR'
         url = search_url.parse_url(query_url)
         assert url == "https://www.amazon.co.uk/dp/B07DJ5KX53", "Parsed url was not as expected."
+
+    def test_incomplete_url(self):
+        query_url = 'https://www.amazon.co.uk/dp/B01H24LM'
+        url = search_url.parse_url(query_url)
+        assert url == "https://www.amazon.co.uk/dp/B01H24LM", "Parsed url was not as expected."

@@ -1,12 +1,9 @@
 import pytest
 import uuid
-import os
-import re
-import json
-import copy
 import boto3
 from moto import mock_dynamodb2, mock_cognitoidp
 from lists import signup
+from tests import fixtures
 
 import sys
 import logging
@@ -18,196 +15,71 @@ logger.addHandler(stream_handler)
 
 @pytest.fixture
 def signup_with_u_and_p_event():
-    """ Generates API GW Event"""
-
-    return {
-        "version": "1",
-        "region": "eu-west-1",
-        "userPoolId": "eu-west-1_vqox9Z8q7",
-        "userName": "12345678-user-0003-1234-abcdefghijkl",
-        "callerContext": {
-            "awsSdkVersion": "aws-sdk-unknown-unknown",
-            "clientId": "61pt55apuqgj2jgbsfjmj1efn8"
-        },
-        "triggerSource": "PreSignUp_SignUp",
-        "request": {
-            "userAttributes": {
-                "email": "test.user@gmail.com"
-            },
-            "validationData": "null"
-        },
-        "response": {
-            "autoConfirmUser": "false",
-            "autoVerifyEmail": "false",
-            "autoVerifyPhone": "false"
-        }
-    }
+    event = fixtures.signup_event()
+    return event
 
 
 @pytest.fixture
 def signup_with_google_event():
-    """ Generates API GW Event"""
-
-    return {
-        "version": "1",
-        "region": "eu-west-1",
-        "userPoolId": "eu-west-1_vqox9Z8q7",
-        "userName": "Google_109769169322789401234",
-        "callerContext": {
-            "awsSdkVersion": "aws-sdk-unknown-unknown",
-            "clientId": "61pt55apuqgj2jgbsfjmj1efn8"
-        },
-        "triggerSource": "PreSignUp_ExternalProvider",
-        "request": {
-            "userAttributes": {
-                "cognito:email_alias": "",
-                "cognito:phone_number_alias": "",
-                "email": "test.user@gmail.com"
-            },
-            "validationData": {}
-        },
-        "response": {
-            "autoConfirmUser": "false",
-            "autoVerifyEmail": "false",
-            "autoVerifyPhone": "false"
-        }
-    }
+    event = fixtures.signup_social_event()
+    event['userName'] = "Google_109769169322789401234"
+    return event
 
 
 @pytest.fixture
 def signup_with_facebook_event():
-    """ Generates API GW Event"""
-
-    return {
-        "version": "1",
-        "region": "eu-west-1",
-        "userPoolId": "eu-west-1_vqox9Z8q7",
-        "userName": "Facebook_10156460942006789",
-        "callerContext": {
-            "awsSdkVersion": "aws-sdk-unknown-unknown",
-            "clientId": "61pt55apuqgj2jgbsfjmj1efn8"
-        },
-        "triggerSource": "PreSignUp_ExternalProvider",
-        "request": {
-            "userAttributes": {
-                "cognito:email_alias": "",
-                "cognito:phone_number_alias": "",
-                "email": "test.user@gmail.com"
-            },
-            "validationData": {}
-        },
-        "response": {
-            "autoConfirmUser": "false",
-            "autoVerifyEmail": "false",
-            "autoVerifyPhone": "false"
-        }
-    }
+    event = fixtures.signup_social_event()
+    event['userName'] = "Facebook_10156460942006789"
+    return event
 
 
 @pytest.fixture
 def signup_with_amazon_event():
-    """ Generates API GW Event"""
-
-    return {
-        "version": "1",
-        "region": "eu-west-1",
-        "userPoolId": "eu-west-1_vqox9Z8q7",
-        "userName": "LoginWithAmazon_amzn1.account.AH2EWIJQPC4QJNTUDTVRABCDEFGH",
-        "callerContext": {
-            "awsSdkVersion": "aws-sdk-unknown-unknown",
-            "clientId": "61pt55apuqgj2jgbsfjmj1efn8"
-        },
-        "triggerSource": "PreSignUp_ExternalProvider",
-        "request": {
-            "userAttributes": {
-                "cognito:email_alias": "",
-                "cognito:phone_number_alias": "",
-                "email": "test.user@gmail.com"
-            },
-            "validationData": {}
-        },
-        "response": {
-            "autoConfirmUser": "false",
-            "autoVerifyEmail": "false",
-            "autoVerifyPhone": "false"
-        }
-    }
+    event = fixtures.signup_social_event()
+    event['userName'] = "LoginWithAmazon_amzn1.account.AH2EWIJQPC4QJNTUDTVRABCDEFGH"
+    return event
 
 
 @pytest.fixture
 def dynamodb_mock():
-    table_name = 'lists-unittest'
-
     mock = mock_dynamodb2()
     mock.start()
-
     dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
 
     table = dynamodb.create_table(
-            TableName=table_name,
-            KeySchema=[
-                {
-                    'AttributeName': 'PK',
-                    'KeyType': 'HASH'
-                },
-                {
-                    'AttributeName': 'SK',
-                    'KeyType': 'RANGE'
-                }
-            ],
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'PK',
-                    'AttributeType': 'S'
-                },
-                {
-                    'AttributeName': 'SK',
-                    'AttributeType': 'S'
-                }
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 5,
-                'WriteCapacityUnits': 5
-            }
-        )
+        TableName='lists-unittest',
+        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
+        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
+        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+    )
 
     items = [
         {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.join@gmail.com", "name": "Test User", "userId": "eu-west-1:12345678-user-0001-1234-abcdefghijkl"},
     ]
 
     for item in items:
-        table.put_item(TableName=table_name, Item=item)
+        table.put_item(TableName='lists-unittest', Item=item)
 
     yield
-    # teardown: stop moto server
     mock.stop()
 
 
 @pytest.fixture
 def cognito_mock():
-    pool_name = 'ewelists-unittest'
-
     mock = mock_cognitoidp()
     mock.start()
-
     client = boto3.client('cognito-idp', region_name='eu-west-1')
 
-    user_pool_id = client.create_user_pool(
-        PoolName=pool_name,
-    )["UserPool"]["Id"]
-
+    user_pool_id = client.create_user_pool(PoolName='ewelists-unittest')["UserPool"]["Id"]
     username = str(uuid.uuid4())
 
     client.admin_create_user(
         UserPoolId=user_pool_id,
         Username=username,
-        UserAttributes=[
-            {"Name": "email", "Value": 'test.user@gmail.com'}
-        ],
+        UserAttributes=[{"Name": "email", "Value": 'test.user@gmail.com'}]
     )
 
     yield
-    # teardown: stop moto server
     mock.stop()
 
 
