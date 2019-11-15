@@ -135,8 +135,10 @@ def dynamodb_mock():
         {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's New Christmas List", "occasion": "Christmas", "listId": "12345678-list-0003-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas.", "imageUrl": "/images/celebration-default.jpg"},
         {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's New Christmas List", "occasion": "Christmas", "listId": "12345678-list-0003-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": "2019-11-01T10:00:00", "description": "A gift list for Oscars Christmas.", "imageUrl": "/images/celebration-default.jpg"},
         {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0, "type": "products"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1001", "quantity": 1, "reserved": 1, "type": "products", "reservedDetails": [{"name": {"S": "Test User1"}, "userId": {"S": "12345678-user-0004-1234-abcdefghijkl"}, "reservedNumber": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}}]},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1, "type": "notfound", "reservedDetails": [{"name": {"S": "Test User2"}, "userId": {"S": "12345678-user-0005-1234-abcdefghijkl"}, "reservedNumber": {"N": "1"}, "message": {"S": "Happy Birthday to you"}, "reservedAt": {"N": "1573739580"}}]}
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1001", "quantity": 1, "reserved": 1, "type": "products"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1, "type": "notfound"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "RESERVED#PRODUCT#1001", "name": "Test User2", "userId": "12345678-user-0005-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday to you", "reservedAt": "1573739580"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "RESERVED#PRODUCT#1002", "name": "Test User1", "userId": "12345678-user-0004-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday", "reservedAt": "1573739584"}
     ]
 
     for item in items:
@@ -152,7 +154,7 @@ class TestGetListQuery:
         user_id = "12345678-user-0001-1234-abcdefghijkl"
         list_id = "12345678-list-0001-1234-abcdefghijkl"
         items = get_list.get_list_query('lists-unittest', user_id, list_id)
-        assert len(items) == 6, "Number of items deleted was not as expected."
+        assert len(items) == 8, "Number of items returned was not as expected."
 
     def test_get_list_query_wrong_table(self, dynamodb_mock):
         user_id = "12345678-user-0001-1234-abcdefghijkl"
@@ -184,26 +186,14 @@ class TestGetListMain:
         assert body['list']['eventDate'] == "01 September 2019", "Get list response did not contain a date."
         assert body['list']['occasion'] == "Birthday", "Get list response did not contain an occasion."
         assert body['list']['imageUrl'] == "/images/celebration-default.jpg", "Get list response did not contain an imageUrl."
+
         assert len(body['products']) == 3, "Get list response did not contain correct number of products."
-        assert body['products'][0]['productId'] == "1000", "Product ID was not correct."
-        assert body['products'][0]['quantity'] == 1, "Quantity of product was not correct."
-        assert body['products'][0]['reserved'] == 0, "Reserved quantity of product was not correct."
-        assert body['products'][0]['type'] == 'products', "Product type not as expected."
+        assert body['products']["1000"] == {"productId": "1000", "quantity": 1, "reserved": 0, "type": "products"}, "Product object not correct."
+        assert body['products']["1001"] == {"productId": "1001", "quantity": 1, "reserved": 1, "type": "products"}, "Product object not correct."
+        assert body['products']["1002"] == {"productId": "1002", "quantity": 2, "reserved": 1, "type": "notfound"}, "Product object not correct."
 
-        assert body['products'][1]['productId'] == "1001", "Product ID was not correct."
-        assert body['products'][1]['quantity'] == 1, "Quantity of product was not correct."
-        assert body['products'][1]['reserved'] == 1, "Reserved quantity of product was not correct."
-        assert body['products'][1]['type'] == 'products', "Product type not as expected."
-        reservedDetails = body['products'][1]['reservedDetails']
-        assert len(reservedDetails) == 1, "Reserved details length not as expected."
-        assert reservedDetails[0]['name'] == 'Test User1', "Reserved details name is not as expected."
-        # Add tests for other attributes
-
-        assert body['products'][2]['productId'] == "1002", "Product ID was not correct."
-        assert body['products'][2]['quantity'] == 2, "Quantity of product was not correct."
-        assert body['products'][2]['reserved'] == 1, "Reserved quantity of product was not correct."
-        assert body['products'][2]['type'] == 'notfound', "Product type not as expected."
-        assert len(body['products'][2]['reservedDetails']) == 1, "Reserved details length not as expected."
+        assert body['reserved'][0] == {"productId": "1001", "name": "Test User2", "userId": "12345678-user-0005-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday to you"}, "Reserved object not correct."
+        assert body['reserved'][1] == {"productId": "1002", "name": "Test User1", "userId": "12345678-user-0004-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
 
     def test_get_list_with_no_date(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

@@ -24,7 +24,6 @@ def list_main(event):
     try:
         table_name = common.get_table_name(os.environ)
         index_name = common.get_table_index(os.environ)
-        # index_name = "userId-index"
         identity = common.get_identity(event, os.environ)
         usersLists = get_lists(table_name, index_name, identity['userPoolSub'])
     except Exception as e:

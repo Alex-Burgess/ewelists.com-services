@@ -2,7 +2,7 @@
 import logging
 import re
 import json
-from lists.entities import List, Product
+from lists.entities import List, Product, Reserved
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -71,7 +71,8 @@ def confirm_list_shared_with_user(cognito_user_id, list_id, response_items):
 
 
 def generate_list_object(response_items):
-    list = {"list": None, "products": []}
+    # list = {"list": None, "products": [], "reserved": []}
+    list = {"list": None, "products": {}, "reserved": []}
 
     for item in response_items:
         if item['SK']['S'].startswith("USER"):
@@ -80,7 +81,13 @@ def generate_list_object(response_items):
         elif item['SK']['S'].startswith("PRODUCT"):
             logger.info("Product Item: {}".format(item))
             product = Product(item).get_details()
-            list['products'].append(product)
+            # list['products'].append(product)
+            productId = product['productId']
+            list['products'][productId] = product
+        elif item['SK']['S'].startswith("RESERVED"):
+            logger.info("Reserved Item: {}".format(item))
+            reserved = Reserved(item).get_details()
+            list['reserved'].append(reserved)
 
     return list
 

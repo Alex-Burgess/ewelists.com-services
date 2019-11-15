@@ -1,5 +1,5 @@
 import pytest
-from lists.entities import User, List, Product
+from lists.entities import User, List, Product, Reserved
 import sys
 import logging
 logger = logging.getLogger()
@@ -14,7 +14,8 @@ def response_items():
         {'PK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'email': {'S': 'test.user@gmail.com'}, 'name': {'S': 'Test User'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}},
         {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Api Child's 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'description': {'S': 'A gift list for Api Childs birthday.'}, 'eventDate': {'S': '01 September 2019'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
         {'PK': {'S': 'LIST#12345678-list-0002-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Api Child's 2nd Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0002-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'description': {'S': 'A gift list for Api Childs birthday.'}, 'eventDate': {'S': '01 September 2020'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
-        {"quantity": {"N": "1"}, "reserved": {"N": "1"}, "type": {"S": "products"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "reservedDetails": {"L": [{"M": {"name": {"S": "Test User"}, "userId": {"S": "12345678-user-0005-1234-abcdefghijkl"}, "reservedNumber": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}}}]}}
+        {"quantity": {"N": "1"}, "reserved": {"N": "1"}, "type": {"S": "products"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "reservedDetails": {"L": [{"M": {"name": {"S": "Test User"}, "userId": {"S": "12345678-user-0005-1234-abcdefghijkl"}, "reservedNumber": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}}}]}},
+        {"SK": {"S": "RESERVED#PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "name": {"S": "Test User1"}, "userId": {"S": "12345678-user-0004-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}}
     ]
 
     return response_items
@@ -56,7 +57,14 @@ class TestProduct:
         assert product['quantity'] == 1, "Product quanity was not 1."
         assert product['reserved'] == 1, "Product reserved quantity was not 0."
         assert product['type'] == 'products', "Product reserved quantity was not 0."
-        assert len(product['reservedDetails']) == 1, "Reserved details of product was not correct."
-        assert product['reservedDetails'][0]['name'] == 'Test User', "Reserved details name is not as expected."
-        # Add tests for other attributes
-        # Add test for product with multiple reserved users in list.
+
+
+class TestReserved:
+    def test_get_details(self, response_items):
+        reserved = Reserved(response_items[4]).get_details()
+
+        assert reserved['productId'] == '12345678-prod-0001-1234-abcdefghijkl', "Product ID was not correct."
+        assert reserved['quantity'] == 1, "Product quanity was not 1."
+        assert reserved['name'] == "Test User1", "Product reserved quantity was not 0."
+        assert reserved['message'] == 'Happy Birthday', "Product reserved quantity was not 0."
+        assert reserved['userId'] == '12345678-user-0004-1234-abcdefghijkl', "Product reserved quantity was not 0."

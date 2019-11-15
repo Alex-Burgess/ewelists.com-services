@@ -55,8 +55,6 @@ class Product:
         self.quantity = item.get('quantity').get('N')
         self.reserved = item.get('reserved').get('N')
         self.type = item.get('type').get('S')
-        if item.get('reservedDetails'):
-            self.reservedDetails = item.get('reservedDetails').get('L')
 
     def __repr__(self):
         return "Product<{} -- {} -- {} -- {}>".format(self.productId, self.listId, self.quantity, self.reserved, self.type)
@@ -69,16 +67,28 @@ class Product:
             'type': self.type
         }
 
-        if hasattr(self, 'reservedDetails'):
-            reserved_list = self.reservedDetails
-
-            reserved_user_map = reserved_list[0].get('M') # loop
-
-            user_map = {
-                'name': reserved_user_map.get('name').get('S')
-            }
-            product['reservedDetails'] = [
-                user_map
-            ]
-
         return product
+
+
+class Reserved:
+    def __init__(self, item):
+        self.listId = item.get('PK').get('S')
+        self.productId = item.get('SK').get('S').split("#")[2]
+        self.quantity = item.get('quantity').get('N')
+        self.name = item.get('name').get('S')
+        self.userId = item.get('userId').get('S')
+        self.message = item.get('message').get('S')
+
+    def __repr__(self):
+        return "Reserved<{} -- {} -- {} -- {} -- {} -- {}>".format(self.productId, self.listId, self.quantity, self.name, self.userId, self.message)
+
+    def get_details(self):
+        reserved = {
+            'productId': self.productId,
+            'quantity': int(self.quantity),
+            'name': self.name,
+            'userId': self.userId,
+            'message': self.message
+        }
+
+        return reserved
