@@ -2,16 +2,19 @@ import json
 import sys
 import boto3
 
-# table_name = 'lists-test'
-# file_name = 'items.json'
-table_name = sys.argv[1]
-file_name = sys.argv[2]
-# usage: python bulk_load_table.py lists-test items-test.json
-# usage: python bulk_load_table.py lists-staging items-staging.json
+# Test setup
+# usage: python bulk_load_table.py lists-test ../Lists/data/lists-test.json
 # usage: python bulk_load_table.py products-test products-test.json
 # usage: python bulk_load_table.py notfound-test notfound-test.json
+
+# Staging setup
+# usage: python bulk_load_table.py lists-staging items-staging.json
 # usage: python bulk_load_table.py products-staging products-test.json
 # usage: python bulk_load_table.py notfound-staging notfound-test.json
+
+table_name = sys.argv[1]
+file_name = sys.argv[2]
+
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(table_name)

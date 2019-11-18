@@ -22,7 +22,7 @@ def api_gateway_event():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl",
     event['httpMethod'] = "PUT"
     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 2\n}"
+    event['body'] = "{\n    \"quantity\": 4\n}"
 
     return event
 
@@ -40,13 +40,7 @@ def dynamodb_mock():
         ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
     )
 
-    # 1 User, with 1 list.
-    items = [
-        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl", "type": "products", "quantity": 1, "reserved": 1}
-    ]
+    items = fixtures.load_test_data()
 
     for item in items:
         table.put_item(TableName='lists-unittest', Item=item)
@@ -60,8 +54,8 @@ class TestUpdateProductItem:
     def test_update_product_item(self, dynamodb_mock):
         product_id = '12345678-prod-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
-        updated_quantity = update_product.update_product_item('lists-unittest', list_id, product_id, 2)
-        assert updated_quantity == 2, "Updated quantity was not 2."
+        updated_quantity = update_product.update_product_item('lists-unittest', list_id, product_id, 4)
+        assert updated_quantity == 4, "Updated quantity was not 4."
 
         # Check the table was updated with right number of items
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
@@ -71,14 +65,14 @@ class TestUpdateProductItem:
             Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "PRODUCT#" + product_id}}
         )
 
-        assert test_response['Item']['quantity']['N'] == '2', "Quantity not as expected."
+        assert test_response['Item']['quantity']['N'] == '4', "Quantity not as expected."
 
     def test_update_with_same_quantity(self, dynamodb_mock):
         product_id = '12345678-prod-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
 
         with pytest.raises(Exception) as e:
-            update_product.update_product_item('lists-unittest', list_id, product_id, 1)
+            update_product.update_product_item('lists-unittest', list_id, product_id, 2)
         assert str(e.value) == "No updates to quantity were required.", "Exception not as expected."
 
     def test_update_product_item_with_no_table(self, dynamodb_mock):
@@ -91,11 +85,11 @@ class TestUpdateProductItem:
 
 
 class TestUpdateProductMain:
-    def test_update_product_(self, api_gateway_event, monkeypatch, dynamodb_mock):
+    def test_update_product(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         response = update_product.update_product_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['quantity'] == 2, "Update to product quantity was not expected result."
+        assert body['quantity'] == 4, "Update to product quantity was not expected result."
 
     def test_update_product_with_no_quantity(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
@@ -113,7 +107,7 @@ class TestUpdateProductMain:
 
     def test_add_product_with_no_list_id(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['id'] = '12345678-list-0002-1234-abcdefghijkl'
+        api_gateway_event['pathParameters']['id'] = '12345678-list-0200-1234-abcdefghijkl'
         response = update_product.update_product_main(api_gateway_event)
         body = json.loads(response['body'])
         assert body['error'] == "No list exists with this ID.", "Error not as expected."

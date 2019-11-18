@@ -1,3 +1,17 @@
+import json
+import os
+
+
+def load_test_data():
+    dirname = os.path.dirname(__file__)
+    filename = os.path.join(dirname, '../data/lists-test.json')
+
+    items = []
+    with open(filename, 'r') as f:
+        for row in f:
+            items.append(json.loads(row))
+    return items
+
 
 def api_gateway_base_event():
     """ Generates API GW Event"""

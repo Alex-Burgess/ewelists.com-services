@@ -43,13 +43,7 @@ def dynamodb_mock():
         ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
     )
 
-    # 1 User, with 1 list.
-    items = [
-        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl", "type": "products", "quantity": 1, "reserved": 1}
-    ]
+    items = fixtures.load_test_data()
 
     for item in items:
         table.put_item(TableName=table_name, Item=item)
@@ -110,7 +104,7 @@ class TestDeleteProductMain:
 
     def test_delete_product_with_no_list_id(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['id'] = '12345678-list-0002-1234-abcdefghijkl'
+        api_gateway_event['pathParameters']['id'] = '12345678-list-0200-1234-abcdefghijkl'
         response = delete_product.delete_product_main(api_gateway_event)
         body = json.loads(response['body'])
         assert body['error'] == "No list exists with this ID.", "Error not as expected."
@@ -121,6 +115,7 @@ class TestDeleteProductMain:
         response = delete_product.delete_product_main(api_gateway_event)
         body = json.loads(response['body'])
         assert body['error'] == "API Event did not contain a Product ID in the path parameters.", "Error not as expected."
+
 
 def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

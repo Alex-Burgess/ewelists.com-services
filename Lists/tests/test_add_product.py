@@ -19,9 +19,9 @@ logger.addHandler(stream_handler)
 def api_gateway_event():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/{id}/product/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0100-1234-abcdefghijkl"
     event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['pathParameters'] = {"productid": "12345678-prod-0100-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
     event['body'] = "{\n    \"quantity\": 1,\n    \"productType\": \"products\"\n}"
 
     return event
@@ -34,19 +34,13 @@ def dynamodb_mock():
     dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
 
     table = dynamodb.create_table(
-            TableName='lists-unittest',
-            KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-            AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
-            ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
-        )
+        TableName='lists-unittest',
+        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
+        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
+        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+    )
 
-    # 1 User, with 1 list.
-    items = [
-        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0010-1234-abcdefghijkl", "type": "products", "quantity": 1, "reserved": 1}
-    ]
+    items = fixtures.load_test_data()
 
     for item in items:
         table.put_item(TableName='lists-unittest', Item=item)
@@ -58,7 +52,7 @@ def dynamodb_mock():
 
 class TestCreateProductItem:
     def test_create_product_item(self, dynamodb_mock):
-        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0010-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
         result = add_product.create_product_item('lists-unittest', list_id, product_id, 'products', 1)
         assert result, "Product was not added to table."
@@ -72,13 +66,13 @@ class TestCreateProductItem:
         )
 
         assert test_response['Item']['PK']['S'] == 'LIST#12345678-list-0001-1234-abcdefghijkl', "List ID not as expected."
-        assert test_response['Item']['SK']['S'] == 'PRODUCT#12345678-prod-0001-1234-abcdefghijkl', "Product Id not as expected."
+        assert test_response['Item']['SK']['S'] == 'PRODUCT#12345678-prod-0010-1234-abcdefghijkl', "Product Id not as expected."
         assert test_response['Item']['type']['S'] == 'products', "Product type not as expected."
         assert test_response['Item']['quantity']['N'] == '1', "Quantity not as expected."
         assert test_response['Item']['reserved']['N'] == '0', "Quantity not as expected."
 
     def test_with_quantity_2(self, dynamodb_mock):
-        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0011-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
         result = add_product.create_product_item('lists-unittest', list_id, product_id, 'products', 2)
         assert result, "Product was not added to table."
@@ -132,7 +126,7 @@ class TestCreateProductMain:
 
     def test_add_product_with_no_list_id(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['id'] = '12345678-list-0002-1234-abcdefghijkl'
+        api_gateway_event['pathParameters']['id'] = '12345678-list-0200-1234-abcdefghijkl'
         response = add_product.add_product_main(api_gateway_event)
         body = json.loads(response['body'])
         assert body['error'] == "No list exists with this ID.", "Error not as expected."
@@ -146,7 +140,7 @@ class TestCreateProductMain:
 
     def test_add_product_which_already_exists(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['productid'] = '12345678-prod-0010-1234-abcdefghijkl'
+        api_gateway_event['pathParameters']['productid'] = '12345678-prod-0001-1234-abcdefghijkl'
         response = add_product.add_product_main(api_gateway_event)
         body = json.loads(response['body'])
         assert body['error'] == "Product already exists in list.", "Error not as expected."

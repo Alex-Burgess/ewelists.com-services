@@ -79,8 +79,7 @@ class TestGetLists:
         user_id = '12345678-user-0001-1234-abcdefghijkl'
         lists_response = list.get_lists('lists-unittest', 'userId-index', user_id)
 
-        test_user = {"email": "test.user@gmail.com"}
-        assert lists_response['user'] == test_user, "Test user was not as expected."
+        assert lists_response['user'] == {"email": "test.user@gmail.com", "name": "Test User"}, "Test user was not as expected."
 
         owned_list = {"listId": "12345678-list-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"}
         assert len(lists_response['owned']) == 1, "User should only own 1 list."

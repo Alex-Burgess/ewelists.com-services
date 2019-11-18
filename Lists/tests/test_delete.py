@@ -42,17 +42,7 @@ def dynamodb_mock():
         ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
     )
 
-    # 2 Users, 1 List with 3 products and shared with owner and 1 other user.
-    items = [
-        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
-        {"PK": "USER#12345678-user-0002-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1001", "quantity": 2, "reserved": 0},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1}
-    ]
+    items = fixtures.load_test_data()
 
     for item in items:
         table.put_item(TableName=table_name, Item=item)
@@ -77,7 +67,7 @@ class TestDeleteItems:
         user_id = '12345678-user-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
         items = [
-            {"PK": {'S': "LIST#{}".format(list_id)}, 'SK': {'S': "PRODUCT#1000"}, "quantity": 1, "reserved": 0}
+            {"PK": {'S': "LIST#{}".format(list_id)}, 'SK': {'S': "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "quantity": 1, "reserved": 0}
         ]
 
         message = delete.delete_items('lists-unittest', user_id, list_id, items)
@@ -108,7 +98,7 @@ class TestGetItemsAssociatedWithList:
     def test_get_items_associated_with_list(self, dynamodb_mock):
         list_id = '12345678-list-0001-1234-abcdefghijkl'
         items = delete.get_items_associated_with_list('lists-unittest', list_id)
-        assert len(items) == 6, "Number of items deleted was not as expected."
+        assert len(items) == 8, "Number of items deleted was not as expected."
 
 
 class TestDeleteMain:
@@ -120,7 +110,7 @@ class TestDeleteMain:
 
         assert body['deleted'], "Delete main response did not contain the correct status."
         assert len(body['listId']) == 36, "Create main response did not contain a listId."
-        assert body['message'] == 'Deleted all items [6] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete main response did not contain the correct message."
+        assert body['message'] == 'Deleted all items [8] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete main response did not contain the correct message."
 
     def test_delete_main_with_bad_table_name(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
@@ -138,7 +128,7 @@ class TestDeleteMain:
 
     def test_delete_main_with_bad_list(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['id'] = "12345678-list-0003-1234-abcdefghijkl"
+        api_gateway_event['pathParameters']['id'] = "12345678-list-0100-1234-abcdefghijkl"
 
         response = delete.delete_main(api_gateway_event)
         body = json.loads(response['body'])
@@ -153,4 +143,4 @@ def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
     assert re.match('{"deleted": .*}', response['body']), "Response body was not as expected."
 
     body = json.loads(response['body'])
-    assert body['count'] == 6, "Number of items deleted was not as expected."
+    assert body['count'] == 8, "Number of items deleted was not as expected."
