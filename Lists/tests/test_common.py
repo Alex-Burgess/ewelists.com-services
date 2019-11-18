@@ -83,6 +83,18 @@ def api_gateway_add_product_event():
     return event
 
 
+@pytest.fixture
+def api_gateway_reserve_event():
+    event = fixtures.api_gateway_base_event()
+    event['resource'] = "/lists/{id}/product/{productid}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/reserved/12345678-prod-0001-1234-abcdefghijkl"
+    event['httpMethod'] = "POST"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['body'] = "{\n    \"quantity\": 1,\n    \"message\": \"Happy birthday\"\n}"
+
+    return event
+
+
 @pytest.fixture()
 def response_items():
     items = fixtures.load_test_response()
@@ -160,6 +172,17 @@ class TestGetQuantity:
         with pytest.raises(Exception) as e:
             common.get_quantity(api_gateway_event_with_no_list_id)
         assert str(e.value) == "API Event did not contain the quantity in the body.", "Exception not as expected."
+
+
+class TestGetMessage:
+    def test_get_message(self, api_gateway_reserve_event):
+        message = common.get_message(api_gateway_reserve_event)
+        assert message == "Happy birthday", "Quantity returned from API event was not as expected."
+
+    def test_get_message_when_not_present(self, api_gateway_event_with_no_list_id):
+        with pytest.raises(Exception) as e:
+            common.get_message(api_gateway_event_with_no_list_id)
+        assert str(e.value) == "API Event did not contain a message in the body.", "Exception not as expected."
 
 
 class TestGetProductType:

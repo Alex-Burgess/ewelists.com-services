@@ -27,22 +27,15 @@ def update_product_main(event):
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
         product_id = common.get_product_id(event)
-        request_reserve_q = common.get_quantity(event)
-        message = 'A test message'
-        users_name = get_users_name(table_name, identity['userPoolSub'])
-        current_qs = get_product_quantities(table_name, list_id, product_id)
-        new_reserved_total = update_reserved_quantities(current_qs, request_reserve_q)
+        request_reserve_quantity = common.get_quantity(event)
+        message = common.get_message(event)
 
-        add_reserved_details(table_name,
-                             list_id,
-                             product_id,
-                             identity['userPoolSub'],
-                             users_name,
-                             request_reserve_q,
-                             current_qs['reserved'],
-                             new_reserved_total,
-                             message
-                             )
+        users_name = get_users_name(table_name, identity['userPoolSub'])
+        product_quantities = get_product_quantities(table_name, list_id, product_id)
+        new_product_reserved_quantity = update_reserved_quantities(product_quantities, request_reserve_quantity)
+
+        add_reserved_details(table_name, list_id, product_id, identity['userPoolSub'], users_name, request_reserve_quantity, message)
+        update_product_reserved_quantity(table_name, list_id, product_id, new_product_reserved_quantity)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -54,44 +47,47 @@ def update_product_main(event):
     return response
 
 
-def add_reserved_details(table_name, list_id, product_id, user_id, users_name, request_reserve, current_reserved, total_reserved, message):
+def update_product_reserved_quantity(table_name, list_id, product_id, new_quantity):
     key = {
         'PK': {'S': "LIST#{}".format(list_id)},
         'SK': {'S': "PRODUCT#{}".format(product_id)}
     }
 
-    details_obj = {
+    try:
+        response = dynamodb.update_item(
+            TableName=table_name,
+            Key=key,
+            UpdateExpression="set reserved = :r",
+            ExpressionAttributeValues={
+                ':r': {'N': str(new_quantity)},
+            },
+            ReturnValues="UPDATED_NEW"
+        )
+        logger.info("Attributes updated: " + json.dumps(response['Attributes']))
+    except Exception as e:
+        logger.info("update item exception: " + str(e))
+        raise Exception("Unexpected error when updating the list item.")
+
+    return True
+
+
+def add_reserved_details(table_name, list_id, product_id, user_id, users_name, quantity, message):
+    item = {
+        'PK': {'S': "LIST#{}".format(list_id)},
+        'SK': {'S': "RESERVED#PRODUCT#{}".format(product_id)},
         'name': {'S': users_name},
         'userId': {'S': user_id},
-        'reserved': {'N': str(request_reserve)},
+        'quantity': {'N': str(quantity)},
         'message': {'S': message},
         'reservedAt': {'N': str(int(time.time()))}
     }
 
-    if (current_reserved > 0):
-        update_expression = "set reservedDetails = list_append(reservedDetails, :r), reserved = :q"
-    else:
-        update_expression = "set reservedDetails = :r, reserved = :q"
-
     try:
-        logger.info("Updating product with reserved quantity ({}) and reserved data {}".format(total_reserved, details_obj))
-        response = dynamodb.update_item(
-            TableName=table_name,
-            Key=key,
-            UpdateExpression=update_expression,
-            ExpressionAttributeValues={
-                ':q': {'N': str(total_reserved)},
-                ':r': {'L': [
-                        {'M': details_obj}
-                    ]}
-            },
-            ReturnValues="UPDATED_NEW"
-        )
-    except ClientError as e:
-        logger.error("Product could not be updated. Error code: {}. Error message: {}".format(e.response['Error']['Code'], e.response['Error']['Message']))
-        raise Exception('Unexpected error when updating product.')
-
-    logger.info("Reserve response: {}".format(response))
+        logger.info("Put reserved item for lists table: {}".format(item))
+        dynamodb.put_item(TableName=table_name, Item=item)
+    except Exception as e:
+        logger.error("Reserved details item could not be added: {}".format(e))
+        raise Exception('Reserved details item could not be added.')
 
     return True
 

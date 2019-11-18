@@ -191,6 +191,18 @@ def get_product_type(event):
     return product_type
 
 
+def get_message(event):
+    try:
+        body_object = json.loads(event['body'])
+        message = body_object['message']
+        logger.info("Message: " + message)
+    except Exception:
+        logger.error("API Event did not contain a message in the body.")
+        raise Exception('API Event did not contain a message in the body.')
+
+    return message
+
+
 def create_response(code, body):
     logger.info("Creating response with status code ({}) and body ({})".format(code, body))
     response = {'statusCode': code,

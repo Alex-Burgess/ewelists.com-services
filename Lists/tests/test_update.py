@@ -39,18 +39,6 @@ def dynamodb_mock():
         ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
     )
 
-    # 2 users. User 1 owns list 1, which is shared with user 2 and a pending user 3 which has not signed up yet.
-    # items = [
-    #     {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
-    #     {"PK": "USER#12345678-user-0002-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl"},
-    #     {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"},
-    #     {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"},
-    #     {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"},
-    #     {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PENDING#test.user3@gmail.com", "email": "test.user3@gmail.com", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "description": "A gift list for Oscars birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"},
-    #     {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1009", "quantity": 1, "reserved": 0},
-    #     {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1010", "quantity": 2, "reserved": 1, "reservedDetails": {"userId": "12345678-user-0002-1234-abcdefghijkl", "name": "Test User2", "reserved": 1, "timestamp": "2018-11-01T10:00:00"}}
-    # ]
-
     items = fixtures.load_test_data()
 
     for item in items:

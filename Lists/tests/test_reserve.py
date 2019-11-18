@@ -15,12 +15,24 @@ logger.addHandler(stream_handler)
 
 
 @pytest.fixture
-def api_gateway_event():
+def api_gateway_event_prod1():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/{id}/reserve/{productid}"
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['body'] = "{\n    \"quantity\": 2,\n    \"message\": \"Happy birthday to you!\"\n}"
+
+    return event
+
+
+@pytest.fixture
+def api_gateway_event_prod2():
+    event = fixtures.api_gateway_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0002-1234-abcdefghijkl"
+    event['httpMethod'] = "POST"
+    event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
     event['body'] = "{\n    \"quantity\": 1,\n    \"message\": \"Happy birthday to you!\"\n}"
 
     return event
@@ -39,14 +51,7 @@ def dynamodb_mock():
         ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
     )
 
-    # 1 User, with 1 list.
-    items = [
-        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl", "type": "products", "quantity": 1, "reserved": 0},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0002-1234-abcdefghijkl", "type": "products", "quantity": 2, "reserved": 1, "reservedDetails": [{"name": "Test User"}]}
-    ]
+    items = fixtures.load_test_data()
 
     for item in items:
         table.put_item(TableName='lists-unittest', Item=item)
@@ -59,7 +64,7 @@ class TestGetUsersName:
     def test_get_users_name(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
         name = reserve.get_users_name('lists-unittest', user_id)
-        assert name == "Test User", "User's name was not as expected."
+        assert name == "Test User1", "User's name was not as expected."
 
     def test_with_invalid_userid(self, dynamodb_mock):
         user_id = '12345678-user-0010-1234-abcdefghijkl'
@@ -74,7 +79,7 @@ class TestGetProductQuantities:
         list_id = '12345678-list-0001-1234-abcdefghijkl'
         quantities = reserve.get_product_quantities('lists-unittest', list_id, product_id)
 
-        expected_result = {'quantity': 1, 'reserved': 0}
+        expected_result = {'quantity': 3, 'reserved': 1}
         assert quantities == expected_result, "Quantities not as expected."
 
     def test_with_invalid_productid(self, dynamodb_mock):
@@ -115,80 +120,52 @@ class TestUpdateReservedQuantities:
 
 
 class TestAddReservedDetails:
-    def test_when_reservedDetails_not_present(self, dynamodb_mock):
-        table_name = 'lists-unittest'
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        product_id = '12345678-prod-0001-1234-abcdefghijkl'
-        user_id = '12345678-user-0001-1234-abcdefghijkl'
-        users_name = 'Test User'
-        request_reserve = 1
-        current_reserved = 0
-        total_reserved = 1
-        message = 'A test message'
-        assert reserve.add_reserved_details(table_name, list_id, product_id, user_id, users_name, request_reserve, current_reserved, total_reserved, message)
-
-        # Check the table was updated with right reserved details
-        dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
-
-        test_response = dynamodb.get_item(
-            TableName='lists-unittest',
-            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "PRODUCT#" + product_id}}
-        )
-
-        reserved_quantity = int(test_response['Item']['reserved']['N'])
-        reserved_details = test_response['Item']['reservedDetails']['L']
-        reserved_obj = reserved_details[0]['M']
-
-        assert reserved_quantity == 1, "Quantity not as expected."
-        assert len(reserved_details) == 1, "Number of reserved details was not as expected."
-        assert reserved_obj['name']['S'] == 'Test User', "Reserved name was not as expected."
-
-    def test_with_reserved_details_present(self, dynamodb_mock):
+    def test_reserve_a_product(self, dynamodb_mock):
         table_name = 'lists-unittest'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
         product_id = '12345678-prod-0002-1234-abcdefghijkl'
         user_id = '12345678-user-0001-1234-abcdefghijkl'
-        users_name = 'Test User'
+        users_name = 'Test User1'
         request_reserve = 1
-        current_reserved = 1
-        total_reserved = 2
         message = 'A test message'
-        assert reserve.add_reserved_details(table_name, list_id, product_id, user_id, users_name, request_reserve, current_reserved, total_reserved, message)
+        assert reserve.add_reserved_details(table_name, list_id, product_id, user_id, users_name, request_reserve, message)
 
         # Check the table was updated with right reserved details
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
 
         test_response = dynamodb.get_item(
             TableName='lists-unittest',
-            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "PRODUCT#" + product_id}}
+            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "RESERVED#PRODUCT#" + product_id}}
         )
 
-        # print("reserved details: " + json.dumps(test_response['Item']['reservedDetails']))
+        assert test_response['Item']['PK']['S'] == 'LIST#12345678-list-0001-1234-abcdefghijkl', "PK not as expected."
+        assert test_response['Item']['SK']['S'] == 'RESERVED#PRODUCT#12345678-prod-0002-1234-abcdefghijkl', "SK not as expected."
+        assert test_response['Item']['name']['S'] == 'Test User1', "Users name not as expected."
+        assert test_response['Item']['userId']['S'] == '12345678-user-0001-1234-abcdefghijkl', "UserId not as expected."
+        assert test_response['Item']['quantity']['N'] == '1', "Quantity not as expected."
+        assert test_response['Item']['message']['S'] == 'A test message', "Message not as expected."
 
-        reserved_quantity = int(test_response['Item']['reserved']['N'])
-        reserved_details = test_response['Item']['reservedDetails']['L']
-        reserved_obj = reserved_details[1]['M']
 
-        assert reserved_quantity == 2, "Quantity not as expected."
-        assert len(reserved_details) == 2, "Number of reserved details was not as expected."
-        assert reserved_obj['name']['S'] == 'Test User', "Reserved name was not as expected."
-        assert reserved_obj['userId']['S'] == '12345678-user-0001-1234-abcdefghijkl', "UserId was not as expected."
-        assert reserved_obj['reserved']['N'] == '1', "Reserved quantity was not as expected."
-        assert reserved_obj['message']['S'] == 'A test message', "Message was not as expected."
-        assert len(reserved_obj['reservedAt']['N']) == 10, "Message was not as expected."
+class TestUpdateProductReservedQuantity:
+    def test_update_quantity(self, dynamodb_mock):
+        table_name = 'lists-unittest'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0002-1234-abcdefghijkl'
+
+        assert reserve.update_product_reserved_quantity(table_name, list_id, product_id, 2)
 
 
 class TestUpdateProductMain:
-    def test_reserve_product_not_yet_reserved(self, monkeypatch, api_gateway_event, dynamodb_mock):
+    def test_reserve_product_not_yet_reserved(self, monkeypatch, api_gateway_event_prod2, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        response = reserve.update_product_main(api_gateway_event)
+        response = reserve.update_product_main(api_gateway_event_prod2)
         body = json.loads(response['body'])
         assert body['reserved'], "Reserve response was not true."
 
         # Check the table was updated with right reserved details
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
-        list_id = api_gateway_event['pathParameters']['id']
-        product_id = api_gateway_event['pathParameters']['productid']
+        list_id = api_gateway_event_prod2['pathParameters']['id']
+        product_id = api_gateway_event_prod2['pathParameters']['productid']
 
         test_response = dynamodb.get_item(
             TableName='lists-unittest',
@@ -196,26 +173,28 @@ class TestUpdateProductMain:
         )
 
         reserved_quantity = int(test_response['Item']['reserved']['N'])
-        reserved_details = test_response['Item']['reservedDetails']['L']
-        reserved_obj = reserved_details[0]['M']
-
         assert reserved_quantity == 1, "Quantity not as expected."
-        assert len(reserved_details) == 1, "Number of reserved details was not as expected."
-        assert reserved_obj['name']['S'] == 'Test User', "Reserved name was not as expected."
 
-    def test_reserve_product_with_one_reserved(self, monkeypatch, api_gateway_event, dynamodb_mock):
+        reserved_details_response = dynamodb.get_item(
+            TableName='lists-unittest',
+            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "RESERVED#PRODUCT#" + product_id}}
+        )
+
+        assert reserved_details_response['Item']['PK']['S'] == 'LIST#12345678-list-0001-1234-abcdefghijkl', "PK not as expected."
+        assert reserved_details_response['Item']['SK']['S'] == 'RESERVED#PRODUCT#12345678-prod-0002-1234-abcdefghijkl', "SK not as expected."
+        assert reserved_details_response['Item']['quantity']['N'] == '1', "Quantity not as expected."
+
+    def test_reserve_product_with_one_reserved(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
-        api_gateway_event['pathParameters']['productid'] = '12345678-prod-0002-1234-abcdefghijkl'
-
-        response = reserve.update_product_main(api_gateway_event)
+        response = reserve.update_product_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
         assert body['reserved'], "Reserve response was not true."
 
         # Check the table was updated with right reserved details
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
-        list_id = api_gateway_event['pathParameters']['id']
-        product_id = api_gateway_event['pathParameters']['productid']
+        list_id = api_gateway_event_prod1['pathParameters']['id']
+        product_id = api_gateway_event_prod1['pathParameters']['productid']
 
         test_response = dynamodb.get_item(
             TableName='lists-unittest',
@@ -223,28 +202,30 @@ class TestUpdateProductMain:
         )
 
         reserved_quantity = int(test_response['Item']['reserved']['N'])
-        reserved_details = test_response['Item']['reservedDetails']['L']
-        reserved_obj = reserved_details[1]['M']
+        assert reserved_quantity == 3, "Quantity not as expected."
 
-        assert reserved_quantity == 2, "Quantity not as expected."
-        assert len(reserved_details) == 2, "Number of reserved details was not as expected."
-        assert reserved_obj['name']['S'] == 'Test User', "Reserved name was not as expected."
-        assert reserved_obj['userId']['S'] == '12345678-user-0001-1234-abcdefghijkl', "UserId was not as expected."
-        assert reserved_obj['reserved']['N'] == '1', "Reserved quantity was not as expected."
+        reserved_details_response = dynamodb.get_item(
+            TableName='lists-unittest',
+            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "RESERVED#PRODUCT#" + product_id}}
+        )
 
-    def test_over_reserve_product(self, monkeypatch, api_gateway_event, dynamodb_mock):
+        assert reserved_details_response['Item']['PK']['S'] == 'LIST#12345678-list-0001-1234-abcdefghijkl', "PK not as expected."
+        assert reserved_details_response['Item']['SK']['S'] == 'RESERVED#PRODUCT#12345678-prod-0001-1234-abcdefghijkl', "SK not as expected."
+        assert reserved_details_response['Item']['quantity']['N'] == '2', "Quantity not as expected."
+
+    def test_over_reserve_product(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
-        api_gateway_event['body'] = "{\n    \"quantity\": 2,\n    \"message\": \"Happy birthday to you!\"\n}"
+        api_gateway_event_prod1['body'] = "{\n    \"quantity\": 4,\n    \"message\": \"Happy birthday to you!\"\n}"
 
-        response = reserve.update_product_main(api_gateway_event)
+        response = reserve.update_product_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
-        assert body['error'] == 'Reserved product quantity 2 exceeds quantity required 1.', "Reserve error was not as expected."
+        assert body['error'] == 'Reserved product quantity 5 exceeds quantity required 3.', "Reserve error was not as expected."
 
 
-def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
+def test_handler(api_gateway_event_prod1, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    response = reserve.handler(api_gateway_event, None)
+    response = reserve.handler(api_gateway_event_prod1, None)
     body = json.loads(response['body'])
 
     assert response['statusCode'] == 200

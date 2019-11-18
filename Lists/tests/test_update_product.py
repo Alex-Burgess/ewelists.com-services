@@ -72,7 +72,7 @@ class TestUpdateProductItem:
         list_id = '12345678-list-0001-1234-abcdefghijkl'
 
         with pytest.raises(Exception) as e:
-            update_product.update_product_item('lists-unittest', list_id, product_id, 2)
+            update_product.update_product_item('lists-unittest', list_id, product_id, 3)
         assert str(e.value) == "No updates to quantity were required.", "Exception not as expected."
 
     def test_update_product_item_with_no_table(self, dynamodb_mock):
