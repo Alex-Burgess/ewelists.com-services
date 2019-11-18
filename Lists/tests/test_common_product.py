@@ -13,35 +13,16 @@ logger.addHandler(stream_handler)
 
 @pytest.fixture
 def dynamodb_mock():
-    table_name = 'lists-unittest'
-
     mock = mock_dynamodb2()
     mock.start()
-
     dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
 
     table = dynamodb.create_table(
-            TableName=table_name,
-            KeySchema=[
-                {
-                    'AttributeName': 'PK', 'KeyType': 'HASH'
-                },
-                {
-                    'AttributeName': 'SK', 'KeyType': 'RANGE'
-                }
-            ],
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'PK', 'AttributeType': 'S'
-                },
-                {
-                    'AttributeName': 'SK', 'AttributeType': 'S'
-                }
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5
-            }
-        )
+        TableName='lists-unittest',
+        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
+        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
+        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+    )
 
     # 1 User, with 1 list.
     items = [
@@ -51,10 +32,9 @@ def dynamodb_mock():
     ]
 
     for item in items:
-        table.put_item(TableName=table_name, Item=item)
+        table.put_item(TableName='lists-unittest', Item=item)
 
     yield
-    # teardown: stop moto server
     mock.stop()
 
 
