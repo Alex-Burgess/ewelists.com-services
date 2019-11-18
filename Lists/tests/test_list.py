@@ -33,38 +33,20 @@ def dynamodb_mock():
     dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
 
     table = dynamodb.create_table(
-            TableName='lists-unittest',
-            KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-            AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}, {'AttributeName': 'userId', 'AttributeType': 'S'}],
-            ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
-            GlobalSecondaryIndexes=[{
-                'IndexName': 'userId-index',
-                'KeySchema': [{'AttributeName': 'userId', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
-                'Projection': {
-                    'ProjectionType': 'ALL'
-                }
-            }]
-        )
+        TableName='lists-unittest',
+        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
+        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}, {'AttributeName': 'userId', 'AttributeType': 'S'}],
+        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
+        GlobalSecondaryIndexes=[{
+            'IndexName': 'userId-index',
+            'KeySchema': [{'AttributeName': 'userId', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
+            'Projection': {
+                'ProjectionType': 'ALL'
+            }
+        }]
+    )
 
-    # 3 users. User 1, owns list 1, which is not shared.  user 2, owns list 2 and 3 which are shared with user 1.  User 3 has no lists.
-    items = [
-        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
-        {"PK": "USER#12345678-user-0002-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl"},
-        {"PK": "USER#12345678-user-0003-1234-abcdefghijkl", "SK": "USER#12345678-user-0003-1234-abcdefghijkl", "email": "test.user3@gmail.com", "name": "Test User3", "userId": "12345678-user-0003-1234-abcdefghijkl"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0002-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0002-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0002-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "12345678-list-0003-1234-abcdefghijkl", "createdAt": "2019-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "31 October 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "12345678-list-0003-1234-abcdefghijkl", "createdAt": "2019-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "31 October 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0003-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "listId": "12345678-list-0003-1234-abcdefghijkl", "createdAt": "2019-09-01T10:00:00", "listOwner": "12345678-user-0002-1234-abcdefghijkl", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "31 October 2019", "imageUrl": "/images/celebration-default.jpg"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1000", "quantity": 1, "reserved": 0, "type": "products"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1001", "quantity": 1, "reserved": 1, "type": "products"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#1002", "quantity": 2, "reserved": 1, "type": "notfound"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "RESERVED#PRODUCT#1001", "name": "Test User2", "userId": "12345678-user-0001-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday to you", "reservedAt": "1573739580"},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "RESERVED#PRODUCT#1002", "name": "Test User1", "userId": "12345678-user-0001-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday", "reservedAt": "1573739584"}
-    ]
+    items = fixtures.load_test_data()
 
     for item in items:
         table.put_item(TableName='lists-unittest', Item=item)
@@ -79,14 +61,16 @@ class TestGetLists:
         user_id = '12345678-user-0001-1234-abcdefghijkl'
         lists_response = list.get_lists('lists-unittest', 'userId-index', user_id)
 
-        assert lists_response['user'] == {"email": "test.user@gmail.com", "name": "Test User"}, "Test user was not as expected."
+        assert lists_response['user'] == {"email": "test.user1@gmail.com", "name": "Test User1"}, "Test user was not as expected."
 
-        owned_list = {"listId": "12345678-list-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"}
-        assert len(lists_response['owned']) == 1, "User should only own 1 list."
-        assert lists_response['owned'][0] == owned_list, "Details of the list owned by user was not as expected."
+        owned_list1 = {"listId": "12345678-list-0001-1234-abcdefghijkl", "title": "Child User1 1st Birthday", "occasion": "Birthday", "description": "A gift list for Child User1 birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"}
+        owned_list2 = {"listId": "12345678-list-0002-1234-abcdefghijkl", "title": "Child User1 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User1 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
+        assert len(lists_response['owned']) == 2, "User should only own 1 list."
+        assert lists_response['owned'][0] == owned_list1, "Details of the list owned by user was not as expected."
+        assert lists_response['owned'][1] == owned_list2, "Details of the list owned by user was not as expected."
 
-        shared_list1 = {"listId": "12345678-list-0002-1234-abcdefghijkl", "title": "Oscar's 1st Birthday", "occasion": "Birthday", "description": "A gift list for Oscars birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"}
-        shared_list2 = {"listId": "12345678-list-0003-1234-abcdefghijkl", "title": "Oscar's 2nd Birthday", "occasion": "Birthday", "description": "A gift list for Oscars 2nd Birthday.", "eventDate": "31 October 2019", "imageUrl": "/images/celebration-default.jpg"}
+        shared_list1 = {"listId": "12345678-list-0003-1234-abcdefghijkl", "title": "Child User2 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User2 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
+        shared_list2 = {"listId": "12345678-list-0004-1234-abcdefghijkl", "title": "Child User3 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User3 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
         assert len(lists_response['shared']) == 2, "User should only have 2 lists shared with them."
         assert lists_response['shared'][0] == shared_list1, "Details of the list shared with user was not as expected."
         assert lists_response['shared'][1] == shared_list2, "Details of the list shared with user was not as expected."
@@ -119,7 +103,7 @@ class TestListMain:
         response = list.list_main(api_gateway_event)
         body = json.loads(response['body'])
 
-        assert len(body['owned']) == 1, "Number of lists returned was not as expected."
+        assert len(body['owned']) == 2, "Number of lists returned was not as expected."
         assert len(body['shared']) == 2, "Number of lists returned was not as expected."
 
     def test_list_main_no_table(self, api_gateway_event, monkeypatch, dynamodb_mock):
