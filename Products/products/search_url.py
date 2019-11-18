@@ -85,16 +85,22 @@ def url_query(table_name, index_name, url):
 
 
 def parse_url(url):
-    # General -  Chop off anything after and including ?
-    url = url.split('?')[0]
+    logger.info("Parsing URL: " + url)
 
-    # Amazon
-    if 'www.amazon.co.uk' in url:
-        # Get product code of /dp/ABCDEFGHIJ
-        p = re.compile('https://www.amazon.co.uk.*(/dp/[A-Z0-9]{10}).*')
-        product_code = p.search(url)
-        product_code = product_code.group(1)
-        url = 'https://www.amazon.co.uk' + product_code
+    try:
+        # General -  Chop off anything after and including ?
+        url = url.split('?')[0]
+
+        # Amazon
+        if 'www.amazon.co.uk' in url:
+            # Get product code of /dp/ABCDEFGHIJ
+            p = re.compile('https://www.amazon.co.uk.*(/dp/[A-Z0-9]{10}).*')
+            product_code = p.search(url)
+            product_code = product_code.group(1)
+            url = 'https://www.amazon.co.uk' + product_code
+    except Exception as e:
+        logger.info("There was an issue parsing the url: " + str(e))
+        return url
 
     logger.info("Parsed URL: " + url)
     return url
