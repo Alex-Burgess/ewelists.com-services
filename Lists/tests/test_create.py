@@ -76,7 +76,7 @@ class TestGenerateListId:
 class TestPutItemInTable:
     def test_put_item_in_table(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
-        list_id = '12345678-list-0002-1234-abcdefghijkl'
+        list_id = '12345678-list-0012-1234-abcdefghijkl'
 
         attributes = {
             'title': 'My Test List',
@@ -97,15 +97,15 @@ class TestPutItemInTable:
             ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
         )
         assert len(test_response['Items']) == 2, "Number of items for new list should be 2."
-        assert test_response['Items'][0]['PK']['S'] == 'LIST#12345678-list-0002-1234-abcdefghijkl', "PK of item was not as expected."
+        assert test_response['Items'][0]['PK']['S'] == 'LIST#12345678-list-0012-1234-abcdefghijkl', "PK of item was not as expected."
         assert test_response['Items'][0]['imageUrl']['S'] == '/images/celebration-default.jpg', "imageurl of item was not as expected."
 
-        assert test_response['Items'][1]['PK']['S'] == 'LIST#12345678-list-0002-1234-abcdefghijkl', "PK of item was not as expected."
+        assert test_response['Items'][1]['PK']['S'] == 'LIST#12345678-list-0012-1234-abcdefghijkl', "PK of item was not as expected."
         assert test_response['Items'][1]['imageUrl']['S'] == '/images/celebration-default.jpg', "imageurl of item was not as expected."
 
     def test_put_item_in_table_with_bad_name(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
-        list_id = '12345678-list-0002-1234-abcdefghijkl'
+        list_id = '12345678-list-0012-1234-abcdefghijkl'
 
         attributes = {
             'title': 'My Test List',
