@@ -9,6 +9,20 @@ if logger.handlers:
     handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
 
 
+def calculate_new_reserved_quantity(product_item, update_amount):
+    new_quantity = product_item['reserved'] + update_amount
+    logger.info("Product reserved quantity updated from {} to {}".format(product_item['reserved'], new_quantity))
+
+    if new_quantity < 0:
+        logger.info("Reserved quantity for product ({}) could not be updated by {}.".format(product_item['reserved'], update_amount))
+        raise Exception("Reserved quantity for product ({}) could not be updated by {}.".format(product_item['reserved'], update_amount))
+
+    if new_quantity > product_item['quantity']:
+        raise Exception("Reserved quantity for product ({}) could not be updated by {} as exceeds required quantity ({}).".format(product_item['reserved'], update_amount, product_item['quantity']))
+
+    return new_quantity
+
+
 def confirm_owner(user_id, list_id, response_items):
     """Confirms that the user owns a specified list, from the response items relating to a query for the same list."""
     list_owner_id = None

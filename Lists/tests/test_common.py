@@ -25,8 +25,8 @@ def list_query_response():
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "quantity": {"N": "2"}, "reserved": {"N": "1"}, "type": {"S": "products"}},
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-prod-0002-1234-abcdefghijkl"}, "quantity": {"N": "3"}, "reserved": {"N": "1"}, "type": {"S": "products"}},
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-notf-0001-1234-abcdefghijkl"}, "quantity": {"N": "2"}, "reserved": {"N": "0"}, "type": {"S": "notfound"}},
-        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVED#PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "name": {"S": "Test User2"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}},
-        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVED#PRODUCT#12345678-prod-0002-1234-abcdefghijkl"}, "name": {"S": "Test User2"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}},
+        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl"}, "name": {"S": "Test User2"}, "productId": {"S": "12345678-prod-0001-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}},
+        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVED#12345678-prod-0002-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl"}, "name": {"S": "Test User2"}, "productId": {"S": "12345678-prod-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}},
     ]
 
     return response
@@ -78,6 +78,35 @@ class TestConfirmListSharedWithUser:
         with pytest.raises(Exception) as e:
             common.confirm_list_shared_with_user(user_id, list_id, list_query_response)
         assert str(e.value) == "List ID 12345678-list-0001-1234-abcdefghijkl did not have a shared item with user 12345678-user-0010-1234-abcdefghijkl.", "Exception not thrown for list not being shared with user."
+
+
+class TestCalculateNewReservedQuantity:
+    def test_subtract_1(self):
+        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
+        new_quantity = common.calculate_new_reserved_quantity(expected_item, -1)
+        assert new_quantity == 0
+
+    def test_no_update(self):
+        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
+        new_quantity = common.calculate_new_reserved_quantity(expected_item, 0)
+        assert new_quantity == 1
+
+    def test_add_2(self):
+        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
+        new_quantity = common.calculate_new_reserved_quantity(expected_item, 2)
+        assert new_quantity == 3
+
+    def test_over_subtract(self):
+        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
+        with pytest.raises(Exception) as e:
+            common.calculate_new_reserved_quantity(expected_item, -2)
+        assert str(e.value) == "Reserved quantity for product (1) could not be updated by -2.", "Exception message not correct."
+
+    def test_over_add(self):
+        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
+        with pytest.raises(Exception) as e:
+            common.calculate_new_reserved_quantity(expected_item, 3)
+        assert str(e.value) == "Reserved quantity for product (1) could not be updated by 3 as exceeds required quantity (3).", "Exception message not correct."
 
 
 class TestGenerateListObject:

@@ -55,7 +55,7 @@ class TestGetListQuery:
         user_id = "12345678-user-0002-1234-abcdefghijkl"
         list_id = "12345678-list-0001-1234-abcdefghijkl"
         items = get_shared_list.get_list_query('lists-unittest', user_id, list_id)
-        assert len(items) == 8, "Number of items deleted was not as expected."
+        assert len(items) == 9, "Number of items deleted was not as expected."
 
     def test_get_list_query_no_table_name(self, dynamodb_mock):
         user_id = "12345678-user-0002-1234-abcdefghijkl"
@@ -89,7 +89,7 @@ class TestGetSharedListMain:
         assert body['list']['imageUrl'] == "/images/celebration-default.jpg", "Get list response did not contain an imageUrl."
         assert len(body['products']) == 3, "Get list response did not contain correct number of products."
 
-        assert body['products']["12345678-prod-0001-1234-abcdefghijkl"] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "quantity": 3, "reserved": 1, "type": "products"}, "Product object not correct."
+        assert body['products']["12345678-prod-0001-1234-abcdefghijkl"] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "quantity": 3, "reserved": 2, "type": "products"}, "Product object not correct."
         assert body['products']["12345678-prod-0002-1234-abcdefghijkl"] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "type": "products"}, "Product object not correct."
         assert body['products']["12345678-notf-0001-1234-abcdefghijkl"] == {"productId": "12345678-notf-0001-1234-abcdefghijkl", "quantity": 2, "reserved": 1, "type": "notfound"}, "Product object not correct."
 

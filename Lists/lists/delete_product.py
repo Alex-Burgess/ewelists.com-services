@@ -3,7 +3,7 @@ import os
 import boto3
 import logging
 from lists import common
-from lists import common_product
+from lists import common_table_ops
 from lists import common_env_vars
 from lists import common_event
 
@@ -29,7 +29,7 @@ def delete_product_main(event):
         list_id = common_event.get_list_id(event)
         product_id = common_event.get_product_id(event)
 
-        list_item = common_product.get_list(table_name, identity, list_id)
+        list_item = common_table_ops.get_list(table_name, identity, list_id)
         common.confirm_owner(identity, list_id, [list_item])
 
         message = delete_product_item(table_name, list_id, product_id)

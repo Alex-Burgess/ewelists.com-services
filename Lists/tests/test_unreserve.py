@@ -50,78 +50,12 @@ def dynamodb_mock():
     mock.stop()
 
 
-class TestGetReservedDetailsItem:
-    def test_get_reserved_details(self, dynamodb_mock):
-        product_id = '12345678-prod-0001-1234-abcdefghijkl'
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        reserved_item = unreserve.get_reserved_details_item('lists-unittest', list_id, product_id)
-
-        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 1, 'name': 'Test User2', 'userId': '12345678-user-0002-1234-abcdefghijkl', 'message': 'Happy Birthday'}
-
-        assert reserved_item == expected_item, "Reserved item was not correct."
-
-    def test_with_no_reserved_item(self, dynamodb_mock):
-        product_id = '12345678-prod-0010-1234-abcdefghijkl'
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-
-        with pytest.raises(Exception) as e:
-            unreserve.get_reserved_details_item('lists-unittest', list_id, product_id)
-        assert str(e.value) == "No reserved item exists with this ID.", "Exception not as expected."
-
-
-class TestGetProductItem:
-    def test_get_product_item(self, dynamodb_mock):
-        product_id = '12345678-prod-0001-1234-abcdefghijkl'
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        product_item = unreserve.get_product_item('lists-unittest', list_id, product_id)
-
-        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
-
-        assert product_item == expected_item, "Product item was not correct."
-
-    def test_with_no_reserved_item(self, dynamodb_mock):
-        product_id = '12345678-prod-0010-1234-abcdefghijkl'
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-
-        with pytest.raises(Exception) as e:
-            unreserve.get_product_item('lists-unittest', list_id, product_id)
-        assert str(e.value) == "No product item exists with this ID.", "Exception not as expected."
-
-
-class TestConfirmUserReservedProduct:
-    def test_confirm_user_reserved_product(self):
-        reserved_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 1, 'name': 'Test User2', 'userId': '12345678-user-0002-1234-abcdefghijkl', 'message': 'Happy Birthday'}
-        user_id = '12345678-user-0002-1234-abcdefghijkl'
-        assert unreserve.confirm_user_reserved_product(user_id, reserved_item)
-
-    def test_bad_requestor_throws_exception(self):
-        reserved_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 1, 'name': 'Test User2', 'userId': '12345678-user-0002-1234-abcdefghijkl', 'message': 'Happy Birthday'}
-        user_id = '12345678-user-0003-1234-abcdefghijkl'
-
-        with pytest.raises(Exception) as e:
-            unreserve.confirm_user_reserved_product(user_id, reserved_item)
-        assert str(e.value) == "Requestor ID 12345678-user-0003-1234-abcdefghijkl did not match user id of reserved item user ID 12345678-user-0002-1234-abcdefghijkl."
-
-
-class TestCalculateNewReservedQuantity:
-    def test_subtract_1(self):
-        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
-        new_quantity = unreserve.calculate_new_reserved_quantity(expected_item, -1)
-        assert new_quantity == 0
-
-    def test_over_subtract(self):
-        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
-        with pytest.raises(Exception) as e:
-            unreserve.calculate_new_reserved_quantity(expected_item, -2)
-        assert str(e.value) == "Reserved quantity for product (1) could not be updated by -2.", "Exception message not correct."
-
-
 class TestUpdateTable:
     @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
     def test_update_items(self, dynamodb_mock):
         product_id = '12345678-prod-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
-        assert unreserve.update_items('lists-unittest', list_id, product_id, 2)
+        assert unreserve.update_product_and_delete_reserved_item('lists-unittest', list_id, product_id, 2)
 
 
 class TestUnreserveMain:
@@ -151,7 +85,7 @@ class TestUnreserveMain:
         api_gateway_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl"
         response = unreserve.unreserve_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == "Requestor ID 12345678-user-0001-1234-abcdefghijkl did not match user id of reserved item user ID 12345678-user-0002-1234-abcdefghijkl.", "Error was not as expected"
+        assert body['error'] == "No reserved item exists with this ID.", "Error was not as expected"
 
     def test_unreserve_product_with_wrong_quantities(self, monkeypatch, dynamodb_mock, api_gateway_event):
         # Update table to break concurrency of product reserved quantity, with that of the reserved items.
@@ -174,3 +108,15 @@ class TestUnreserveMain:
         response = unreserve.unreserve_main(api_gateway_event)
         body = json.loads(response['body'])
         assert body['error'] == "Reserved quantity for product (0) could not be updated by -1.", "Error was not as expected"
+
+
+@pytest.mark.skip(reason="transact_write_items is not implemented for moto")
+def test_handler(api_gateway_event_prod1, monkeypatch, dynamodb_mock):
+    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    response = unreserve.handler(api_gateway_event, None)
+    body = json.loads(response['body'])
+
+    assert response['statusCode'] == 200
+    assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
+
+    assert body['reserved']

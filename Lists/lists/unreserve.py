@@ -5,8 +5,7 @@ import logging
 from lists import common
 from lists import common_env_vars
 from lists import common_event
-from lists.common_entities import Product, Reserved
-from botocore.exceptions import ClientError
+from lists import common_table_ops
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -31,17 +30,14 @@ def unreserve_main(event):
         product_id = common_event.get_product_id(event)
 
         # Step 1 - get reserved item and product item.
-        reserved_item = get_reserved_details_item(table_name, list_id, product_id)
-        product_item = get_product_item(table_name, list_id, product_id)
+        reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, identity)
+        product_item = common_table_ops.get_product_item(table_name, list_id, product_id)
 
-        # Step 2 - Check that requestor id matches userid of reserved details.
-        confirm_user_reserved_product(identity, reserved_item)
+        # Step 2 - Calculate new reserved quantity of product.
+        new_product_reserved_quantity = common.calculate_new_reserved_quantity(product_item, -reserved_item['quantity'])
 
-        # Step 3 - Calculate new reserved quantity of product.
-        new_product_reserved_quantity = calculate_new_reserved_quantity(product_item, -reserved_item['quantity'])
-
-        # Step 4 - Delete reserved details item and update product reserved quantities
-        update_items(table_name, list_id, product_id, new_product_reserved_quantity)
+        # Step 3 - Delete reserved details item and update product reserved quantities
+        update_product_and_delete_reserved_item(table_name, list_id, product_id, identity, new_product_reserved_quantity)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -54,76 +50,7 @@ def unreserve_main(event):
     return response
 
 
-def get_reserved_details_item(table_name, list_id, product_id):
-    key = {
-        'PK': {'S': "LIST#" + list_id},
-        'SK': {'S': "RESERVED#PRODUCT#" + product_id}
-    }
-
-    try:
-        response = dynamodb.get_item(
-            TableName=table_name,
-            Key=key
-        )
-        logger.info("Get reserved item response: {}".format(response))
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-
-    if 'Item' not in response:
-        logger.info("No reserved details were found for list {} and product id {} was found.".format(list_id, product_id))
-        raise Exception("No reserved item exists with this ID.")
-
-    item = response['Item']
-    logger.info("Reserved Item: {}".format(item))
-
-    return Reserved(item).get_details()
-
-
-def get_product_item(table_name, list_id, product_id):
-    key = {
-        'PK': {'S': "LIST#" + list_id},
-        'SK': {'S': "PRODUCT#" + product_id}
-    }
-
-    try:
-        response = dynamodb.get_item(
-            TableName=table_name,
-            Key=key
-        )
-        logger.info("Get reserved item response: {}".format(response))
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-
-    if 'Item' not in response:
-        logger.info("No product was found for list {} and product id {} was found.".format(list_id, product_id))
-        raise Exception("No product item exists with this ID.")
-
-    item = response['Item']
-    logger.info("Product Item: {}".format(item))
-
-    return Product(item).get_details()
-
-
-def confirm_user_reserved_product(user_id, reserved_item):
-    if user_id != reserved_item['userId']:
-        logger.info("Requestor ID {} did not match user id of reserved item user ID {}.".format(user_id, reserved_item['userId']))
-        raise Exception("Requestor ID {} did not match user id of reserved item user ID {}.".format(user_id, reserved_item['userId']))
-
-    return True
-
-
-def calculate_new_reserved_quantity(product_item, update_amount):
-    new_quantity = product_item['reserved'] + update_amount
-    logger.info("Product reserved quantity updated from {} to {}".format(product_item['reserved'], new_quantity))
-
-    if new_quantity < 0:
-        logger.info("Reserved quantity for product ({}) could not be updated by {}.".format(product_item['reserved'], update_amount))
-        raise Exception("Reserved quantity for product ({}) could not be updated by {}.".format(product_item['reserved'], update_amount))
-
-    return new_quantity
-
-
-def update_items(table_name, list_id, product_id, new_product_reserved_quantity):
+def update_product_and_delete_reserved_item(table_name, list_id, product_id, user_id, new_product_reserved_quantity):
     product_key = {
         'PK': {'S': "LIST#{}".format(list_id)},
         'SK': {'S': "PRODUCT#{}".format(product_id)}
@@ -131,12 +58,12 @@ def update_items(table_name, list_id, product_id, new_product_reserved_quantity)
 
     reserved_key = {
         'PK': {'S': "LIST#{}".format(list_id)},
-        'SK': {'S': "RESERVED#PRODUCT#{}".format(product_id)}
+        'SK': {'S': "RESERVED#{}#{}".format(product_id, user_id)}
     }
 
     condition = {
         ':PK': {'S': "LIST#{}".format(list_id)},
-        ':SK': {'S': "RESERVED#PRODUCT#{}".format(product_id)}
+        ':SK': {'S': "RESERVED#{}#{}".format(product_id, user_id)}
     }
 
     try:

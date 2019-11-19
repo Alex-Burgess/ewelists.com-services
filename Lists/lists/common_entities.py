@@ -72,7 +72,7 @@ class Product:
 class Reserved:
     def __init__(self, item):
         self.listId = item.get('PK').get('S')
-        self.productId = item.get('SK').get('S').split("#")[2]
+        self.productId = item.get('productId').get('S')
         self.quantity = item.get('quantity').get('N')
         self.name = item.get('name').get('S')
         self.userId = item.get('userId').get('S')
