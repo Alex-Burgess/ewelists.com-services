@@ -78,7 +78,6 @@ class TestDeleteProductItem:
             delete_product.delete_product_item('lists-unittes', list_id, product_id)
         assert str(e.value) == "Product could not be deleted.", "Exception not as expected."
 
-    @pytest.mark.skip(reason="Moto is not throwing an exception when deleting with ConditionExpression")
     def test_delete_non_existent_product_item(self, dynamodb_mock):
         product_id = '112345678-prod-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'

@@ -28,12 +28,22 @@ def update_product_main(event):
         identity = common.get_identity(event, os.environ)
         list_id = common.get_list_id(event)
         product_id = common.get_product_id(event)
-        quantity = common.get_quantity(event)
+        request_reserve_quantity = common.get_quantity(event)
 
-        # list_item = common_product.get_list(table_name, identity['userPoolSub'], list_id)
-        # common.confirm_owner(identity['userPoolSub'], list_id, [list_item])
-        #
-        # quantity = update_product_item(table_name, list_id, product_id, quantity)
+        # get reserved data object
+        reserved_details_item = get_reserved_details_item(table_name, list_id, product_id)
+
+        # check user reserved item
+        # confirm_user_reserved_product()
+
+        # product_quantities = get_product_quantities(table_name, list_id, product_id)
+        # new_product_reserved_quantity = update_reserved_quantities(product_quantities, request_reserve_quantity)
+        # update_product_reserved_attribute(table_name, list_id, product_id, new_product_reserved_quantity)
+
+        # Check quantity is > 0
+        
+        # update_reserved_quantity_attribute(table_name, list_id, product_id, identity['userPoolSub'], new_reserve_quantity)
+
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -43,3 +53,8 @@ def update_product_main(event):
     data = {'reserved': 'true'}
     response = common.create_response(200, json.dumps(data))
     return response
+
+
+def get_reserved_details_item(table_name, list_id, product_id):
+
+    return

@@ -17,11 +17,11 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    response = update_product_main(event)
+    response = reserve_main(event)
     return response
 
 
-def update_product_main(event):
+def reserve_main(event):
     try:
         table_name = common.get_table_name(os.environ)
         identity = common.get_identity(event, os.environ)
@@ -47,7 +47,7 @@ def update_product_main(event):
     return response
 
 
-def update_product_reserved_quantity(table_name, list_id, product_id, new_quantity):
+def update_product_reserved_quantity(table_name, list_id, product_id, new_product_reserved_quantity):
     key = {
         'PK': {'S': "LIST#{}".format(list_id)},
         'SK': {'S': "PRODUCT#{}".format(product_id)}
@@ -59,7 +59,7 @@ def update_product_reserved_quantity(table_name, list_id, product_id, new_quanti
             Key=key,
             UpdateExpression="set reserved = :r",
             ExpressionAttributeValues={
-                ':r': {'N': str(new_quantity)},
+                ':r': {'N': str(new_product_reserved_quantity)},
             },
             ReturnValues="UPDATED_NEW"
         )

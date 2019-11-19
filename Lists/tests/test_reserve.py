@@ -155,10 +155,10 @@ class TestUpdateProductReservedQuantity:
         assert reserve.update_product_reserved_quantity(table_name, list_id, product_id, 2)
 
 
-class TestUpdateProductMain:
+class TestReserveMain:
     def test_reserve_product_not_yet_reserved(self, monkeypatch, api_gateway_event_prod2, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        response = reserve.update_product_main(api_gateway_event_prod2)
+        response = reserve.reserve_main(api_gateway_event_prod2)
         body = json.loads(response['body'])
         assert body['reserved'], "Reserve response was not true."
 
@@ -187,7 +187,7 @@ class TestUpdateProductMain:
     def test_reserve_product_with_one_reserved(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
-        response = reserve.update_product_main(api_gateway_event_prod1)
+        response = reserve.reserve_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
         assert body['reserved'], "Reserve response was not true."
 
@@ -218,7 +218,7 @@ class TestUpdateProductMain:
 
         api_gateway_event_prod1['body'] = "{\n    \"quantity\": 4,\n    \"message\": \"Happy birthday to you!\"\n}"
 
-        response = reserve.update_product_main(api_gateway_event_prod1)
+        response = reserve.reserve_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
         assert body['error'] == 'Reserved product quantity 5 exceeds quantity required 3.', "Reserve error was not as expected."
 
