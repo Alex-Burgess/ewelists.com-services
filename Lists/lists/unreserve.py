@@ -3,7 +3,9 @@ import os
 import boto3
 import logging
 from lists import common
-from lists.entities import Product, Reserved
+from lists import common_env_vars
+from lists import common_event
+from lists.common_entities import Product, Reserved
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
@@ -23,17 +25,17 @@ def handler(event, context):
 
 def unreserve_main(event):
     try:
-        table_name = common.get_table_name(os.environ)
-        identity = common.get_identity(event, os.environ)
-        list_id = common.get_list_id(event)
-        product_id = common.get_product_id(event)
+        table_name = common_env_vars.get_table_name(os.environ)
+        identity = common_event.get_identity(event, os.environ)
+        list_id = common_event.get_list_id(event)
+        product_id = common_event.get_product_id(event)
 
         # Step 1 - get reserved item and product item.
         reserved_item = get_reserved_details_item(table_name, list_id, product_id)
         product_item = get_product_item(table_name, list_id, product_id)
 
         # Step 2 - Check that requestor id matches userid of reserved details.
-        confirm_user_reserved_product(identity['userPoolSub'], reserved_item)
+        confirm_user_reserved_product(identity, reserved_item)
 
         # Step 3 - Calculate new reserved quantity of product.
         new_product_reserved_quantity = calculate_new_reserved_quantity(product_item, -reserved_item['quantity'])

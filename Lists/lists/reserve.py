@@ -4,6 +4,8 @@ import boto3
 import logging
 import time
 from lists import common
+from lists import common_env_vars
+from lists import common_event
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
@@ -23,18 +25,19 @@ def handler(event, context):
 
 def reserve_main(event):
     try:
-        table_name = common.get_table_name(os.environ)
-        identity = common.get_identity(event, os.environ)
-        list_id = common.get_list_id(event)
-        product_id = common.get_product_id(event)
-        request_reserve_quantity = common.get_quantity(event)
-        message = common.get_message(event)
+        table_name = common_env_vars.get_table_name(os.environ)
 
-        users_name = get_users_name(table_name, identity['userPoolSub'])
+        identity = common_event.get_identity(event, os.environ)
+        list_id = common_event.get_list_id(event)
+        product_id = common_event.get_product_id(event)
+        request_reserve_quantity = common_event.get_quantity(event)
+        message = common_event.get_message(event)
+
+        users_name = get_users_name(table_name, identity)
         product_quantities = get_product_quantities(table_name, list_id, product_id)
         new_product_reserved_quantity = update_reserved_quantities(product_quantities, request_reserve_quantity)
 
-        add_reserved_details(table_name, list_id, product_id, identity['userPoolSub'], users_name, request_reserve_quantity, message)
+        add_reserved_details(table_name, list_id, product_id, identity, users_name, request_reserve_quantity, message)
         update_product_reserved_quantity(table_name, list_id, product_id, new_product_reserved_quantity)
     except Exception as e:
         logger.error("Exception: {}".format(e))

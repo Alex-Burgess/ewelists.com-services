@@ -3,8 +3,8 @@ import os
 import boto3
 import logging
 from lists import common
-from lists import common_product
-from botocore.exceptions import ClientError
+from lists import common_env_vars
+from lists import common_event
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -24,11 +24,11 @@ def handler(event, context):
 
 def update_product_main(event):
     try:
-        table_name = common.get_table_name(os.environ)
-        identity = common.get_identity(event, os.environ)
-        list_id = common.get_list_id(event)
-        product_id = common.get_product_id(event)
-        request_reserve_quantity = common.get_quantity(event)
+        table_name = common_env_vars.get_table_name(os.environ)
+        identity = common_event.get_identity(event, os.environ)
+        list_id = common_event.get_list_id(event)
+        product_id = common_event.get_product_id(event)
+        request_reserve_quantity = common_event.get_quantity(event)
 
         # get reserved data object
         reserved_details_item = get_reserved_details_item(table_name, list_id, product_id)
@@ -41,8 +41,8 @@ def update_product_main(event):
         # update_product_reserved_attribute(table_name, list_id, product_id, new_product_reserved_quantity)
 
         # Check quantity is > 0
-        
-        # update_reserved_quantity_attribute(table_name, list_id, product_id, identity['userPoolSub'], new_reserve_quantity)
+
+        # update_reserved_quantity_attribute(table_name, list_id, product_id, identity, new_reserve_quantity)
 
     except Exception as e:
         logger.error("Exception: {}".format(e))

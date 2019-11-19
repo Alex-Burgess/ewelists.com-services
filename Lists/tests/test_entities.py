@@ -1,4 +1,4 @@
-from lists.entities import User, List, Product, Reserved
+from lists.common_entities import User, List, Product, Reserved
 import sys
 import logging
 logger = logging.getLogger()
