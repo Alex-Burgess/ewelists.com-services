@@ -70,6 +70,32 @@ def generate_list_object(response_items):
     return list
 
 
+def generate_shared_list_object(response_items):
+    list = {"list": None, "products": {}, "reserved": {}}
+
+    for item in response_items:
+        if item['SK']['S'].startswith("USER"):
+            logger.info("List Owner Item: {}".format(item))
+            list['list'] = List(item).get_details()
+        elif item['SK']['S'].startswith("PRODUCT"):
+            logger.info("Product Item: {}".format(item))
+            product = Product(item).get_details()
+            productId = product['productId']
+            list['products'][productId] = product
+        elif item['SK']['S'].startswith("RESERVED"):
+            logger.info("Reserved Item: {}".format(item))
+            reserved = Reserved(item).get_details()
+            productId = reserved['productId']
+            userId = reserved['userId']
+
+            if productId not in list['reserved']:
+                list['reserved'][productId] = {}
+
+            list['reserved'][productId][userId] = reserved
+
+    return list
+
+
 def create_response(code, body):
     logger.info("Creating response with status code ({}) and body ({})".format(code, body))
     response = {'statusCode': code,

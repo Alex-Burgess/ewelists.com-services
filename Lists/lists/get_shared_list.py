@@ -29,7 +29,10 @@ def get_shared_list_main(event):
         list_id = common_event.get_list_id(event)
         response_items = get_list_query(table_name, identity, list_id)
         common.confirm_list_shared_with_user(identity, list_id, response_items)
-        list_object = common.generate_list_object(response_items)
+        # list_object = common.generate_list_object(response_items)
+
+        # TODO done quickly without tests
+        list_object = common.generate_shared_list_object(response_items)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))

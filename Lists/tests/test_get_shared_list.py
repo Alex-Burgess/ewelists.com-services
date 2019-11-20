@@ -93,6 +93,13 @@ class TestGetSharedListMain:
         assert body['products']["12345678-prod-0002-1234-abcdefghijkl"] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "type": "products"}, "Product object not correct."
         assert body['products']["12345678-notf-0001-1234-abcdefghijkl"] == {"productId": "12345678-notf-0001-1234-abcdefghijkl", "quantity": 2, "reserved": 1, "type": "notfound"}, "Product object not correct."
 
+        assert len(body['reserved']) == 2, "Number of products reserved was not 2."
+        assert len(body['reserved']["12345678-prod-0001-1234-abcdefghijkl"]) == 2, "Number of users that have reserved product not correct."
+        assert len(body['reserved']["12345678-notf-0001-1234-abcdefghijkl"]) == 1, "Number of users that have reserved product not correct."
+        assert body['reserved']["12345678-prod-0001-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
+        assert body['reserved']["12345678-prod-0001-1234-abcdefghijkl"]['12345678-user-0003-1234-abcdefghijkl'] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User3", "userId": "12345678-user-0003-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
+        assert body['reserved']["12345678-notf-0001-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-notf-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
+
     def test_get_shared_list_with_no_date(self, monkeypatch, api_gateway_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         api_gateway_event['pathParameters']['id'] = "12345678-list-0002-1234-abcdefghijkl"

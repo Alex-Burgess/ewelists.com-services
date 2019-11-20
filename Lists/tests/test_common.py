@@ -125,3 +125,23 @@ class TestGenerateListObject:
         assert len(items['reserved']) == 2, "Number of products reserved was not 2."
         assert items['reserved'][0] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
         assert items['reserved'][1] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
+
+
+class TestGenerateSharedListObject:
+    def test_generate_shared_list_object(self, list_query_response):
+        items = common.generate_shared_list_object(list_query_response)
+        assert items['list']['listId'] == "12345678-list-0001-1234-abcdefghijkl", "ListId was incorrect."
+        assert items['list']['title'] == "Child User1 1st Birthday", "List title was incorrect."
+        assert items['list']['description'] == "A gift list for Child User1 birthday.", "List description was incorrect."
+        assert items['list']['occasion'] == "Birthday", "List occasion was incorrect."
+
+        assert len(items['products']) == 3, "Number of products was not 2."
+        assert items['products']["12345678-prod-0001-1234-abcdefghijkl"] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "quantity": 2, "reserved": 1, "type": "products"}, "Product object not correct."
+        assert items['products']["12345678-prod-0002-1234-abcdefghijkl"] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "quantity": 3, "reserved": 1, "type": "products"}, "Product object not correct."
+        assert items['products']["12345678-notf-0001-1234-abcdefghijkl"] == {"productId": "12345678-notf-0001-1234-abcdefghijkl", "quantity": 2, "reserved": 0, "type": "notfound"}, "Product object not correct."
+
+        assert len(items['reserved']) == 2, "Number of products reserved was not 2."
+        assert len(items['reserved']["12345678-prod-0001-1234-abcdefghijkl"]) == 1, "Number of users that have reserved product not correct."
+        assert len(items['reserved']["12345678-prod-0002-1234-abcdefghijkl"]) == 1, "Number of users that have reserved product not correct."
+        assert items['reserved']["12345678-prod-0001-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
+        assert items['reserved']["12345678-prod-0002-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
