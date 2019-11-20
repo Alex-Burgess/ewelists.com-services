@@ -1,10 +1,10 @@
 import pytest
 import os
+import re
 import json
 import boto3
 from moto import mock_dynamodb2
 from lists import reserve
-from tests import fixtures
 
 import sys
 import logging
@@ -15,63 +15,201 @@ logger.addHandler(stream_handler)
 
 
 @pytest.fixture
-def api_gateway_event_prod1():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/reserve/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
-    event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 2,\n    \"message\": \"Happy birthday to you!\"\n}"
+def api_gateway_reserve_event():
+    """ Generates API GW Event"""
 
-    return event
-
-
-@pytest.fixture
-def api_gateway_event_prod2():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/reserve/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0002-1234-abcdefghijkl"
-    event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 1,\n    \"message\": \"Happy birthday to you!\"\n}"
-
-    return event
+    return {
+        "resource": "/lists/{id}/reserve/{productid}",
+        "path": "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl",
+        "httpMethod": "POST",
+        "headers": {
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "Cache-Control": "no-cache",
+            "CloudFront-Forwarded-Proto": "https",
+            "CloudFront-Is-Desktop-Viewer": "true",
+            "CloudFront-Is-Mobile-Viewer": "false",
+            "CloudFront-Is-SmartTV-Viewer": "false",
+            "CloudFront-Is-Tablet-Viewer": "false",
+            "CloudFront-Viewer-Country": "GB",
+            "Content-Type": "text/plain",
+            "Host": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
+            "Postman-Token": "512388b6-c036-4d11-a6c9-adf8e07e1da0",
+            "User-Agent": "PostmanRuntime/7.15.2",
+            "Via": "1.1 a1cb6e97bccd4899987b343ae5d4c252.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Id": "zJgUVrLX5O4d-B43SVe4Bs6YVpSTWXxrAVtWjeF0FcAnXJ8dARKQRA==",
+            "x-amz-content-sha256": "b9d4c66e0ae3c09af8a6ce4c99518f244c3db701a196021c79f094b51e9b49d4",
+            "x-amz-date": "20191008T162240Z",
+            "X-Amzn-Trace-Id": "Root=1-5d9cb7d0-6965798907570a0728570212",
+            "X-Forwarded-For": "5.81.150.55, 70.132.38.104",
+            "X-Forwarded-Port": "443",
+            "X-Forwarded-Proto": "https"
+        },
+        "queryStringParameters": "null",
+        "multiValueQueryStringParameters": "null",
+        "pathParameters": {
+            "productid": "12345678-prod-0001-1234-abcdefghijkl",
+            "id": "12345678-list-0001-1234-abcdefghijkl"
+        },
+        "stageVariables": "null",
+        "requestContext": {
+            "resourceId": "sgzmgr",
+            "resourcePath": "/lists/{id}/product/{productid}",
+            "httpMethod": "POST",
+            "extendedRequestId": "BQGojGkBjoEFsTw=",
+            "requestTime": "08/Oct/2019:16:22:40 +0000",
+            "path": "/test/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl",
+            "accountId": "123456789012",
+            "protocol": "HTTP/1.1",
+            "stage": "test",
+            "domainPrefix": "4sdcvv0n2e",
+            "requestTimeEpoch": 1570551760227,
+            "requestId": "a3d965cd-a79b-4249-867a-a03eb858a839",
+            "identity": {
+                "cognitoIdentityPoolId": "eu-west-1:2208d797-dfc9-40b4-8029-827c9e76e029",
+                "accountId": "123456789012",
+                "cognitoIdentityId": "eu-west-1:db9476fd-de77-4977-839f-4f943ff5d68c",
+                "caller": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials",
+                "sourceIp": "31.49.230.217",
+                "principalOrgId": "o-d8jj6dyqv2",
+                "accessKey": "ABCDEFGPDMJL4EB35H6H",
+                "cognitoAuthenticationType": "authenticated",
+                "cognitoAuthenticationProvider": "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl",
+                "userArn": "arn:aws:sts::123456789012:assumed-role/Ewelists-test-CognitoAuthRole/CognitoIdentityCredentials",
+                "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
+                "user": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials"
+            },
+            "domainName": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
+            "apiId": "4sdcvv0n2e"
+        },
+        "body": "{\n    \"quantity\": 1,\n    \"message\": \"Happy birthday to you!\"\n}",
+        "isBase64Encoded": "false"
+    }
 
 
 @pytest.fixture
 def dynamodb_mock():
+    table_name = 'lists-unittest'
+
     mock = mock_dynamodb2()
     mock.start()
+
     dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
 
     table = dynamodb.create_table(
-        TableName='lists-unittest',
-        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
-    )
+            TableName=table_name,
+            KeySchema=[
+                {
+                    'AttributeName': 'PK', 'KeyType': 'HASH'
+                },
+                {
+                    'AttributeName': 'SK', 'KeyType': 'RANGE'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'PK', 'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'SK', 'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5
+            }
+        )
 
-    items = fixtures.load_test_data()
+    # 1 User, with 1 list.
+    items = [
+        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "userId": "12345678-user-0001-1234-abcdefghijkl", "title": "Api Child's 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "createdAt": "2018-09-01T10:00:00", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "description": "A gift list for Api Childs birthday.", "eventDate": "01 September 2019", "imageUrl": "/images/celebration-default.jpg"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl", "type": "products", "quantity": 1, "reserved": 0},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PRODUCT#12345678-prod-0002-1234-abcdefghijkl", "type": "products", "quantity": 2, "reserved": 1, "reservedDetails": [{"name": "Test User"}]}
+    ]
 
     for item in items:
-        table.put_item(TableName='lists-unittest', Item=item)
+        table.put_item(TableName=table_name, Item=item)
 
     yield
+    # teardown: stop moto server
     mock.stop()
 
 
-class TestReserveMain:
-    @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-    def test_reserve_product_not_yet_reserved(self, monkeypatch, api_gateway_event_prod2, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        response = reserve.reserve_main(api_gateway_event_prod2)
-        body = json.loads(response['body'])
-        assert body['reserved'], "Reserve response was not true."
+class TestGetUsersName:
+    def test_get_users_name(self, dynamodb_mock):
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        name = reserve.get_users_name('lists-unittest', user_id)
+        assert name == "Test User", "User's name was not as expected."
+
+    def test_with_invalid_userid(self, dynamodb_mock):
+        user_id = '12345678-user-0010-1234-abcdefghijkl'
+        with pytest.raises(Exception) as e:
+            reserve.get_users_name('lists-unittest', user_id)
+        assert str(e.value) == "No user exists with this ID.", "Exception not as expected."
+
+
+class TestGetProductQuantities:
+    def test_get_product_quantities(self, dynamodb_mock):
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        quantities = reserve.get_product_quantities('lists-unittest', list_id, product_id)
+
+        expected_result = {'quantity': 1, 'reserved': 0}
+        assert quantities == expected_result, "Quantities not as expected."
+
+    def test_with_invalid_productid(self, dynamodb_mock):
+        product_id = '12345678-prod-0010-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        with pytest.raises(Exception) as e:
+            reserve.get_product_quantities('lists-unittest', list_id, product_id)
+        assert str(e.value) == "No product exists with this ID.", "Exception not as expected."
+
+
+class TestUpdateReservedQuantities:
+    def test_with_no_update(self):
+        quantities = {'quantity': 1, 'reserved': 0}
+        new_reserve_total = reserve.update_reserved_quantities(quantities, 0)
+        assert new_reserve_total == 0
+
+    def test_reserve_one_product(self):
+        quantities = {'quantity': 1, 'reserved': 0}
+        new_reserve_total = reserve.update_reserved_quantities(quantities, 1)
+        assert new_reserve_total == 1
+
+    def test_reserve_two_product(self):
+        quantities = {'quantity': 2, 'reserved': 0}
+        new_reserve_total = reserve.update_reserved_quantities(quantities, 2)
+        assert new_reserve_total == 2
+
+    def test_over_reserve(self):
+        quantities = {'quantity': 1, 'reserved': 1}
+        with pytest.raises(Exception) as e:
+            reserve.update_reserved_quantities(quantities, 1)
+        assert str(e.value) == "Reserved product quantity 2 exceeds quantity required 1."
+
+    def test_over_reserve2(self):
+        quantities = {'quantity': 1, 'reserved': 0}
+        with pytest.raises(Exception) as e:
+            reserve.update_reserved_quantities(quantities, 2)
+        assert str(e.value) == "Reserved product quantity 2 exceeds quantity required 1."
+
+
+class TestAddReservedDetails:
+    def test_when_reservedDetails_not_present(self, dynamodb_mock):
+        table_name = 'lists-unittest'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        users_name = 'Test User'
+        request_reserve = 1
+        current_reserved = 0
+        total_reserved = 1
+        message = 'A test message'
+        assert reserve.add_reserved_details(table_name, list_id, product_id, user_id, users_name, request_reserve, current_reserved, total_reserved, message)
 
         # Check the table was updated with right reserved details
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
-        list_id = api_gateway_event_prod2['pathParameters']['id']
-        product_id = api_gateway_event_prod2['pathParameters']['productid']
 
         test_response = dynamodb.get_item(
             TableName='lists-unittest',
@@ -79,29 +217,59 @@ class TestReserveMain:
         )
 
         reserved_quantity = int(test_response['Item']['reserved']['N'])
+        reserved_details = test_response['Item']['reservedDetails']['L']
+        reserved_obj = reserved_details[0]['M']
+
         assert reserved_quantity == 1, "Quantity not as expected."
+        assert len(reserved_details) == 1, "Number of reserved details was not as expected."
+        assert reserved_obj['name']['S'] == 'Test User', "Reserved name was not as expected."
 
-        reserved_details_response = dynamodb.get_item(
+    def test_with_reserved_details_present(self, dynamodb_mock):
+        table_name = 'lists-unittest'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0002-1234-abcdefghijkl'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        users_name = 'Test User'
+        request_reserve = 1
+        current_reserved = 1
+        total_reserved = 2
+        message = 'A test message'
+        assert reserve.add_reserved_details(table_name, list_id, product_id, user_id, users_name, request_reserve, current_reserved, total_reserved, message)
+
+        # Check the table was updated with right reserved details
+        dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
+
+        test_response = dynamodb.get_item(
             TableName='lists-unittest',
-            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "RESERVED#PRODUCT#" + product_id}}
+            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "PRODUCT#" + product_id}}
         )
 
-        assert reserved_details_response['Item']['PK']['S'] == 'LIST#12345678-list-0001-1234-abcdefghijkl', "PK not as expected."
-        assert reserved_details_response['Item']['SK']['S'] == 'RESERVED#12345678-prod-0002-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl', "SK not as expected."
-        assert reserved_details_response['Item']['quantity']['N'] == '1', "Quantity not as expected."
+        # print("reserved details: " + json.dumps(test_response['Item']['reservedDetails']))
 
-    @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-    def test_reserve_product_with_one_reserved(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
+        reserved_quantity = int(test_response['Item']['reserved']['N'])
+        reserved_details = test_response['Item']['reservedDetails']['L']
+        reserved_obj = reserved_details[1]['M']
+
+        assert reserved_quantity == 2, "Quantity not as expected."
+        assert len(reserved_details) == 2, "Number of reserved details was not as expected."
+        assert reserved_obj['name']['S'] == 'Test User', "Reserved name was not as expected."
+        assert reserved_obj['userId']['S'] == '12345678-user-0001-1234-abcdefghijkl', "UserId was not as expected."
+        assert reserved_obj['reserved']['N'] == '1', "Reserved quantity was not as expected."
+        assert reserved_obj['message']['S'] == 'A test message', "Message was not as expected."
+        assert len(reserved_obj['reservedAt']['N']) == 10, "Message was not as expected."
+
+
+class TestUpdateProductMain:
+    def test_reserve_product_not_yet_reserved(self, monkeypatch, api_gateway_reserve_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-
-        response = reserve.reserve_main(api_gateway_event_prod1)
+        response = reserve.update_product_main(api_gateway_reserve_event)
         body = json.loads(response['body'])
         assert body['reserved'], "Reserve response was not true."
 
         # Check the table was updated with right reserved details
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
-        list_id = api_gateway_event_prod1['pathParameters']['id']
-        product_id = api_gateway_event_prod1['pathParameters']['productid']
+        list_id = api_gateway_reserve_event['pathParameters']['id']
+        product_id = api_gateway_reserve_event['pathParameters']['productid']
 
         test_response = dynamodb.get_item(
             TableName='lists-unittest',
@@ -109,49 +277,55 @@ class TestReserveMain:
         )
 
         reserved_quantity = int(test_response['Item']['reserved']['N'])
-        assert reserved_quantity == 3, "Quantity not as expected."
+        reserved_details = test_response['Item']['reservedDetails']['L']
+        reserved_obj = reserved_details[0]['M']
 
-        reserved_details_response = dynamodb.get_item(
+        assert reserved_quantity == 1, "Quantity not as expected."
+        assert len(reserved_details) == 1, "Number of reserved details was not as expected."
+        assert reserved_obj['name']['S'] == 'Test User', "Reserved name was not as expected."
+
+    def test_reserve_product_with_one_reserved(self, monkeypatch, api_gateway_reserve_event, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+
+        api_gateway_reserve_event['pathParameters']['productid'] = '12345678-prod-0002-1234-abcdefghijkl'
+
+        response = reserve.update_product_main(api_gateway_reserve_event)
+        body = json.loads(response['body'])
+        assert body['reserved'], "Reserve response was not true."
+
+        # Check the table was updated with right reserved details
+        dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
+        list_id = api_gateway_reserve_event['pathParameters']['id']
+        product_id = api_gateway_reserve_event['pathParameters']['productid']
+
+        test_response = dynamodb.get_item(
             TableName='lists-unittest',
-            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "RESERVED#PRODUCT#" + product_id}}
+            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "PRODUCT#" + product_id}}
         )
 
-        assert reserved_details_response['Item']['PK']['S'] == 'LIST#12345678-list-0001-1234-abcdefghijkl', "PK not as expected."
-        assert reserved_details_response['Item']['SK']['S'] == 'RESERVED#PRODUCT#12345678-prod-0001-1234-abcdefghijkl', "SK not as expected."
-        assert reserved_details_response['Item']['quantity']['N'] == '2', "Quantity not as expected."
+        reserved_quantity = int(test_response['Item']['reserved']['N'])
+        reserved_details = test_response['Item']['reservedDetails']['L']
+        reserved_obj = reserved_details[1]['M']
 
-    def test_over_reserve_product(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
+        assert reserved_quantity == 2, "Quantity not as expected."
+        assert len(reserved_details) == 2, "Number of reserved details was not as expected."
+        assert reserved_obj['name']['S'] == 'Test User', "Reserved name was not as expected."
+        assert reserved_obj['userId']['S'] == '12345678-user-0001-1234-abcdefghijkl', "UserId was not as expected."
+        assert reserved_obj['reserved']['N'] == '1', "Reserved quantity was not as expected."
+
+    def test_over_reserve_product(self, monkeypatch, api_gateway_reserve_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
-        api_gateway_event_prod1['body'] = "{\n    \"quantity\": 4,\n    \"message\": \"Happy birthday to you!\"\n}"
+        api_gateway_reserve_event['body'] = "{\n    \"quantity\": 2,\n    \"message\": \"Happy birthday to you!\"\n}"
 
-        response = reserve.reserve_main(api_gateway_event_prod1)
+        response = reserve.update_product_main(api_gateway_reserve_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'Reserved quantity for product (2) could not be updated by 4 as exceeds required quantity (3).', "Reserve error was not as expected."
-
-    def test_reserve_product_not_added_to_list(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-
-        api_gateway_event_prod1['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0011-1234-abcdefghijkl"}
-
-        response = reserve.reserve_main(api_gateway_event_prod1)
-        body = json.loads(response['body'])
-        assert body['error'] == 'No product item exists with this ID.', "Reserve error was not as expected."
-
-    def test_reserve_product_already_reserved_by_user(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-
-        api_gateway_event_prod1['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0002-1234-abcdefghijkl"
-
-        response = reserve.reserve_main(api_gateway_event_prod1)
-        body = json.loads(response['body'])
-        assert body['error'] == 'Product already reserved by user.', "Reserve error was not as expected."
+        assert body['error'] == 'Reserved product quantity 2 exceeds quantity required 1.', "Reserve error was not as expected."
 
 
-@pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-def test_handler(api_gateway_event_prod1, monkeypatch, dynamodb_mock):
+def test_handler(api_gateway_reserve_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    response = reserve.handler(api_gateway_event_prod1, None)
+    response = reserve.handler(api_gateway_reserve_event, None)
     body = json.loads(response['body'])
 
     assert response['statusCode'] == 200

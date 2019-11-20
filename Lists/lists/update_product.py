@@ -3,9 +3,7 @@ import os
 import boto3
 import logging
 from lists import common
-from lists import common_table_ops
-from lists import common_env_vars
-from lists import common_event
+from lists import common_product
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
@@ -25,14 +23,14 @@ def handler(event, context):
 
 def update_product_main(event):
     try:
-        table_name = common_env_vars.get_table_name(os.environ)
-        identity = common_event.get_identity(event, os.environ)
-        list_id = common_event.get_list_id(event)
-        product_id = common_event.get_product_id(event)
-        quantity = common_event.get_quantity(event)
+        table_name = common.get_table_name(os.environ)
+        identity = common.get_identity(event, os.environ)
+        list_id = common.get_list_id(event)
+        product_id = common.get_product_id(event)
+        quantity = common.get_quantity(event)
 
-        list_item = common_table_ops.get_list(table_name, identity, list_id)
-        common.confirm_owner(identity, list_id, [list_item])
+        list_item = common_product.get_list(table_name, identity['userPoolSub'], list_id)
+        common.confirm_owner(identity['userPoolSub'], list_id, [list_item])
 
         quantity = update_product_item(table_name, list_id, product_id, quantity)
     except Exception as e:

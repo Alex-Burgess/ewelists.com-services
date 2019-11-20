@@ -3,8 +3,6 @@ import os
 import boto3
 import logging
 from lists import common
-from lists import common_env_vars
-from lists import common_event
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -23,12 +21,12 @@ def handler(event, context):
 
 def update_list_main(event):
     try:
-        table_name = common_env_vars.get_table_name(os.environ)
-        identity = common_event.get_identity(event, os.environ)
-        list_id = common_event.get_list_id(event)
+        table_name = common.get_table_name(os.environ)
+        identity = common.get_identity(event, os.environ)
+        list_id = common.get_list_id(event)
         attribute_details = get_attribute_details(event)
         items = get_items_to_update(table_name, list_id)
-        common.confirm_owner(identity, list_id, items)
+        common.confirm_owner(identity['userPoolSub'], list_id, items)
         updated_attributes = update_list(table_name, items, attribute_details)
     except Exception as e:
         logger.error("Exception: {}".format(e))

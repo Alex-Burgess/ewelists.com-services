@@ -4,7 +4,7 @@ import json
 import logging
 import random
 import string
-from lists import common_env_vars
+from lists import common
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -20,8 +20,8 @@ dynamodb = boto3.client('dynamodb')
 def handler(event, context):
     logger.info("SignUp Post Confirmation Trigger event: " + json.dumps(event))
 
-    table_name = common_env_vars.get_table_name(os.environ)
-    user_pool_id = common_env_vars.get_userpool_id(os.environ)
+    table_name = common.get_table_name(os.environ)
+    user_pool_id = common.get_userpool_id(os.environ)
     new_user = get_user_from_event(event)
     exists = get_user_from_userpool(user_pool_id, new_user['email'])
 

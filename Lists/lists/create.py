@@ -5,8 +5,6 @@ import logging
 import time
 import uuid
 from lists import common
-from lists import common_env_vars
-from lists import common_event
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -25,11 +23,11 @@ def handler(event, context):
 
 def create_main(event):
     try:
-        table_name = common_env_vars.get_table_name(os.environ)
-        identity = common_event.get_identity(event, os.environ)
+        table_name = common.get_table_name(os.environ)
+        identity = common.get_identity(event, os.environ)
         listId = generate_list_id()
         attributes = get_attribute_details(event)
-        message = put_item_in_table(table_name, identity, listId, attributes)
+        message = put_item_in_table(table_name, identity['userPoolSub'], listId, attributes)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
