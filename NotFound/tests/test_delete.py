@@ -114,7 +114,7 @@ def dynamodb_mock():
 
     # 1 User, with 1 list.
     items = [
-        {"productId": "12345678-notf-0010-1234-abcdefghijkl", "brand": "John Lewis", "details": "John Lewis & Partners Safari Mobile", "productUrl": "https://www.johnlewis.com/john-lewis-partners-safari-mobile/p3439165"},
+        {"productId": "12345678-notf-0010-1234-abcdefghijkl", "brand": "John Lewis", "details": "John Lewis & Partners Safari Mobile", "productUrl": "https://www.johnlewis.com/john-lewis-partners-safari-mobile/p3439165", "createdBy": "12345678-user-0001-1234-abcdefghijkl"},
     ]
 
     for item in items:
@@ -132,7 +132,7 @@ class TestDeleteProduct:
         result = delete.delete_product('notfound-unittest', cognito_user_id, product_id)
         assert result, "Delete result was not true"
 
-    @pytest.mark.skip(reason="Moto is not throwing an exception when deleting with ConditionExpression")
+    # @pytest.mark.skip(reason="Moto is not throwing an exception when deleting with ConditionExpression")
     def test_delete_product_not_present(self, dynamodb_mock):
         cognito_user_id = '12345678-user-0001-1234-abcdefghijkl'
         product_id = '12345678-notf-0010-1234-abcdefghijkl-bad'
@@ -141,7 +141,7 @@ class TestDeleteProduct:
             delete.delete_product('notfound-unittest', cognito_user_id, product_id)
         assert str(e.value) == "Product can not be deleted.", "Exception not as expected."
 
-    @pytest.mark.skip(reason="Moto is not throwing an exception when deleting with ConditionExpression")
+    # @pytest.mark.skip(reason="Moto is not throwing an exception when deleting with ConditionExpression")
     def test_delete_product_not_createdby_user(self, dynamodb_mock):
         cognito_user_id = '12345678-user-0002-1234-abcdefghijkl'
         product_id = '12345678-notf-0010-1234-abcdefghijkl'
