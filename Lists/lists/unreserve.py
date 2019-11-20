@@ -44,7 +44,7 @@ def unreserve_main(event):
         logger.info("Returning response: {}".format(response))
         return response
 
-    data = {'unreserved': 'true'}
+    data = {'unreserved': True}
 
     response = common.create_response(200, json.dumps(data))
     return response

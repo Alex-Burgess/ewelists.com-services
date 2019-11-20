@@ -52,7 +52,7 @@ def update_reserve_main(event):
         logger.info("Returning response: {}".format(response))
         return response
 
-    data = {'updated': 'true'}
+    data = {'updated': True}
     response = common.create_response(200, json.dumps(data))
     return response
 
