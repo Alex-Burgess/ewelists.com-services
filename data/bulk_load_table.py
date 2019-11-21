@@ -8,7 +8,7 @@ import boto3
 # usage: python bulk_load_table.py notfound-test notfound-test.json
 
 # Staging setup
-# usage: python bulk_load_table.py lists-staging items-staging.json
+# usage: python bulk_load_table.py lists-staging ../Lists/data/lists-staging.json
 # usage: python bulk_load_table.py products-staging products-test.json
 # usage: python bulk_load_table.py notfound-staging notfound-test.json
 
