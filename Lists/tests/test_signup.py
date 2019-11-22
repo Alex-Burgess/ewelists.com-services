@@ -54,7 +54,7 @@ def dynamodb_mock():
     )
 
     items = [
-        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.join@gmail.com", "name": "Test User", "userId": "eu-west-1:12345678-user-0001-1234-abcdefghijkl"},
+        {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.join@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
     ]
 
     for item in items:
@@ -89,24 +89,28 @@ class TestGetUserFromEvent:
         assert user['type'] == "Cognito", "Attribute type was not Cognito."
         assert user['username'] == "12345678-user-0003-1234-abcdefghijkl", "Attribute username was not as expected."
         assert user['email'] == "test.user@gmail.com", "Attribute email was not as expected."
+        assert user['name'] == "Test User", "Attribute name was not as expected."
 
     def test_google_user(self, signup_with_google_event):
         user = signup.get_user_from_event(signup_with_google_event)
         assert user['type'] == "Google", "Attribute type was not Google."
         assert user['username'] == "109769169322789401234", "Attribute username was not as expected."
         assert user['email'] == "test.user@gmail.com", "Attribute email was not as expected."
+        assert user['name'] == "Test User", "Attribute name was not as expected."
 
     def test_facebook_user(self, signup_with_facebook_event):
         user = signup.get_user_from_event(signup_with_facebook_event)
         assert user['type'] == "Facebook", "Attribute type was not Facebook."
         assert user['username'] == "10156460942006789", "Attribute username was not as expected."
         assert user['email'] == "test.user@gmail.com", "Attribute email was not as expected."
+        assert user['name'] == "Test User", "Attribute name was not as expected."
 
     def test_amazon_user(self, signup_with_amazon_event):
         user = signup.get_user_from_event(signup_with_amazon_event)
         assert user['type'] == "LoginWithAmazon", "Attribute type was not LoginWithAmazon."
         assert user['username'] == "amzn1.account.AH2EWIJQPC4QJNTUDTVRABCDEFGH", "Attribute username was not as expected."
         assert user['email'] == "test.user@gmail.com", "Attribute email was not as expected."
+        assert user['name'] == "Test User", "Attribute name was not as expected."
 
 
 class TestGetUserFromUserpool:
@@ -136,17 +140,38 @@ class TestGetUserFromUserpool:
 
 class TestCreateUserInListsDB:
     def test_create_new_user(self, dynamodb_mock):
-        email = 'test.user@gmail.com'
+        email = 'test.user2@gmail.com'
+        name = 'Test User2'
         sub = '12345678-user-0002-1234-abcdefghijkl'
-        created = signup.create_user_in_lists_db('lists-unittest', sub, email)
+        assert signup.create_user_in_lists_db('lists-unittest', sub, email, name), "User was not created in table."
 
-        assert created, "User was not created in table."
+        # Check the table was updated with right number of items
+        dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
+
+        response = dynamodb.get_item(
+            TableName='lists-unittest',
+            Key={
+                'PK': {'S': "USER#12345678-user-0002-1234-abcdefghijkl"},
+                'SK': {'S': "USER#12345678-user-0002-1234-abcdefghijkl"}
+            }
+        )
+
+        expected_item = {
+            "PK": {"S": "USER#12345678-user-0002-1234-abcdefghijkl"},
+            "SK": {"S": "USER#12345678-user-0002-1234-abcdefghijkl"},
+            "email": {"S": "test.user2@gmail.com"},
+            "name": {"S": "Test User2"},
+            "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}
+        }
+
+        assert response['Item'] == expected_item
 
     def test_create_user_with_bad_table_name(self, dynamodb_mock):
         email = 'test.user@gmail.com'
+        name = 'Test User2'
         sub = '12345678-user-0002-1234-abcdefghijkl'
         with pytest.raises(Exception) as e:
-            signup.create_user_in_lists_db('lists-unittes', sub, email)
+            signup.create_user_in_lists_db('lists-unittes', sub, email, name)
         assert str(e.value) == "User entry could not be created.", "Exception not as expected."
 
 
@@ -173,8 +198,9 @@ class TestCreateNewCognitoUser:
         user_pool_id = list_response['UserPools'][0]['Id']
 
         email = 'test.user@gmail.com'
+        name = 'Test User'
 
-        result = signup.create_new_cognito_user(user_pool_id, email)
+        result = signup.create_new_cognito_user(user_pool_id, email, name)
 
         assert result['created'], "New account was not created."
         assert len(result['user_id']) == 19, "New user id was not expected lenghth."

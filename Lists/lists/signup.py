@@ -33,13 +33,15 @@ def handler(event, context):
         logger.info("User does not have entry in userpool.")
 
         if new_user['type'] == 'Google' or new_user['type'] == 'Facebook' or new_user['type'] == 'LoginWithAmazon':
+            logger.info("Creating new cognito user.")
+
             # Create new cognito user
-            new_cognito_user = create_new_cognito_user(user_pool_id, new_user['email'])
+            new_cognito_user = create_new_cognito_user(user_pool_id, new_user['email'], new_user['name'])
             # Link Accounts
             link_accounts(user_pool_id, new_user['email'], new_cognito_user['user_id'], new_user['type'], new_user['username'])
 
             # Create entry in table
-            create_user_in_lists_db(table_name, new_cognito_user['user_id'], new_user['email'])
+            create_user_in_lists_db(table_name, new_cognito_user['user_id'], new_user['email'], new_user['name'])
 
             # Set random password, otherwise congito account will stay in FORCE_CHANGED_PASSWORD state and user won't be able to reset password.
             set_random_password(user_pool_id, new_user['email'])
@@ -47,7 +49,8 @@ def handler(event, context):
             logger.info("Completed signup process for user. Raising exception to prevent normal signup process from continuing as not required.")
             raise Exception("Sign up process complete for user.")
         else:
-            create_user_in_lists_db(table_name, new_user['username'], new_user['email'])
+            create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])
+
             logger.info("Allowing signup process to complete for user.")
 
     return event
@@ -79,7 +82,7 @@ def set_random_password(user_pool_id, email):
     return True
 
 
-def create_new_cognito_user(user_pool_id, email):
+def create_new_cognito_user(user_pool_id, email, name):
     result = {}
 
     try:
@@ -88,6 +91,7 @@ def create_new_cognito_user(user_pool_id, email):
             Username=email,
             UserAttributes=[
                 {'Name': 'email', 'Value': email},
+                {'Name': 'name', 'Value': name},
             ],
             MessageAction='SUPPRESS',
         )
@@ -129,14 +133,15 @@ def link_accounts(user_pool_id, email, existing_sub, new_type, new_id):
     return True
 
 
-def create_user_in_lists_db(table_name, sub, email):
+def create_user_in_lists_db(table_name, sub, email, name):
     logger.info("Creating entry in table {} for user with email {} (sub: {}).".format(table_name, email, sub))
 
     user_item = {
         'PK': {'S': "USER#{}".format(sub)},
         'SK': {'S': "USER#{}".format(sub)},
         'userId': {'S': sub},
-        'email': {'S': email}
+        'email': {'S': email},
+        'name': {'S': name}
     }
 
     try:
@@ -153,6 +158,9 @@ def get_user_from_event(event):
     user = {}
 
     user['email'] = event['request']['userAttributes']['email']
+
+    if 'name' in event['request']['userAttributes']:
+        user['name'] = event['request']['userAttributes']['name']
 
     if "Google" in event['userName'] or "Facebook" in event['userName']:
         user['type'] = event['userName'].split('_')[0]

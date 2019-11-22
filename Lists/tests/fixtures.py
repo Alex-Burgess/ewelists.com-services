@@ -97,6 +97,7 @@ def signup_event():
         "triggerSource": "PreSignUp_SignUp",
         "request": {
             "userAttributes": {
+                "name": "Test User",
                 "email": "test.user@gmail.com"
             },
             "validationData": "null"
@@ -114,6 +115,7 @@ def signup_social_event():
     event['triggerSource'] = "PreSignUp_ExternalProvider"
     event['request']['userAttributes'] = {
         "cognito:email_alias": "",
+        "name": "Test User",
         "cognito:phone_number_alias": "",
         "email": "test.user@gmail.com"
     }
