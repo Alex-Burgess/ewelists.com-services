@@ -5,6 +5,7 @@ import logging
 from lists import common
 from lists import common_env_vars
 from lists import common_event
+from lists.common_entities import List, Product, Reserved
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
@@ -29,10 +30,8 @@ def get_shared_list_main(event):
         list_id = common_event.get_list_id(event)
         response_items = get_list_query(table_name, identity, list_id)
         common.confirm_list_shared_with_user(identity, list_id, response_items)
-        # list_object = common.generate_list_object(response_items)
 
-        # TODO done quickly without tests
-        list_object = common.generate_shared_list_object(response_items)
+        list_object = generate_shared_list_object(response_items)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -41,6 +40,32 @@ def get_shared_list_main(event):
 
     response = common.create_response(200, json.dumps(list_object))
     return response
+
+
+def generate_shared_list_object(response_items):
+    list = {"list": None, "products": {}, "reserved": {}}
+
+    for item in response_items:
+        if item['SK']['S'].startswith("USER"):
+            logger.info("List Owner Item: {}".format(item))
+            list['list'] = List(item).get_details()
+        elif item['SK']['S'].startswith("PRODUCT"):
+            logger.info("Product Item: {}".format(item))
+            product = Product(item).get_details()
+            productId = product['productId']
+            list['products'][productId] = product
+        elif item['SK']['S'].startswith("RESERVED"):
+            logger.info("Reserved Item: {}".format(item))
+            reserved = Reserved(item).get_details()
+            productId = reserved['productId']
+            userId = reserved['userId']
+
+            if productId not in list['reserved']:
+                list['reserved'][productId] = {}
+
+            list['reserved'][productId][userId] = reserved
+
+    return list
 
 
 def get_list_query(table_name, cognito_user_id, list_id):

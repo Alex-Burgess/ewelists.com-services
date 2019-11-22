@@ -50,11 +50,20 @@ def dynamodb_mock():
         TableName='lists-unittest',
         KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
         AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
+        GlobalSecondaryIndexes=[{
+            'IndexName': 'SK-index',
+            'KeySchema': [{'AttributeName': 'SK', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
+            'Projection': {
+                'ProjectionType': 'ALL'
+            }
+        }]
     )
 
     items = [
         {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.join@gmail.com", "name": "Test User", "userId": "12345678-user-0001-1234-abcdefghijkl"},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PENDING#test.user4@gmail.com", "shared_user_email": "test.user4@gmail.com", "title": "Child User1 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0001-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": 1573739584, "description": "A gift list for Child User1 birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"},
+        {"PK": "LIST#12345678-list-0002-1234-abcdefghijkl", "SK": "PENDING#test.user4@gmail.com", "shared_user_email": "test.user4@gmail.com", "title": "Child User2 1st Birthday", "occasion": "Birthday", "listId": "12345678-list-0002-1234-abcdefghijkl", "listOwner": "12345678-user-0001-1234-abcdefghijkl", "createdAt": 1573739590, "description": "A gift list for Child User2 birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"}
     ]
 
     for item in items:
@@ -173,6 +182,78 @@ class TestCreateUserInListsDB:
         with pytest.raises(Exception) as e:
             signup.create_user_in_lists_db('lists-unittes', sub, email, name)
         assert str(e.value) == "User entry could not be created.", "Exception not as expected."
+
+
+class TestGetPendingLists:
+    def test_get_pending_lists(self, dynamodb_mock):
+        email = 'test.user4@gmail.com'
+        lists = signup.get_pending_lists('lists-unittest', 'SK-index', email)
+        assert len(lists) == 2, "Number of pending lists not as expected."
+
+        expected_items = [
+            {
+                "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"},
+                "SK": {'S': "PENDING#test.user4@gmail.com"},
+                "shared_user_email": {'S': "test.user4@gmail.com"},
+                "title": {'S': "Child User1 1st Birthday"},
+                "occasion": {'S': "Birthday"},
+                "listId": {'S': "12345678-list-0001-1234-abcdefghijkl"},
+                "listOwner": {'S': "12345678-user-0001-1234-abcdefghijkl"},
+                "createdAt": {'N': "1573739584"},
+                "description": {'S': "A gift list for Child User1 birthday."},
+                "eventDate": {'S': "31 October 2018"},
+                "imageUrl": {'S': "/images/celebration-default.jpg"}
+            },
+            {
+                "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"},
+                "SK": {'S': "PENDING#test.user4@gmail.com"},
+                "shared_user_email": {'S': "test.user4@gmail.com"},
+                "title": {'S': "Child User2 1st Birthday"},
+                "occasion": {'S': "Birthday"},
+                "listId": {'S': "12345678-list-0002-1234-abcdefghijkl"},
+                "listOwner": {'S': "12345678-user-0001-1234-abcdefghijkl"},
+                "createdAt": {'N': "1573739590"},
+                "description": {'S': "A gift list for Child User2 birthday."},
+                "eventDate": {'S': "31 October 2018"},
+                "imageUrl": {'S': "/images/celebration-default.jpg"}
+            }
+        ]
+
+        assert lists == expected_items
+
+
+class TestCreatedSharedItems:
+    @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
+    def test_created_shared_item(self, dynamodb_mock):
+        pending_items = [
+            {
+                "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"},
+                "SK": {'S': "PENDING#test.user4@gmail.com"},
+                "shared_user_email": {'S': "test.user4@gmail.com"},
+                "title": {'S': "Child User1 1st Birthday"},
+                "occasion": {'S': "Birthday"},
+                "listId": {'S': "12345678-list-0001-1234-abcdefghijkl"},
+                "listOwner": {'S': "12345678-user-0001-1234-abcdefghijkl"},
+                "createdAt": {'N': "1573739584"},
+                "description": {'S': "A gift list for Child User1 birthday."},
+                "eventDate": {'S': "31 October 2018"},
+                "imageUrl": {'S': "/images/celebration-default.jpg"}
+            },
+            {
+                "PK": {"S": "LIST#12345678-list-0002-1234-abcdefghijkl"},
+                "SK": {'S': "PENDING#test.user4@gmail.com"},
+                "shared_user_email": {'S': "test.user4@gmail.com"},
+                "title": {'S': "Child User2 1st Birthday"},
+                "occasion": {'S': "Birthday"},
+                "listId": {'S': "12345678-list-0002-1234-abcdefghijkl"},
+                "listOwner": {'S': "12345678-user-0001-1234-abcdefghijkl"},
+                "createdAt": {'N': "1573739590"},
+                "description": {'S': "A gift list for Child User2 birthday."},
+                "eventDate": {'S': "31 October 2018"},
+                "imageUrl": {'S': "/images/celebration-default.jpg"}
+            }
+        ]
+        assert signup.create_shared_items('lists-unittest', pending_items, '12345678-user-0004-1234-abcdefghijkl', 'Test User4')
 
 
 class TestLinkAccounts:

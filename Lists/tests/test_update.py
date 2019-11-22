@@ -85,10 +85,11 @@ class TestGetAttributeDetails:
 class TestGetItemsToUpdate:
     def test_get_items_to_update(self, dynamodb_mock):
         items = update.get_items_to_update('lists-unittest', '12345678-list-0001-1234-abcdefghijkl')
-        assert len(items) == 3
-        assert items[0]['SK']['S'] == 'SHARE#12345678-user-0001-1234-abcdefghijkl'
-        assert items[1]['SK']['S'] == 'SHARE#12345678-user-0002-1234-abcdefghijkl'
-        assert items[2]['SK']['S'] == 'USER#12345678-user-0001-1234-abcdefghijkl'
+        assert len(items) == 4
+        assert items[0]['SK']['S'] == 'PENDING#test.user4@gmail.com'
+        assert items[1]['SK']['S'] == 'SHARED#12345678-user-0001-1234-abcdefghijkl'
+        assert items[2]['SK']['S'] == 'SHARED#12345678-user-0002-1234-abcdefghijkl'
+        assert items[3]['SK']['S'] == 'USER#12345678-user-0001-1234-abcdefghijkl'
 
 
 class TestUpdateList:
@@ -96,14 +97,14 @@ class TestUpdateList:
         api_gateway_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"A gift list for Child User1 birthday.\",\n    \"eventDate\": \"31 October 2018\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"
         update_attributes = json.loads(api_gateway_event['body'])
         items = [
-            {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'SHARE#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
+            {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'SHARED#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'shared_user_name': {'S': 'Test User 1'}, 'shared_user_email': {'S': 'test.user1@gmail.com'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
             {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}}
         ]
 
         updates = update.update_list('lists-unittest', items, update_attributes)
 
         assert len(updates) == 2, "Update response did not contain expected number of updated attributes."
-        assert updates[0]['SK'] == 'SHARE#12345678-user-0001-1234-abcdefghijkl'
+        assert updates[0]['SK'] == 'SHARED#12345678-user-0001-1234-abcdefghijkl'
         assert updates[0]['updates'] == {'title': 'My Updated Title'}
         assert updates[1]['SK'] == 'USER#12345678-user-0001-1234-abcdefghijkl'
         assert updates[1]['updates'] == {'title': 'My Updated Title'}
@@ -112,14 +113,14 @@ class TestUpdateList:
         api_gateway_event['body'] = "{\n    \"title\": \"My Updated Title\",\n    \"description\": \"Updated.\",\n    \"eventDate\": \"25 December 2025\",\n    \"occasion\": \"Christmas\",\n    \"imageUrl\": \"/images/christmas-default.jpg\"\n}"
         update_attributes = json.loads(api_gateway_event['body'])
         items = [
-            {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'SHARE#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '25 December 2025'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
+            {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'SHARED#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '25 December 2025'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
             {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '25 December 2025'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}}
         ]
 
         updates = update.update_list('lists-unittest', items, update_attributes)
 
         assert len(updates) == 2, "Update response did not contain expected number of updated attributes."
-        assert updates[0]['SK'] == 'SHARE#12345678-user-0001-1234-abcdefghijkl'
+        assert updates[0]['SK'] == 'SHARED#12345678-user-0001-1234-abcdefghijkl'
         assert updates[0]['updates'] == {'title': 'My Updated Title', 'description': 'Updated.', 'eventDate': '25 December 2025', 'occasion': 'Christmas', 'imageUrl': '/images/christmas-default.jpg'}
         assert updates[1]['SK'] == 'USER#12345678-user-0001-1234-abcdefghijkl'
         assert updates[1]['updates'] == {'title': 'My Updated Title', 'description': 'Updated.', 'eventDate': '25 December 2025', 'occasion': 'Christmas', 'imageUrl': '/images/christmas-default.jpg'}
@@ -128,14 +129,14 @@ class TestUpdateList:
         api_gateway_event['body'] = "{\n    \"title\": \"Child User1 1st Birthday\",\n    \"description\": \"A gift list for Child User1 birthday.\",\n    \"eventDate\": \"\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"
         update_attributes = json.loads(api_gateway_event['body'])
         items = [
-            {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'SHARE#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
+            {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'SHARED#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
             {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}}
         ]
 
         updates = update.update_list('lists-unittest', items, update_attributes)
 
         assert len(updates) == 2, "Update response did not contain expected number of updated attributes."
-        assert updates[0]['SK'] == 'SHARE#12345678-user-0001-1234-abcdefghijkl'
+        assert updates[0]['SK'] == 'SHARED#12345678-user-0001-1234-abcdefghijkl'
         assert updates[0]['updates'] == {'eventDate': 'None'}
         assert updates[1]['SK'] == 'USER#12345678-user-0001-1234-abcdefghijkl'
         assert updates[1]['updates'] == {'eventDate': 'None'}
@@ -149,12 +150,13 @@ class TestUpdateListMain:
         body = json.loads(response['body'])
 
         expected_body = [
-            {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "updates": {"title": "My Updated Title"}},
-            {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "updates": {"title": "My Updated Title"}},
+            {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PENDING#test.user4@gmail.com", "updates": {"title": "My Updated Title"}},
+            {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARED#12345678-user-0001-1234-abcdefghijkl", "updates": {"title": "My Updated Title"}},
+            {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARED#12345678-user-0002-1234-abcdefghijkl", "updates": {"title": "My Updated Title"}},
             {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "updates": {"title": "My Updated Title"}}
         ]
 
-        assert len(body) == 3, "Update main response did not contain expected number of updated items."
+        assert len(body) == 4, "Update main response did not contain expected number of updated items."
         assert body == expected_body, "Updates from response were not as expected."
 
     def test_update_list_main_with_empty_body(self, monkeypatch, api_gateway_event, dynamodb_mock):
@@ -198,8 +200,9 @@ def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
 
     expected_body = [
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0001-1234-abcdefghijkl", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list.", "eventDate": "25 December 2020", "imageUrl": "/images/christmas-default.jpg"}},
-        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARE#12345678-user-0002-1234-abcdefghijkl", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list.", "eventDate": "25 December 2020", "imageUrl": "/images/christmas-default.jpg"}},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "PENDING#test.user4@gmail.com", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list.", "eventDate": "25 December 2020", "imageUrl": "/images/christmas-default.jpg"}},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARED#12345678-user-0001-1234-abcdefghijkl", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list.", "eventDate": "25 December 2020", "imageUrl": "/images/christmas-default.jpg"}},
+        {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "SHARED#12345678-user-0002-1234-abcdefghijkl", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list.", "eventDate": "25 December 2020", "imageUrl": "/images/christmas-default.jpg"}},
         {"PK": "LIST#12345678-list-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "updates": {"title": "My Updated Title", "occasion": "Christmas", "description": "Updated description for the list.", "eventDate": "25 December 2020", "imageUrl": "/images/christmas-default.jpg"}}
     ]
 

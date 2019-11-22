@@ -50,3 +50,20 @@ class TestGetPostmanIdentity:
         with pytest.raises(Exception) as e:
             common_env_vars.get_postman_identity(os.environ)
         assert str(e.value) == "POSTMAN_USERPOOL_SUB environment variables not set correctly.", "Exception not as expected."
+
+
+class TestGetUrl:
+    def test_with_test_table(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-test')
+        url = common_env_vars.get_url(os.environ)
+        assert url == "https://test.ewelists.com", "Url was not correct."
+
+    def test_with_staging_table(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-staging')
+        url = common_env_vars.get_url(os.environ)
+        assert url == "https://staging.ewelists.com", "Url was not correct."
+
+    def test_with_prod_table(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-prod')
+        url = common_env_vars.get_url(os.environ)
+        assert url == "https://ewelists.com", "Url was not correct."

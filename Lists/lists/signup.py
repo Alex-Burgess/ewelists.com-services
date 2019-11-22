@@ -21,6 +21,7 @@ def handler(event, context):
     logger.info("SignUp Post Confirmation Trigger event: " + json.dumps(event))
 
     table_name = common_env_vars.get_table_name(os.environ)
+    index_name = common_env_vars.get_table_index(os.environ)
     user_pool_id = common_env_vars.get_userpool_id(os.environ)
     new_user = get_user_from_event(event)
     exists = get_user_from_userpool(user_pool_id, new_user['email'])
@@ -43,17 +44,91 @@ def handler(event, context):
             # Create entry in table
             create_user_in_lists_db(table_name, new_cognito_user['user_id'], new_user['email'], new_user['name'])
 
+            # Get all the pending shared lists
+            pending_lists = get_pending_lists(table_name, index_name, new_user['email'])
+
+            # Transaction to delete pending item and add SHARED item
+            if len(pending_lists) > 0:
+                create_shared_items(table_name, pending_lists, new_user['username'], new_user['name'])
+
             # Set random password, otherwise congito account will stay in FORCE_CHANGED_PASSWORD state and user won't be able to reset password.
             set_random_password(user_pool_id, new_user['email'])
 
             logger.info("Completed signup process for user. Raising exception to prevent normal signup process from continuing as not required.")
             raise Exception("Sign up process complete for user.")
         else:
+            logger.info("New User is using username and password..")
             create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])
+
+            # Get all the pending shared lists
+            pending_lists = get_pending_lists(table_name, index_name, new_user['email'])
+
+            if len(pending_lists) > 0:
+                create_shared_items(table_name, pending_lists, new_user['username'], new_user['name'])
 
             logger.info("Allowing signup process to complete for user.")
 
     return event
+
+
+def get_pending_lists(table_name, index_name, email):
+    try:
+        response = dynamodb.query(
+            TableName=table_name,
+            IndexName=index_name,
+            KeyConditionExpression="SK = :SK",
+            ExpressionAttributeValues={":SK":  {'S': "PENDING#" + email}}
+        )
+        logger.info("All items in query response. ({})".format(response['Items']))
+    except Exception as e:
+        logger.info("Exception: " + str(e))
+        raise Exception("Unexpected error when getting pending lists from table.")
+
+    return response['Items']
+
+
+def create_shared_items(table_name, pending_items, sub, name):
+    for pending_list in pending_items:
+        pending_key = {
+            'PK': {'S': pending_list['PK']['S']},
+            'SK': {'S': pending_list['SK']['S']}
+        }
+
+        delete_condition = {
+            ':PK': {'S': pending_list['PK']['S']},
+            ':SK': {'S': pending_list['SK']['S']}
+        }
+
+        shared_item = pending_list
+        shared_item['SK'] = {'S': 'SHARED#' + sub}
+        shared_item['userId'] = {'S': sub}
+        shared_item['shared_user_name'] = {'S': name}
+
+        try:
+            response = dynamodb.transact_write_items(
+                TransactItems=[
+                    {
+                        'Put': {
+                            'TableName': table_name,
+                            'Item': shared_item
+                        }
+                    },
+                    {
+                        'Delete': {
+                            'TableName': table_name,
+                            'Key': pending_key,
+                            'ConditionExpression': "PK = :PK AND SK = :SK",
+                            'ExpressionAttributeValues': delete_condition
+                        }
+                    }
+                ]
+            )
+            logger.info("Attributes updated: " + json.dumps(response))
+        except Exception as e:
+            logger.info("Transaction write exception: " + str(e))
+            raise Exception("Unexpected error when unreserving product.")
+
+    return True
 
 
 def set_random_password(user_pool_id, email):
@@ -161,6 +236,8 @@ def get_user_from_event(event):
 
     if 'name' in event['request']['userAttributes']:
         user['name'] = event['request']['userAttributes']['name']
+    else:
+        user['name'] = ''
 
     if "Google" in event['userName'] or "Facebook" in event['userName']:
         user['type'] = event['userName'].split('_')[0]
@@ -171,6 +248,8 @@ def get_user_from_event(event):
     else:
         user['type'] = "Cognito"
         user['username'] = event['userName']
+
+    logger.info("User object being returned: {}.".format(json.dumps(user)))
 
     return user
 

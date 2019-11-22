@@ -250,6 +250,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          INDEX_NAME: "SK-index"
           USERPOOL_ID: !Sub '{{resolve:ssm:/CognitoUserPoolId/${Environment}:1}}'
           POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
 
@@ -319,6 +320,51 @@ Resources:
             Path: /lists/{id}/reserve/{productId}
             Method: PUT
 
+  ShareListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ServiceName}-sharelist-${Environment}'
+      Handler: lists/share.handler
+      Runtime: python3.6
+      MemorySize: 512
+      Timeout: 3
+      Description: Shares a list with a user.
+      Role: !GetAtt FunctionRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          INDEX_NAME: "email-index"
+          POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
+      Events:
+        CreateList:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /lists/{id}/share/{user}
+            Method: POST
+
+  UnshareListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ServiceName}-unshare-${Environment}'
+      Handler: lists/unshare.handler
+      Runtime: python3.6
+      MemorySize: 512
+      Timeout: 3
+      Description: Unshares a list with a user.
+      Role: !GetAtt FunctionRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
+      Events:
+        CreateList:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /lists/{id}/share/{user}
+            Method: DELETE
+
   FunctionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -349,6 +395,16 @@ Resources:
                 Resource:
                   - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}"
                   - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}/*"
+        - PolicyName: EmailPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ses:SendEmail'
+                Resource:
+                  # - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/contact@ewelists.com"
+                  - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/*"
 
   SignUpFunctionRole:
     Type: AWS::IAM::Role
@@ -725,6 +781,66 @@ Resources:
                     statusCode: "200"
                     responseParameters:
                       method.response.header.Access-Control-Allow-Methods: "'POST,PUT,DELETE,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: !If [Prod, !Sub "'https://${DomainName}'",
+                                                                            !If [Staging, !Sub "'https://${Environment}.${DomainName}'", "'*'"]
+                                                                          ]
+                    responseTemplates:
+                      application/json: "{}\n"
+                requestTemplates:
+                  application/json: "{\n  \"statusCode\" : 200\n}\n"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+          "/lists/{id}/share/{user}":
+            post:
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - sigv4: []
+              x-amazon-apigateway-integration:
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ShareListFunction.Arn}/invocations'
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                type: "aws_proxy"
+            delete:
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - sigv4: []
+              x-amazon-apigateway-integration:
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UnshareListFunction.Arn}/invocations'
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                type: "aws_proxy"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'POST,DELETE,OPTIONS'"
                       method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
                       method.response.header.Access-Control-Allow-Origin: !If [Prod, !Sub "'https://${DomainName}'",
                                                                             !If [Staging, !Sub "'https://${Environment}.${DomainName}'", "'*'"]

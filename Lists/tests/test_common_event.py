@@ -12,7 +12,7 @@ stream_handler = logging.StreamHandler(sys.stdout)
 logger.addHandler(stream_handler)
 
 
-@pytest.fixture()
+@pytest.fixture
 def api_gateway_with_id_event():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/{id}"
@@ -24,14 +24,14 @@ def api_gateway_with_id_event():
     return event
 
 
-@pytest.fixture()
+@pytest.fixture
 def api_gateway_event_with_no_list_id():
     event = fixtures.api_gateway_base_event()
     event['httpMethod'] = "POST"
     return event
 
 
-@pytest.fixture()
+@pytest.fixture
 def api_gateway_postman_event():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/{id}"
@@ -58,7 +58,7 @@ def api_gateway_postman_event():
     return event
 
 
-@pytest.fixture()
+@pytest.fixture
 def api_gateway_event_with_no_identity():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/{id}"
@@ -95,6 +95,64 @@ def api_gateway_reserve_event():
     return event
 
 
+@pytest.fixture
+def api_gateway_share_event():
+    event = fixtures.api_gateway_base_event()
+    event['resource'] = "/lists/{id}/share/{user}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/share/test.user3%40gmail.com"
+    event['httpMethod'] = "POST"
+    event['pathParameters'] = {"user": "test.user3%40gmail.com", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['body'] = "null"
+
+    return event
+
+
+@pytest.fixture
+def api_gateway_unshare_shared_event():
+    event = fixtures.api_gateway_base_event()
+    event['resource'] = "/lists/{id}/share/{user}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/share/12345678-user-0002-1234-abcdefghijkl"
+    event['httpMethod'] = "DELETE"
+    event['pathParameters'] = {"user": "12345678-user-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['body'] = "{\n    \"share_type\": \"SHARED\"\n}"
+
+    return event
+
+
+@pytest.fixture
+def api_gateway_unshare_pending_event():
+    event = fixtures.api_gateway_base_event()
+    event['resource'] = "/lists/{id}/share/{user}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/share/test.user4%40gmail.com"
+    event['httpMethod'] = "DELETE"
+    event['pathParameters'] = {"user": "test.user4%40gmail.com", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['body'] = "{\n    \"share_type\": \"PENDING\"\n}"
+
+    return event
+
+
+class TestGetShareType:
+    def test_get_share_type_shared(self, api_gateway_unshare_shared_event):
+        type = common_event.get_share_type(api_gateway_unshare_shared_event)
+        assert type == 'SHARED', "Shared type returned from API event was not as expected."
+
+    def test_get_share_type_pending(self, api_gateway_unshare_pending_event):
+        type = common_event.get_share_type(api_gateway_unshare_pending_event)
+        assert type == 'PENDING', "Shared type returned from API event was not as expected."
+
+    def test_get_wrong_share_type(self, api_gateway_unshare_pending_event):
+        api_gateway_unshare_pending_event['body'] = "{\n    \"share_type\": \"WRONG\"\n}"
+        with pytest.raises(Exception) as e:
+            common_event.get_share_type(api_gateway_unshare_pending_event)
+        assert str(e.value) == "API Event did not contain a share type of SHARED or PENDING.", "Exception not as expected."
+
+    def test_get_share_type_with_no_body(self, api_gateway_unshare_pending_event):
+        api_gateway_unshare_pending_event['body'] = None
+        with pytest.raises(Exception) as e:
+            common_event.get_share_type(api_gateway_unshare_pending_event)
+        assert str(e.value) == "API Event did not contain a share type in the body.", "Exception not as expected."
+
+
 class TestGetListIdFromPath:
     def test_get_list_id(self, api_gateway_with_id_event):
         list_id = common_event.get_list_id(api_gateway_with_id_event)
@@ -110,6 +168,22 @@ class TestGetListIdFromPath:
         with pytest.raises(Exception) as e:
             common_event.get_list_id(api_gateway_with_id_event)
         assert str(e.value) == "API Event did not contain a List ID in the path parameters.", "Exception not as expected."
+
+
+class TestGetUser:
+    def test_get_email(self, api_gateway_share_event):
+        email = common_event.get_user(api_gateway_share_event)
+        assert email == "test.user3@gmail.com", "List ID returned from API event was not as expected."
+
+    def test_get_userId(self, api_gateway_unshare_shared_event):
+        userId = common_event.get_user(api_gateway_unshare_shared_event)
+        assert userId == "12345678-user-0002-1234-abcdefghijkl", "List ID returned from API event was not as expected."
+
+    def test_get_user_when_not_present(self, api_gateway_share_event):
+        api_gateway_share_event['pathParameters']['user'] = ''
+        with pytest.raises(Exception) as e:
+            common_event.get_user(api_gateway_share_event)
+        assert str(e.value) == "API Event did not contain a user in the path parameters.", "Exception not as expected."
 
 
 class TestGetProductIdFromPath:

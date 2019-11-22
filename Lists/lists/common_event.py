@@ -2,6 +2,7 @@ import logging
 import re
 import json
 from lists import common_env_vars
+from urllib.parse import unquote
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -66,6 +67,24 @@ def get_product_id(event):
     return product_id
 
 
+def get_user(event):
+    try:
+        user = event['pathParameters']['user']
+        logger.info("User parameter: " + user)
+    except Exception:
+        logger.error("API Event did not contain an user in the path parameters.")
+        raise Exception('API Event did not contain a user in the path parameters.')
+
+    if len(user) == 0:
+        logger.error("List ID was empty.")
+        raise Exception('API Event did not contain a user in the path parameters.')
+
+    user = unquote(user)
+    logger.info("Decoded email: " + user)
+
+    return user
+
+
 def get_quantity(event):
     try:
         body_object = json.loads(event['body'])
@@ -92,6 +111,22 @@ def get_product_type(event):
         raise Exception('API Event did not contain a product type of products or notfound.')
 
     return product_type
+
+
+def get_share_type(event):
+    try:
+        body_object = json.loads(event['body'])
+        share_type = body_object['share_type']
+        logger.info("Product type: " + str(share_type))
+    except Exception:
+        logger.error("API Event did not contain a share type in the body.")
+        raise Exception('API Event did not contain a share type in the body.')
+
+    if (share_type != 'SHARED') and (share_type != 'PENDING'):
+        logger.error("API Event did not contain a share type of SHARED or PENDING.")
+        raise Exception('API Event did not contain a share type of SHARED or PENDING.')
+
+    return share_type
 
 
 def get_message(event):

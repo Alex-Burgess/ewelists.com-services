@@ -64,7 +64,7 @@ def put_item_in_table(table_name, cognito_user_id, listId, attributes):
         raise Exception('List could not be created.')
 
     try:
-        item['SK']['S'] = "SHARE#{}".format(cognito_user_id)
+        item['SK']['S'] = "SHARED#{}".format(cognito_user_id)
         logger.info("Put shared item for lists table: {}".format(item))
         dynamodb.put_item(TableName=table_name, Item=item)
     except Exception as e:

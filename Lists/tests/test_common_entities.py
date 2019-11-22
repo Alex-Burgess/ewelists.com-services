@@ -1,4 +1,4 @@
-from lists.common_entities import User, List, Product, Reserved
+from lists.common_entities import User, List, Product, Reserved, Shared
 import sys
 import logging
 logger = logging.getLogger()
@@ -14,6 +14,7 @@ class TestUser:
         user = User(user_item).get_basic_details()
         assert user['name'] == 'Test User1', "User name was not Test User."
         assert user['email'] == 'test.user1@gmail.com', "User email was not test.user@gmail.com."
+        assert user['userId'] == '12345678-user-0001-1234-abcdefghijkl', "User ID was not correct."
 
 
 class TestList:
@@ -27,6 +28,7 @@ class TestList:
         assert list['eventDate'] == '31 October 2018', "List event date was not 01 September 2019."
         assert list['occasion'] == 'Birthday', "List occasion was not Birthday."
         assert list['imageUrl'] == '/images/celebration-default.jpg', "List imageUrl was not as expected."
+        assert list['listOwner'] == '12345678-user-0001-1234-abcdefghijkl', "List occasion was not correct."
 
     def test_get_details_with_no_date(self):
         list_item = {"PK": {'S': "LIST#12345678-list-0002-1234-abcdefghijkl"}, "SK": {'S': "USER#12345678-user-0001-1234-abcdefghijkl"}, "userId": {'S': "12345678-user-0001-1234-abcdefghijkl"}, "title": {'S': "Child User1 Christmas List"}, "occasion": {'S': "Christmas"}, "listId": {'S': "12345678-list-0002-1234-abcdefghijkl"}, "listOwner": {'S': "12345678-user-0001-1234-abcdefghijkl"}, "createdAt": {'S': "2018-11-01T10:00:00"}, "description": {'S': "A gift list for Child User1 Christmas."}, "imageUrl": {'S': "/images/christmas-default.jpg"}}
@@ -36,6 +38,7 @@ class TestList:
         assert list['title'] == "Child User1 Christmas List", "List Title was not as expected."
         assert list['description'] == "A gift list for Child User1 Christmas.", "List description was not as expected."
         assert list['occasion'] == 'Christmas', "List occasion was not correct."
+        assert list['listOwner'] == '12345678-user-0001-1234-abcdefghijkl', "List occasion was not correct."
 
 
 class TestProduct:
@@ -59,3 +62,21 @@ class TestReserved:
         assert reserved['name'] == "Test User2", "Reserved name was not correct."
         assert reserved['message'] == 'Happy Birthday', "Reserved message was not correct."
         assert reserved['userId'] == '12345678-user-0002-1234-abcdefghijkl', "Reserved userId was not correct."
+
+
+class TestShared:
+    def test_get_shared_user(self):
+        shared_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "SHARED#12345678-user-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "shared_user_name": {"S": "Test User 2"}, "shared_user_email": {"S": "test.user2@gmail.com"}, "title": {"S": "Child User1 1st Birthday"}, "occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listOwner": {"S": "12345678-user-0001-1234-abcdefghijkl"}, "createdAt": {"N": "2018-09-01T10:00:00"}, "description": {"S": "A gift list for Child User1 birthday."}, "eventDate": {"S": "31 October 2018"}, "imageUrl": {"S": "/images/celebration-default.jpg"}}
+        shared = Shared(shared_item).get_details()
+
+        assert shared['userId'] == '12345678-user-0002-1234-abcdefghijkl', "Shared user ID was not correct."
+        assert shared['email'] == "test.user2@gmail.com", "Shared user email was not correct."
+        assert shared['name'] == "Test User 2", "Shared user name was not correct."
+        assert shared['type'] == "SHARED", "Shared type name was not correct."
+
+    def test_get_pending_user(self):
+        shared_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PENDING#test.user4@gmail.com"}, "shared_user_email": {"S": "test.user4@gmail.com"}, "title": {"S": "Child User1 1st Birthday"}, "occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listOwner": {"S": "12345678-user-0001-1234-abcdefghijkl"}, "createdAt": {"N": "2018-09-01T10:00:00"}, "description": {"S": "A gift list for Child User1 birthday."}, "eventDate": {"S": "31 October 2018"}, "imageUrl": {"S": "/images/celebration-default.jpg"}}
+        shared = Shared(shared_item).get_details()
+
+        assert shared['email'] == "test.user4@gmail.com", "Shared user email was not correct."
+        assert shared['type'] == "PENDING", "Shared type name was not correct."

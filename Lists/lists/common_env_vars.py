@@ -47,3 +47,23 @@ def get_postman_identity(osenv):
         raise Exception('POSTMAN_USERPOOL_SUB environment variables not set correctly.')
 
     return os_identity
+
+
+def get_url(osenv):
+    try:
+        table_name = osenv['TABLE_NAME']
+        logger.info("TABLE_NAME environment variable value: " + table_name)
+    except KeyError:
+        logger.error('TABLE_NAME environment variable not set correctly.')
+        raise Exception('TABLE_NAME environment variable not set correctly.')
+
+    environment = table_name.split('-')[-1]
+
+    if environment == 'prod':
+        url = 'https://ewelists.com'
+    elif environment == 'staging':
+        url = 'https://staging.ewelists.com'
+    else:
+        url = 'https://test.ewelists.com'
+
+    return url

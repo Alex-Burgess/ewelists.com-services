@@ -11,7 +11,8 @@ class User:
     def get_basic_details(self):
         user = {
             'name': self.name,
-            'email': self.email
+            'email': self.email,
+            'userId': self.user_id
         }
 
         return user
@@ -25,6 +26,7 @@ class List:
         self.description = item.get('description').get('S')
         self.occasion = item.get('occasion').get('S')
         self.imageUrl = item.get('imageUrl').get('S')
+        self.listOwner = item.get('listOwner').get('S')
         if item.get('eventDate'):
             self.eventDate = item.get('eventDate').get('S')
 
@@ -37,7 +39,8 @@ class List:
             'title': self.title,
             'description': self.description,
             'occasion': self.occasion,
-            'imageUrl': self.imageUrl
+            'imageUrl': self.imageUrl,
+            'listOwner': self.listOwner
         }
 
         if hasattr(self, 'eventDate'):
@@ -91,3 +94,29 @@ class Reserved:
         }
 
         return reserved
+
+
+class Shared:
+
+    def __init__(self, item):
+        self.type = item.get('SK').get('S').split("#")[0]
+        self.email = item.get('shared_user_email').get('S')
+
+        if self.type == "SHARED":
+            self.userId = item.get('userId').get('S')
+            self.name = item.get('shared_user_name').get('S')
+
+    def __repr__(self):
+        return "Shared<{} -- {} -- {} -- {}>".format(self.email, self.type, self.name, self.email)
+
+    def get_details(self):
+        shared = {
+            'email': self.email,
+            'type': self.type,
+        }
+
+        if self.type == "SHARED":
+            shared['userId'] = self.userId
+            shared['name'] = self.name
+
+        return shared

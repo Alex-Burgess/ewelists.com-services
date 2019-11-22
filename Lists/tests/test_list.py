@@ -61,16 +61,16 @@ class TestGetLists:
         user_id = '12345678-user-0001-1234-abcdefghijkl'
         lists_response = list.get_lists('lists-unittest', 'userId-index', user_id)
 
-        assert lists_response['user'] == {"email": "test.user1@gmail.com", "name": "Test User1"}, "Test user was not as expected."
+        assert lists_response['user'] == {"email": "test.user1@gmail.com", "name": "Test User1", "userId": "12345678-user-0001-1234-abcdefghijkl"}, "Test user was not as expected."
 
-        owned_list1 = {"listId": "12345678-list-0001-1234-abcdefghijkl", "title": "Child User1 1st Birthday", "occasion": "Birthday", "description": "A gift list for Child User1 birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"}
-        owned_list2 = {"listId": "12345678-list-0002-1234-abcdefghijkl", "title": "Child User1 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User1 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
+        owned_list1 = {"listId": "12345678-list-0001-1234-abcdefghijkl", 'listOwner': '12345678-user-0001-1234-abcdefghijkl', "title": "Child User1 1st Birthday", "occasion": "Birthday", "description": "A gift list for Child User1 birthday.", "eventDate": "31 October 2018", "imageUrl": "/images/celebration-default.jpg"}
+        owned_list2 = {"listId": "12345678-list-0002-1234-abcdefghijkl", 'listOwner': '12345678-user-0001-1234-abcdefghijkl', "title": "Child User1 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User1 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
         assert len(lists_response['owned']) == 2, "User should only own 1 list."
         assert lists_response['owned'][0] == owned_list1, "Details of the list owned by user was not as expected."
         assert lists_response['owned'][1] == owned_list2, "Details of the list owned by user was not as expected."
 
-        shared_list1 = {"listId": "12345678-list-0003-1234-abcdefghijkl", "title": "Child User2 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User2 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
-        shared_list2 = {"listId": "12345678-list-0004-1234-abcdefghijkl", "title": "Child User3 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User3 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
+        shared_list1 = {"listId": "12345678-list-0003-1234-abcdefghijkl", 'listOwner': '12345678-user-0002-1234-abcdefghijkl', "title": "Child User2 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User2 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
+        shared_list2 = {"listId": "12345678-list-0004-1234-abcdefghijkl", 'listOwner': '12345678-user-0002-1234-abcdefghijkl', "title": "Child User3 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User3 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
         assert len(lists_response['shared']) == 2, "User should only have 2 lists shared with them."
         assert lists_response['shared'][0] == shared_list1, "Details of the list shared with user was not as expected."
         assert lists_response['shared'][1] == shared_list2, "Details of the list shared with user was not as expected."
