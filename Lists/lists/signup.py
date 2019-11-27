@@ -216,8 +216,10 @@ def create_user_in_lists_db(table_name, sub, email, name):
         'SK': {'S': "USER#{}".format(sub)},
         'userId': {'S': sub},
         'email': {'S': email},
-        'name': {'S': name}
     }
+
+    if len(name) > 0:
+        user_item['name'] = {'S': name}
 
     try:
         logger.info("Put user item in lists table: {}".format(user_item))

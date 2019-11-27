@@ -41,6 +41,14 @@ def signup_with_amazon_event():
 
 
 @pytest.fixture
+def signup_event_with_no_name():
+    event = fixtures.signup_event()
+    del event['request']['userAttributes']['name']
+
+    return event
+
+
+@pytest.fixture
 def dynamodb_mock():
     mock = mock_dynamodb2()
     mock.start()
@@ -121,6 +129,13 @@ class TestGetUserFromEvent:
         assert user['email'] == "test.user@gmail.com", "Attribute email was not as expected."
         assert user['name'] == "Test User", "Attribute name was not as expected."
 
+    def test_with_no_name(self, signup_event_with_no_name):
+        user = signup.get_user_from_event(signup_event_with_no_name)
+        assert user['type'] == "Cognito", "Attribute type was not Cognito."
+        assert user['username'] == "12345678-user-0003-1234-abcdefghijkl", "Attribute username was not as expected."
+        assert user['email'] == "test.user@gmail.com", "Attribute email was not as expected."
+        assert user['name'] == "", "Attribute name was not as expected."
+
 
 class TestGetUserFromUserpool:
     def test_user_exists(self, cognito_mock):
@@ -182,6 +197,12 @@ class TestCreateUserInListsDB:
         with pytest.raises(Exception) as e:
             signup.create_user_in_lists_db('lists-unittes', sub, email, name)
         assert str(e.value) == "User entry could not be created.", "Exception not as expected."
+
+    def test_create_user_with_no_name(self, dynamodb_mock):
+        email = 'test.user@gmail.com'
+        name = ''
+        sub = '12345678-user-0002-1234-abcdefghijkl'
+        assert signup.create_user_in_lists_db('lists-unittest', sub, email, name), "User was not created in table."
 
 
 class TestGetPendingLists:
@@ -285,6 +306,7 @@ class TestCreateNewCognitoUser:
 
         assert result['created'], "New account was not created."
         assert len(result['user_id']) == 19, "New user id was not expected lenghth."
+
 
 # As link account tests not implemented, not able to test whole logic.
 # class TestHandler:

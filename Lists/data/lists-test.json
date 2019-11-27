@@ -1,4 +1,4 @@
-{"PK": "USER#15fc635c-be11-442b-adda-6308a9bfa547", "SK": "USER#15fc635c-be11-442b-adda-6308a9bfa547", "email": "burgess.alexander+test1@gmail.com", "name": "Alex Burgess", "userId": "15fc635c-be11-442b-adda-6308a9bfa547"}
+{"PK": "USER#994f6760-6965-419b-a27d-2ea727d8cd20", "SK": "USER#994f6760-6965-419b-a27d-2ea727d8cd20", "email": "eweuser8@gmail.com", "name": "Ewe User8", "userId": "994f6760-6965-419b-a27d-2ea727d8cd20"}
 {"PK": "USER#ae617d08-1127-4066-87ec-b6df345793b8", "SK": "USER#ae617d08-1127-4066-87ec-b6df345793b8", "email": "burgess.alexander+apitestuser@gmail.com", "name": "Api User", "userId": "ae617d08-1127-4066-87ec-b6df345793b8"}
 {"PK": "USER#12345678-user-0001-1234-abcdefghijkl", "SK": "USER#12345678-user-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com", "name": "Test User1", "userId": "12345678-user-0001-1234-abcdefghijkl"}
 {"PK": "USER#12345678-user-0002-1234-abcdefghijkl", "SK": "USER#12345678-user-0002-1234-abcdefghijkl", "email": "test.user2@gmail.com", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl"}
