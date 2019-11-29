@@ -19,3 +19,4 @@ phases:
       - newman run https://api.getpostman.com/collections/$LISTS_COLLECTION_ID?apikey=$POSTMAN --environment https://api.getpostman.com/environments/$ENVIRONMENT_ID?apikey=$POSTMAN
       - newman run https://api.getpostman.com/collections/$NOTFOUND_COLLECTION_ID?apikey=$POSTMAN --environment https://api.getpostman.com/environments/$ENVIRONMENT_ID?apikey=$POSTMAN
       - newman run https://api.getpostman.com/collections/$PRODUCTS_COLLECTION_ID?apikey=$POSTMAN --environment https://api.getpostman.com/environments/$ENVIRONMENT_ID?apikey=$POSTMAN
+      - newman run https://api.getpostman.com/collections/$CONTACT_COLLECTION_ID?apikey=$POSTMAN --environment https://api.getpostman.com/environments/$ENVIRONMENT_ID?apikey=$POSTMAN
