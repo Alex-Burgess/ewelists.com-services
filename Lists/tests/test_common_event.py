@@ -217,12 +217,12 @@ class TestGetQuantity:
 class TestGetMessage:
     def test_get_message(self, api_gateway_reserve_event):
         message = common_event.get_message(api_gateway_reserve_event)
-        assert message == "Happy birthday", "Quantity returned from API event was not as expected."
+        assert message == "Happy birthday", "Message returned from API event was not as expected."
 
-    def test_get_message_when_not_present(self, api_gateway_event_with_no_list_id):
-        with pytest.raises(Exception) as e:
-            common_event.get_message(api_gateway_event_with_no_list_id)
-        assert str(e.value) == "API Event did not contain a message in the body.", "Exception not as expected."
+    def test_get_message_when_not_present(self, api_gateway_reserve_event):
+        api_gateway_reserve_event['body'] = "{\n    \"quantity\": 1\n }"
+        message = common_event.get_message(api_gateway_reserve_event)
+        assert message is None, "Message returned from API event was not as expected."
 
 
 class TestGetProductType:

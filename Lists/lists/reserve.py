@@ -72,9 +72,12 @@ def update_product_and_create_reserved_item(table_name, list_id, product_id, new
         'productId': {'S': product_id},
         'userId': {'S': user_id},
         'quantity': {'N': str(request_reserve_quantity)},
-        'message': {'S': message},
+        # 'message': {'S': message},
         'reservedAt': {'N': str(int(time.time()))}
     }
+
+    if message:
+        reserved_item['message']: {'S': message}
 
     try:
         response = dynamodb.transact_write_items(

@@ -120,6 +120,15 @@ class TestReserveMain:
         assert reserved_details_response['Item']['SK']['S'] == 'RESERVED#PRODUCT#12345678-prod-0001-1234-abcdefghijkl', "SK not as expected."
         assert reserved_details_response['Item']['quantity']['N'] == '2', "Quantity not as expected."
 
+    @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
+    def test_reserve_product_with_no_message(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_event_prod1['body'] = "{\n    \"quantity\": 1,\n}"
+
+        response = reserve.reserve_main(api_gateway_event_prod1)
+        body = json.loads(response['body'])
+        assert body['reserved'], "Reserve response was not true."
+
     def test_over_reserve_product(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 

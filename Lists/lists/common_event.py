@@ -132,10 +132,14 @@ def get_share_type(event):
 def get_message(event):
     try:
         body_object = json.loads(event['body'])
-        message = body_object['message']
-        logger.info("Message: " + message)
     except Exception:
         logger.error("API Event did not contain a message in the body.")
         raise Exception('API Event did not contain a message in the body.')
+
+    if 'message' in body_object:
+        message = body_object['message']
+        logger.info("Message: " + message)
+    else:
+        message = None
 
     return message
