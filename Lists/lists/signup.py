@@ -18,7 +18,7 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    logger.info("SignUp Post Confirmation Trigger event: " + json.dumps(event))
+    logger.info("SignUp Trigger event: " + json.dumps(event))
 
     table_name = common_env_vars.get_table_name(os.environ)
     index_name = common_env_vars.get_table_index(os.environ)
