@@ -79,7 +79,8 @@ class Reserved:
         self.quantity = item.get('quantity').get('N')
         self.name = item.get('name').get('S')
         self.userId = item.get('userId').get('S')
-        self.message = item.get('message').get('S')
+        if item.get('message'):
+            self.message = item.get('message').get('S')
 
     def __repr__(self):
         return "Reserved<{} -- {} -- {} -- {} -- {} -- {}>".format(self.productId, self.listId, self.quantity, self.name, self.userId, self.message)
@@ -89,9 +90,11 @@ class Reserved:
             'productId': self.productId,
             'quantity': int(self.quantity),
             'name': self.name,
-            'userId': self.userId,
-            'message': self.message
+            'userId': self.userId
         }
+
+        if hasattr(self, 'message'):
+            reserved['message'] = self.message
 
         return reserved
 

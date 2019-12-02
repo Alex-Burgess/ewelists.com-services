@@ -58,6 +58,7 @@ def get_users_name(table_name, user_id):
 
 
 def get_product_item(table_name, list_id, product_id):
+    logger.info("Getting product item {} for list {}.".format(product_id, list_id))
     key = {
         'PK': {'S': "LIST#" + list_id},
         'SK': {'S': "PRODUCT#" + product_id}
@@ -68,7 +69,7 @@ def get_product_item(table_name, list_id, product_id):
             TableName=table_name,
             Key=key
         )
-        logger.info("Get reserved item response: {}".format(response))
+        logger.info("Get product item response: {}".format(response))
     except ClientError as e:
         print(e.response['Error']['Message'])
 
