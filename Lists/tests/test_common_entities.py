@@ -16,6 +16,14 @@ class TestUser:
         assert user['email'] == 'test.user1@gmail.com', "User email was not test.user@gmail.com."
         assert user['userId'] == '12345678-user-0001-1234-abcdefghijkl', "User ID was not correct."
 
+    def test_get_basic_details_with_no_name(self):
+        user_item = {'PK': {'S': 'USER#12345678-user-0002-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0002-1234-abcdefghijkl'}, 'email': {'S': 'test.user2@gmail.com'}, 'userId': {'S': '12345678-user-0002-1234-abcdefghijkl'}}
+
+        user = User(user_item).get_basic_details()
+        assert user['name'] == 'test.user2@gmail.com', "User name was not test.user2@gmail.com."
+        assert user['email'] == 'test.user2@gmail.com', "User email was not test.user2@gmail.com."
+        assert user['userId'] == '12345678-user-0002-1234-abcdefghijkl', "User ID was not correct."
+
 
 class TestList:
     def test_get_details(self):

@@ -2,18 +2,23 @@ class User:
 
     def __init__(self, item):
         self.user_id = item.get('userId').get('S')
-        self.name = item.get('name').get('S')
         self.email = item.get('email').get('S')
+        if item.get('name'):
+            self.name = item.get('name').get('S')
 
     def __repr__(self):
         return "User<{} -- {} -- {}>".format(self.username, self.name, self.email)
 
     def get_basic_details(self):
         user = {
-            'name': self.name,
             'email': self.email,
             'userId': self.user_id
         }
+
+        if hasattr(self, 'name'):
+            user['name'] = self.name
+        else:
+            user['name'] = self.email
 
         return user
 

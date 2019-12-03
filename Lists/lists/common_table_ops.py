@@ -54,6 +54,9 @@ def get_users_name(table_name, user_id):
         logger.info("No user id {} was found.".format(user_id))
         raise Exception("No user exists with this ID.")
 
+    if 'name' not in response['Item']:
+        return response['Item']['email']['S']
+
     return response['Item']['name']['S']
 
 
