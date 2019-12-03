@@ -101,7 +101,7 @@ def update_product_and_update_reserved_item(table_name, list_id, product_id, use
                     'Update': {
                         'TableName': table_name,
                         'Key': reserved_key,
-                        'UpdateExpression': "set reserved = :q",
+                        'UpdateExpression': "set quantity = :q",
                         'ExpressionAttributeValues': {
                             ':q': {'N': str(request_reserve_quantity)},
                         }
