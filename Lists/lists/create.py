@@ -7,6 +7,7 @@ import uuid
 from lists import common
 from lists import common_env_vars
 from lists import common_event
+from lists import common_table_ops
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -27,9 +28,10 @@ def create_main(event):
     try:
         table_name = common_env_vars.get_table_name(os.environ)
         identity = common_event.get_identity(event, os.environ)
+        users_name = common_table_ops.get_users_name(table_name, identity)
         listId = generate_list_id()
         attributes = get_attribute_details(event)
-        message = put_item_in_table(table_name, identity, listId, attributes)
+        message = put_item_in_table(table_name, identity, listId, attributes, users_name)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -42,7 +44,7 @@ def create_main(event):
     return response
 
 
-def put_item_in_table(table_name, cognito_user_id, listId, attributes):
+def put_item_in_table(table_name, cognito_user_id, listId, attributes, users_name):
     item = {
         'PK': {'S': "LIST#{}".format(listId)},
         'SK': {'S': "USER#{}".format(cognito_user_id)},
@@ -65,6 +67,7 @@ def put_item_in_table(table_name, cognito_user_id, listId, attributes):
 
     try:
         item['SK']['S'] = "SHARED#{}".format(cognito_user_id)
+        item['shared_user_name'] = {'S': users_name}
         logger.info("Put shared item for lists table: {}".format(item))
         dynamodb.put_item(TableName=table_name, Item=item)
     except Exception as e:

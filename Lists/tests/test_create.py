@@ -77,6 +77,7 @@ class TestPutItemInTable:
     def test_put_item_in_table(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0012-1234-abcdefghijkl'
+        users_name = 'Test User1'
 
         attributes = {
             'title': 'My Test List',
@@ -85,7 +86,7 @@ class TestPutItemInTable:
             'imageUrl': '/images/celebration-default.jpg'
         }
 
-        message = create.put_item_in_table('lists-unittest', user_id, list_id, attributes)
+        message = create.put_item_in_table('lists-unittest', user_id, list_id, attributes, users_name)
         assert message == "List was created.", "Put item message not as expected."
 
         # Check the table was updated with right number of items
@@ -97,7 +98,18 @@ class TestPutItemInTable:
             ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
         )
         assert len(test_response['Items']) == 2, "Number of items for new list should be 2."
-        assert test_response['Items'][0]['PK']['S'] == 'LIST#12345678-list-0012-1234-abcdefghijkl', "PK of item was not as expected."
+
+        assert test_response['Items'][0]['PK']['S'] == 'LIST#12345678-list-0012-1234-abcdefghijkl', "Attribute of item was not as expected."
+        assert test_response['Items'][0]['SK']['S'] == "SHARED#12345678-user-0001-1234-abcdefghijkl", "Attribute was not as expected."
+        assert test_response['Items'][0]['userId']['S'] == "12345678-user-0001-1234-abcdefghijkl", "Attribute was not as expected."
+        assert test_response['Items'][0]['shared_user_name']['S'] == "Test User1", "Attribute was not as expected."
+        # assert test_response['Items'][0]['shared_user_email']['S'] == "test.user1@gmail.com", "Attribute was not as expected."
+        assert test_response['Items'][0]['title']['S'] == "My Test List", "Attribute was not as expected."
+        assert test_response['Items'][0]['occasion']['S'] == "Birthday", "Attribute was not as expected."
+        assert test_response['Items'][0]['listId']['S'] == "12345678-list-0012-1234-abcdefghijkl", "Attribute was not as expected."
+        assert test_response['Items'][0]['listOwner']['S'] == "12345678-user-0001-1234-abcdefghijkl", "Attribute was not as expected."
+        assert len(test_response['Items'][0]['createdAt']['N']) == 10, "Attribute was not as expected."
+        assert test_response['Items'][0]['description']['S'] == "Test description for the list.", "Attribute was not as expected."
         assert test_response['Items'][0]['imageUrl']['S'] == '/images/celebration-default.jpg', "imageurl of item was not as expected."
 
         assert test_response['Items'][1]['PK']['S'] == 'LIST#12345678-list-0012-1234-abcdefghijkl', "PK of item was not as expected."
@@ -106,6 +118,7 @@ class TestPutItemInTable:
     def test_put_item_in_table_with_bad_name(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0012-1234-abcdefghijkl'
+        users_name = 'Test User1'
 
         attributes = {
             'title': 'My Test List',
@@ -115,7 +128,7 @@ class TestPutItemInTable:
         }
 
         with pytest.raises(Exception) as e:
-            create.put_item_in_table('lists-unittes', user_id, list_id, attributes)
+            create.put_item_in_table('lists-unittes', user_id, list_id, attributes, users_name)
         assert str(e.value) == "List could not be created.", "Exception not as expected."
 
 
