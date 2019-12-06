@@ -44,6 +44,11 @@ def test_create_response():
     assert response == expected_response, "Create_response did not return the expected response value."
 
 
+class TestParseEmail:
+    def test_parse_email(self):
+        assert common.parse_email(' Test.user@gmail.com ') == 'test.user@gmail.com'
+
+
 class TestConfirmOwner:
     def test_confirm_owner(self, list_query_response):
         user_id = '12345678-user-0001-1234-abcdefghijkl'

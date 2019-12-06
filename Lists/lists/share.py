@@ -39,6 +39,7 @@ def share_main(event):
         identity = common_event.get_identity(event, os.environ)
         list_id = common_event.get_list_id(event)
         email = common_event.get_user(event)
+        email = common.parse_email(email)
         list = common_table_ops.get_list(table_name, identity, list_id)
         list_owner_name = common_table_ops.get_users_name(table_name, identity)
         common.confirm_owner(identity, list_id, [list])

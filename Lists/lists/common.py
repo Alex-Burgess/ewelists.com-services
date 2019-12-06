@@ -8,6 +8,12 @@ if logger.handlers:
     handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
 
 
+def parse_email(email):
+    email = email.strip()
+    email = email.lower()
+    return email
+
+
 def calculate_new_reserved_quantity(product_item, update_amount):
     new_quantity = product_item['reserved'] + update_amount
     logger.info("Product reserved quantity updated from {} to {}".format(product_item['reserved'], new_quantity))
