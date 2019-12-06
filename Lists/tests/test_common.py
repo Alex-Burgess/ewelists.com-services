@@ -47,6 +47,7 @@ def test_create_response():
 class TestParseEmail:
     def test_parse_email(self):
         assert common.parse_email(' Test.user@gmail.com ') == 'test.user@gmail.com'
+        assert common.parse_email(' Test.user@googlemail.com ') == 'test.user@gmail.com'
 
 
 class TestConfirmOwner:

@@ -115,6 +115,14 @@ class TestGetUserFromEvent:
         assert user['email'] == "test.user@gmail.com", "Attribute email was not as expected."
         assert user['name'] == "Test User", "Attribute name was not as expected."
 
+    def test_googlemail_dot_com_user(self, signup_with_google_event):
+        signup_with_google_event['request']['userAttributes']['email'] = "test.user@googlemail.com"
+        user = signup.get_user_from_event(signup_with_google_event)
+        assert user['type'] == "Google", "Attribute type was not Google."
+        assert user['username'] == "109769169322789401234", "Attribute username was not as expected."
+        assert user['email'] == "test.user@gmail.com", "Attribute email was not as expected."
+        assert user['name'] == "Test User", "Attribute name was not as expected."
+
     def test_facebook_user(self, signup_with_facebook_event):
         user = signup.get_user_from_event(signup_with_facebook_event)
         assert user['type'] == "Facebook", "Attribute type was not Facebook."

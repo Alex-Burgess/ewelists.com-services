@@ -4,7 +4,7 @@ import json
 import logging
 import random
 import string
-from lists import common_env_vars
+from lists import common, common_env_vars
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -234,7 +234,7 @@ def create_user_in_lists_db(table_name, sub, email, name):
 def get_user_from_event(event):
     user = {}
 
-    user['email'] = event['request']['userAttributes']['email']
+    user['email'] = common.parse_email(event['request']['userAttributes']['email'])
 
     if 'name' in event['request']['userAttributes']:
         user['name'] = event['request']['userAttributes']['name']

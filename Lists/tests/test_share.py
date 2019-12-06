@@ -278,6 +278,18 @@ class TestShareMain:
         assert body['user']['name'] == 'Test User3', "User attribute was not as expected."
         assert body['status'] == 'shared', "User attribute was not as expected."
 
+    def test_share_with_googlemail_dot_com_email(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+        api_gateway_share_event['pathParameters'] = {"user": "test.user3%40googlemail.com ", "id": "12345678-list-0001-1234-abcdefghijkl"}
+        response = share.share_main(api_gateway_share_event)
+        body = json.loads(response['body'])
+
+        assert body['user']['userId'] == '12345678-user-0003-1234-abcdefghijkl', "User attribute was not as expected."
+        assert body['user']['email'] == 'test.user3@gmail.com', "User attribute was not as expected."
+        assert body['user']['name'] == 'Test User3', "User attribute was not as expected."
+        assert body['status'] == 'shared', "User attribute was not as expected."
+
     def test_requestor_is_not_list_owner(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')

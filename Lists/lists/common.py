@@ -11,6 +11,11 @@ if logger.handlers:
 def parse_email(email):
     email = email.strip()
     email = email.lower()
+
+    if '@googlemail.com' in email:
+        fields = email.split('@')
+        email = fields[0] + '@gmail.com'
+
     return email
 
 
