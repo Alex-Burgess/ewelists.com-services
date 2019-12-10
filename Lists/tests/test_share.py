@@ -152,6 +152,12 @@ class TestCreatePendingEntry:
         assert share.create_pending_entry('lists-unittest', email, list_item)
 
 
+class TestEmailSubject:
+    def tets_email_subject(self):
+        list_owner_name = "Alex Burgess"
+        assert share.email_subject(list_owner_name) == "Alex Burgess shared a gift list with you!", "Subject was not as expected."
+
+
 class TestPendingEmailText:
     def test_pending_email_text(self):
         list_owner_name = "Test User1"
@@ -201,8 +207,9 @@ class TestSendEmail:
         recipient = "success@simulator.amazonses.com"
         body_text = "Amazon SES Test (Python)\r\nThis email was sent with Amazon SES using the AWS SDK for Python (Boto)."
         body_html = "<html><head></head><body><h3>Hi Test User2,</h3></body></html>"
+        subject = "Test subject"
 
-        assert share.send_email(recipient, body_text, body_html)
+        assert share.send_email(recipient, body_text, body_html, subject)
 
 
 class TestShareMain:

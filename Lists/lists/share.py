@@ -23,7 +23,6 @@ ses = boto3.client('ses', region_name='eu-west-1')
 # Email configuration
 CHARSET = "UTF-8"
 SENDER = "Ewelists <contact@ewelists.com>"
-SUBJECT = "Alex shared a ewelist with you!"
 
 
 def handler(event, context):
@@ -46,11 +45,13 @@ def share_main(event):
 
         user = get_user_if_exists(table_name, index_name, email)
 
+        subject = email_subject(list_owner_name)
+
         if user:
             create_shared_entry(table_name, user, list)
             body_text = shared_email_text(user['name'], list_owner_name, list['title']['S'], url)
             body_html = shared_email_html(user['name'], list_owner_name, list['title']['S'], url)
-            send_email(email, body_text, body_html)
+            send_email(email, body_text, body_html, subject)
 
             data = {
                 'user': {'userId': user['userId'], 'email': email, 'name': user['name']},
@@ -61,7 +62,7 @@ def share_main(event):
 
             body_text = pending_email_text(list_owner_name, list['title']['S'], url)
             body_html = pending_email_html(list_owner_name, list['title']['S'], url)
-            send_email(email, body_text, body_html)
+            send_email(email, body_text, body_html, subject)
 
             data = {
                 'user': {'email': email},
@@ -75,6 +76,10 @@ def share_main(event):
 
     response = common.create_response(200, json.dumps(data))
     return response
+
+
+def email_subject(list_owner_name):
+    return list_owner_name + " shared a gift list with you!"
 
 
 def pending_email_text(list_owner_name, list_title, url):
@@ -113,7 +118,7 @@ def shared_email_html(recipient_name, list_owner_name, list_title, url):
     return body_html
 
 
-def send_email(recipient, body_text, body_html):
+def send_email(recipient, body_text, body_html, subject):
     try:
         response = ses.send_email(
             Destination={
@@ -124,7 +129,7 @@ def send_email(recipient, body_text, body_html):
                     'Html': {'Charset': CHARSET, 'Data': body_html},
                     'Text': {'Charset': CHARSET, 'Data': body_text},
                 },
-                'Subject': {'Charset': CHARSET, 'Data': SUBJECT},
+                'Subject': {'Charset': CHARSET, 'Data': subject},
             },
             Source=SENDER
         )
