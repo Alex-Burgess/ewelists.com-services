@@ -49,8 +49,9 @@ def share_main(event):
 
         if user:
             create_shared_entry(table_name, user, list)
-            body_text = shared_email_text(user['name'], list_owner_name, list['title']['S'], url)
-            body_html = shared_email_html(user['name'], list_owner_name, list['title']['S'], url)
+            share_exists_url = exist_url(url, list_id)
+            body_text = shared_email_text(user['name'], list_owner_name, list['title']['S'], share_exists_url)
+            body_html = shared_email_html(user['name'], list_owner_name, list['title']['S'], share_exists_url)
             send_email(email, body_text, body_html, subject)
 
             data = {
@@ -59,9 +60,9 @@ def share_main(event):
             }
         else:
             create_pending_entry(table_name, email, list)
-
-            body_text = pending_email_text(list_owner_name, list['title']['S'], url)
-            body_html = pending_email_html(list_owner_name, list['title']['S'], url)
+            share_signup_url = signup_url(url, list_id)
+            body_text = pending_email_text(list_owner_name, list['title']['S'], share_signup_url)
+            body_html = pending_email_html(list_owner_name, list['title']['S'], share_signup_url)
             send_email(email, body_text, body_html, subject)
 
             data = {
@@ -78,13 +79,27 @@ def share_main(event):
     return response
 
 
+def exist_url(url, id):
+    list_url = url + "/lists/" + id
+    logger.info("User exists share url: " + list_url)
+    return list_url
+
+
+def signup_url(url, id):
+    list_url = url + "/signup?redirect=/lists/" + id
+    logger.info("Signup share url: " + list_url)
+    return list_url
+
+
 def email_subject(list_owner_name):
-    return list_owner_name + " shared a gift list with you!"
+    subject = list_owner_name + " shared a gift list with you!"
+    logger.info("Email subject: " + subject)
+    return subject
 
 
 def pending_email_text(list_owner_name, list_title, url):
     body_text = ("Hi,\r\n" + list_owner_name + " shared " + list_title + " with you on Ewelists.\r\n"
-                 "You can view this list by signing up at " + url + "/signup."
+                 "You can view this list by signing up at " + url
                  )
 
     return body_text
@@ -94,7 +109,7 @@ def pending_email_html(list_owner_name, list_title, url):
     body_html = "<html><head></head><body>"
     body_html += "<p>Hi,</p>"
     body_html += "<p>" + list_owner_name + " shared " + list_title + " with you on Ewelists.</p>"
-    body_html += "You can view this list by signing up at <a href=\"" + url + "/signup\">Ewelists</a>"
+    body_html += "You can view this list by signing up at <a href=\"" + url + "\">Ewelists</a>"
     body_html += "</body></html>"
 
     return body_html
@@ -102,7 +117,7 @@ def pending_email_html(list_owner_name, list_title, url):
 
 def shared_email_text(recipient_name, list_owner_name, list_title, url):
     body_text = ("Hi " + recipient_name + ",\r\n" + list_owner_name + " shared " + list_title + " with you on Ewelists.\r\n"
-                 "You can view this list by signing up at " + url + "/signup."
+                 "You can view this list by signing up at " + url
                  )
 
     return body_text

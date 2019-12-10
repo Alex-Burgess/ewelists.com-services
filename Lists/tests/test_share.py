@@ -158,13 +158,27 @@ class TestEmailSubject:
         assert share.email_subject(list_owner_name) == "Alex Burgess shared a gift list with you!", "Subject was not as expected."
 
 
+class TestExistsUrl:
+    def exist_url(self):
+        list_id = "12345678-list-0001-1234-abcdefghijkl"
+        url = "https://test.ewelists.com"
+        assert share.list_url(url, list_id) == "https://test.ewelists.com/lists/12345678-list-0001-1234-abcdefghijkl", "url is not as expected."
+
+
+class TestSignupUrl:
+    def exist_url(self):
+        list_id = "12345678-list-0001-1234-abcdefghijkl"
+        url = "https://test.ewelists.com"
+        assert share.list_url(url, list_id) == "https://test.ewelists.com/signup?redirect=/lists/12345678-list-0001-1234-abcdefghijkl", "url is not as expected."
+
+
 class TestPendingEmailText:
     def test_pending_email_text(self):
         list_owner_name = "Test User1"
         list_title = "Test 1st Birthday List"
-        url = "https://test.ewelists.com"
+        url = "https://test.ewelists.com/lists/12345678-list-0001-1234-abcdefghijkl"
 
-        expected_text = "Hi,\r\nTest User1 shared Test 1st Birthday List with you on Ewelists.\r\nYou can view this list by signing up at https://test.ewelists.com/signup."
+        expected_text = "Hi,\r\nTest User1 shared Test 1st Birthday List with you on Ewelists.\r\nYou can view this list by signing up at https://test.ewelists.com/lists/12345678-list-0001-1234-abcdefghijkl"
         assert share.pending_email_text(list_owner_name, list_title, url) == expected_text, "Email text was not as expected."
 
 
@@ -172,9 +186,9 @@ class TestPendingEmailHtml:
     def test_pending_email_html(self):
         list_owner_name = "Test User1"
         list_title = "Test 1st Birthday List"
-        url = "https://test.ewelists.com"
+        url = "https://test.ewelists.com/lists/12345678-list-0001-1234-abcdefghijkl"
 
-        expected_html = "<html><head></head><body><p>Hi,</p><p>Test User1 shared Test 1st Birthday List with you on Ewelists.</p>You can view this list by signing up at <a href=\"https://test.ewelists.com/signup\">Ewelists</a></body></html>"
+        expected_html = "<html><head></head><body><p>Hi,</p><p>Test User1 shared Test 1st Birthday List with you on Ewelists.</p>You can view this list by signing up at <a href=\"https://test.ewelists.com/lists/12345678-list-0001-1234-abcdefghijkl\">Ewelists</a></body></html>"
 
         assert share.pending_email_html(list_owner_name, list_title, url) == expected_html, "Email html was not as expected."
 
@@ -184,9 +198,9 @@ class TestSharedEmailText:
         recipient_name = "Test User2"
         list_owner_name = "Test User1"
         list_title = "Test 1st Birthday List"
-        url = "https://test.ewelists.com"
+        url = "https://test.ewelists.com/lists/12345678-list-0001-1234-abcdefghijkl"
 
-        expected_text = "Hi Test User2,\r\nTest User1 shared Test 1st Birthday List with you on Ewelists.\r\nYou can view this list by signing up at https://test.ewelists.com/signup."
+        expected_text = "Hi Test User2,\r\nTest User1 shared Test 1st Birthday List with you on Ewelists.\r\nYou can view this list by signing up at https://test.ewelists.com/lists/12345678-list-0001-1234-abcdefghijkl"
         assert share.shared_email_text(recipient_name, list_owner_name, list_title, url) == expected_text, "Email text was not as expected."
 
 
@@ -195,9 +209,9 @@ class TestSharedEmailHtml:
         recipient_name = "Test User2"
         list_owner_name = "Test User1"
         list_title = "Test 1st Birthday List"
-        url = "https://test.ewelists.com"
+        url = "https://test.ewelists.com/lists/12345678-list-0001-1234-abcdefghijkl"
 
-        expected_html = "<html><head></head><body><h3>Hi Test User2,</h3><p>Test User1 shared Test 1st Birthday List with you on Ewelists.</p><a href=\"https://test.ewelists.com\">View List</a></body></html>"
+        expected_html = "<html><head></head><body><h3>Hi Test User2,</h3><p>Test User1 shared Test 1st Birthday List with you on Ewelists.</p><a href=\"https://test.ewelists.com/lists/12345678-list-0001-1234-abcdefghijkl\">View List</a></body></html>"
 
         assert share.shared_email_html(recipient_name, list_owner_name, list_title, url) == expected_html, "Email html was not as expected."
 
