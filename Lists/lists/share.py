@@ -55,8 +55,7 @@ def share_main(event):
             send_email(email, body_text, body_html, subject)
 
             data = {
-                'user': {'userId': user['userId'], 'email': email, 'name': user['name']},
-                'status': 'shared'
+                'user': {'userId': user['userId'], 'email': email, 'name': user['name'], 'type': 'SHARED'}
             }
         else:
             create_pending_entry(table_name, email, list)
@@ -66,8 +65,7 @@ def share_main(event):
             send_email(email, body_text, body_html, subject)
 
             data = {
-                'user': {'email': email},
-                'status': 'pending'
+                'user': {'email': email, 'type': 'PENDING'}
             }
     except Exception as e:
         logger.error("Exception: {}".format(e))

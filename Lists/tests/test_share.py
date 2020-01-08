@@ -236,7 +236,7 @@ class TestShareMain:
         assert body['user']['userId'] == '12345678-user-0003-1234-abcdefghijkl', "User attribute was not as expected."
         assert body['user']['email'] == 'test.user3@gmail.com', "User attribute was not as expected."
         assert body['user']['name'] == 'Test User3', "User attribute was not as expected."
-        assert body['status'] == 'shared', "User attribute was not as expected."
+        assert body['user']['type'] == 'SHARED', "User attribute was not as expected."
 
         # Check that shared entry created in table
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
@@ -267,7 +267,7 @@ class TestShareMain:
         body = json.loads(response['body'])
 
         assert body['user']['email'] == 'test.user20@gmail.com', "User attribute was not as expected."
-        assert body['status'] == 'pending', "User attribute was not as expected."
+        assert body['user']['type'] == 'PENDING', "User attribute was not as expected."
 
         # Check that shared entry created in table
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
@@ -297,7 +297,7 @@ class TestShareMain:
         assert body['user']['userId'] == '12345678-user-0003-1234-abcdefghijkl', "User attribute was not as expected."
         assert body['user']['email'] == 'test.user3@gmail.com', "User attribute was not as expected."
         assert body['user']['name'] == 'Test User3', "User attribute was not as expected."
-        assert body['status'] == 'shared', "User attribute was not as expected."
+        assert body['user']['type'] == 'SHARED', "User attribute was not as expected."
 
     def test_share_with_googlemail_dot_com_email(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
@@ -309,7 +309,7 @@ class TestShareMain:
         assert body['user']['userId'] == '12345678-user-0003-1234-abcdefghijkl', "User attribute was not as expected."
         assert body['user']['email'] == 'test.user3@gmail.com', "User attribute was not as expected."
         assert body['user']['name'] == 'Test User3', "User attribute was not as expected."
-        assert body['status'] == 'shared', "User attribute was not as expected."
+        assert body['user']['type'] == 'SHARED', "User attribute was not as expected."
 
     def test_requestor_is_not_list_owner(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
