@@ -22,6 +22,17 @@ def api_gateway_event():
 
     event = fixtures.api_gateway_base_event()
     event['httpMethod'] = "POST"
+    event['body'] = "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"eventDate\": \"25 December 2020\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"
+
+    return event
+
+
+@pytest.fixture
+def api_gateway_event2():
+    """ Generates API GW Event"""
+
+    event = fixtures.api_gateway_base_event()
+    event['httpMethod'] = "POST"
     event['body'] = "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"
 
     return event
@@ -54,6 +65,7 @@ class TestGetAttributeDetails:
         attribute_details = create.get_attribute_details(api_gateway_event)
         assert attribute_details['title'] == "My Birthday List", "Attribute title was not as expected."
         assert attribute_details['description'] == "A gift wish list for my birthday.", "Attribute description was not as expected."
+        assert attribute_details['eventDate'] == "25 December 2020", "Attribute date was not as expected."
         assert attribute_details['occasion'] == "Birthday", "Attribute occasion was not as expected."
         assert attribute_details['imageUrl'] == "/images/celebration-default.jpg", "Attribute imageUrl was not as expected."
 
@@ -82,6 +94,7 @@ class TestPutItemInTable:
         attributes = {
             'title': 'My Test List',
             'description': 'Test description for the list.',
+            'eventDate': '25 December 2020',
             'occasion': 'Birthday',
             'imageUrl': '/images/celebration-default.jpg'
         }
@@ -105,6 +118,7 @@ class TestPutItemInTable:
         assert test_response['Items'][0]['shared_user_name']['S'] == "Test User1", "Attribute was not as expected."
         # assert test_response['Items'][0]['shared_user_email']['S'] == "test.user1@gmail.com", "Attribute was not as expected."
         assert test_response['Items'][0]['title']['S'] == "My Test List", "Attribute was not as expected."
+        assert test_response['Items'][0]['eventDate']['S'] == "25 December 2020", "Attribute was not as expected."
         assert test_response['Items'][0]['occasion']['S'] == "Birthday", "Attribute was not as expected."
         assert test_response['Items'][0]['listId']['S'] == "12345678-list-0012-1234-abcdefghijkl", "Attribute was not as expected."
         assert test_response['Items'][0]['listOwner']['S'] == "12345678-user-0001-1234-abcdefghijkl", "Attribute was not as expected."
@@ -114,6 +128,7 @@ class TestPutItemInTable:
 
         assert test_response['Items'][1]['PK']['S'] == 'LIST#12345678-list-0012-1234-abcdefghijkl', "PK of item was not as expected."
         assert test_response['Items'][1]['imageUrl']['S'] == '/images/celebration-default.jpg', "imageurl of item was not as expected."
+        assert test_response['Items'][1]['eventDate']['S'] == "25 December 2020", "Attribute was not as expected."
 
     def test_put_item_in_table_with_bad_name(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
@@ -137,6 +152,15 @@ class TestCreateMain:
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
         response = create.create_main(api_gateway_event)
+        body = json.loads(response['body'])
+
+        assert body['message'] == 'List was created.', "Create main response did not contain the correct message."
+        assert len(body['listId']) == 36, "Create main response did not contain a listId."
+
+    def test_create_main_no_date(self, monkeypatch, api_gateway_event2, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+
+        response = create.create_main(api_gateway_event2)
         body = json.loads(response['body'])
 
         assert body['message'] == 'List was created.', "Create main response did not contain the correct message."

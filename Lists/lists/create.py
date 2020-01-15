@@ -58,6 +58,9 @@ def put_item_in_table(table_name, cognito_user_id, listId, attributes, users_nam
         'imageUrl': {'S': attributes['imageUrl']},
     }
 
+    if 'eventDate' in attributes:
+        item['eventDate'] = {'S': attributes['eventDate']}
+
     try:
         logger.info("Put owned item for lists table: {}".format(item))
         dynamodb.put_item(TableName=table_name, Item=item)
