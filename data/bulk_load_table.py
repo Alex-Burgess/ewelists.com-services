@@ -17,20 +17,39 @@ file_name = sys.argv[2]
 
 
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(table_name)
+
+try:
+    table = dynamodb.Table(table_name)
+except Exception as e:
+    print("Could not connect to table. Error:" + e)
 
 items = []
 
 try:
-    with open(file_name, 'r') as f:
-        for row in f:
-            items.append(json.loads(row))
+    with open(file_name) as f:
+        d = json.load(f)
+        for p in d:
+            items.append(d[p])
 
     with table.batch_writer() as batch:
         for item in items:
+            print("Adding item [{}] to table [{}]".format(item['productId'], table_name))
             batch.put_item(Item=item)
 
-    print("Adding items to table [{}]".format(table_name))
 except Exception as e:
-    print("Could not connect to table. Error:")
-    print(e)
+    print("Unexpected Error:" + e)
+
+
+# Old
+# try:
+#     with open(file_name, 'r') as f:
+#         for row in f:
+#             items.append(json.loads(row))
+#
+#     with table.batch_writer() as batch:
+#         for item in items:
+#             print("Adding item [{}] to table [{}]".format(item['productId'], table_name))
+#             # batch.put_item(Item=item)
+#
+# except Exception as e:
+#     print("Unexpected Error:" + e)
