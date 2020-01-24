@@ -294,25 +294,33 @@ class TestGetPostmanIdentity:
         monkeypatch.setitem(os.environ, 'POSTMAN_IDENTITY_ID', 'eu-west-1:12345678-user-fed1-1234-abcdefghijkl')
         monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB', '12345678-user-api1-1234-abcdefghijkl')
 
-        identity = common.get_postman_identity(os.environ)
+        identity = common.get_postman_identity(os.environ, 1)
         assert identity['POSTMAN_IDENTITY_ID'] == 'eu-west-1:12345678-user-fed1-1234-abcdefghijkl', "POSTMAN_IDENTITY_ID not as expected."
         assert identity['POSTMAN_USERPOOL_SUB'] == '12345678-user-api1-1234-abcdefghijkl', "POSTMAN_USERPOOL_SUB not as expected."
 
+    def test_get_postman_identity2(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'POSTMAN_IDENTITY_ID2', 'eu-west-1:12345678-user-fed2-1234-abcdefghijkl')
+        monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB2', '12345678-user-api2-1234-abcdefghijkl')
+
+        identity = common.get_postman_identity(os.environ, 2)
+        assert identity['POSTMAN_IDENTITY_ID'] == 'eu-west-1:12345678-user-fed2-1234-abcdefghijkl', "POSTMAN_IDENTITY_ID not as expected."
+        assert identity['POSTMAN_USERPOOL_SUB'] == '12345678-user-api2-1234-abcdefghijkl', "POSTMAN_USERPOOL_SUB not as expected."
+
     def test_get_postman_identity_when_both_osvars_missing(self):
         with pytest.raises(Exception) as e:
-            common.get_postman_identity(os.environ)
+            common.get_postman_identity(os.environ, 1)
         assert str(e.value) == "POSTMAN_IDENTITY_ID and POSTMAN_USERPOOL_SUB environment variables not set correctly.", "Exception not as expected."
 
     def test_get_postman_identity_when_userpool_missing(self, monkeypatch):
         monkeypatch.setitem(os.environ, 'POSTMAN_IDENTITY_ID', 'eu-west-1:12345678-user-fed1-1234-abcdefghijkl')
         with pytest.raises(Exception) as e:
-            common.get_postman_identity(os.environ)
+            common.get_postman_identity(os.environ, 1)
         assert str(e.value) == "POSTMAN_IDENTITY_ID and POSTMAN_USERPOOL_SUB environment variables not set correctly.", "Exception not as expected."
 
     def test_get_postman_identity_when_identity_id_missing(self, monkeypatch):
         monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB', '12345678-user-api1-1234-abcdefghijkl')
         with pytest.raises(Exception) as e:
-            common.get_postman_identity(os.environ)
+            common.get_postman_identity(os.environ, 1)
         assert str(e.value) == "POSTMAN_IDENTITY_ID and POSTMAN_USERPOOL_SUB environment variables not set correctly.", "Exception not as expected."
 
 
@@ -328,6 +336,14 @@ class TestGetIdentity:
         identity = common.get_identity(api_gateway_postman_event, os.environ)
         assert identity["cognitoIdentityId"] == "eu-west-1:12345678-user-fed1-1234-abcdefghijkl", "cognitoIdentityId not as expected."
         assert identity["userPoolSub"] == "12345678-user-api1-1234-abcdefghijkl", "userPoolSub not as expected."
+
+    def test_get_identity_when_postman2_request(self, monkeypatch, api_gateway_postman_event):
+        api_gateway_postman_event['requestContext']['identity']['userArn'] = "arn:aws:iam::123456789012:user/ApiTestUser2"
+        monkeypatch.setitem(os.environ, 'POSTMAN_IDENTITY_ID2', 'eu-west-1:12345678-user-fed2-1234-abcdefghijkl')
+        monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB2', '12345678-user-api2-1234-abcdefghijkl')
+        identity = common.get_identity(api_gateway_postman_event, os.environ)
+        assert identity["cognitoIdentityId"] == "eu-west-1:12345678-user-fed2-1234-abcdefghijkl", "cognitoIdentityId not as expected."
+        assert identity["userPoolSub"] == "12345678-user-api2-1234-abcdefghijkl", "userPoolSub not as expected."
 
     def test_get_identity_when_noid(self, api_gateway_event_with_no_identity):
         with pytest.raises(Exception) as e:
