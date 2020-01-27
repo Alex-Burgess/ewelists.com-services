@@ -51,10 +51,8 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
-          POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
-          POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
-          POSTMAN_IDENTITY_ID2: "eu-west-1:fa0aa029-42c7-43df-9a4d-c91ee024e00d"
-          POSTMAN_USERPOOL_SUB2: "3924fa14-e251-4903-a865-8afe8c683ddb"
+          POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
+          POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
       Events:
         CreateProduct:
           Type: Api
@@ -76,10 +74,8 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
-          POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
-          POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
-          POSTMAN_IDENTITY_ID2: "eu-west-1:fa0aa029-42c7-43df-9a4d-c91ee024e00d"
-          POSTMAN_USERPOOL_SUB2: "3924fa14-e251-4903-a865-8afe8c683ddb"
+          POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
+          POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
       Events:
         CreateList:
           Type: Api
@@ -101,10 +97,8 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
-          POSTMAN_IDENTITY_ID: "eu-west-1:10b65885-4c7e-4dc5-a9c9-eb7e143336ee"
-          POSTMAN_USERPOOL_SUB: "ae617d08-1127-4066-87ec-b6df345793b8"
-          POSTMAN_IDENTITY_ID2: "eu-west-1:fa0aa029-42c7-43df-9a4d-c91ee024e00d"
-          POSTMAN_USERPOOL_SUB2: "3924fa14-e251-4903-a865-8afe8c683ddb"
+          POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
+          POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
       Events:
         CreateList:
           Type: Api

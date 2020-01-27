@@ -2,7 +2,7 @@ import json
 import os
 import boto3
 import logging
-from notfound import common
+from products import common
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
@@ -23,9 +23,8 @@ def handler(event, context):
 def delete_main(event):
     try:
         table_name = common.get_table_name(os.environ)
-        identity = common.get_identity(event, os.environ)
         product_id = common.get_product_id(event)
-        delete_product(table_name, identity, product_id)
+        delete_product(table_name, product_id)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -37,8 +36,8 @@ def delete_main(event):
     return response
 
 
-def delete_product(table_name, cognito_user_id, product_id):
-    logger.info("Deleting Product ID: {} for user: {}.".format(product_id, cognito_user_id))
+def delete_product(table_name, product_id):
+    logger.info("Deleting Product ID: {}.".format(product_id))
 
     key = {
         'productId': {'S': product_id},
@@ -48,15 +47,10 @@ def delete_product(table_name, cognito_user_id, product_id):
         response = dynamodb.delete_item(
             TableName=table_name,
             Key=key,
-            ConditionExpression="createdBy = :C",
-            ExpressionAttributeValues={":C":  {'S': cognito_user_id}}
         )
         logger.info("Delete response: {}".format(response))
     except ClientError as e:
-        if e.response['Error']['Code'] == "ConditionalCheckFailedException":
-            logger.info("Delete request failed for product_id: {} and user {} due to condition check on createdBy user id.".format(product_id, cognito_user_id))
-            raise Exception("Product can not be deleted.")
-        else:
-            raise
+        logger.error("Delete failed exception: " + e)
+        raise Exception("Product can not be deleted.")
 
     return True

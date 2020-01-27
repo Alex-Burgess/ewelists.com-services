@@ -32,8 +32,6 @@ def get_table_name(osenv):
 
 
 def get_identity(event, osenv):
-    identity = {}
-
     try:
         userArn = event['requestContext']['identity']['userArn']
         cognito_user_id = event['requestContext']['identity']['cognitoIdentityId']
@@ -47,40 +45,31 @@ def get_identity(event, osenv):
     pattern2 = re.compile("^arn:aws:iam::[0-9]{12}:user/ApiTestUser2$")
     if pattern.match(userArn):
         logger.info('Request was from postman, using API test identity.')
-        os_identity = get_postman_identity(osenv, 1)
-        identity["cognitoIdentityId"] = os_identity["POSTMAN_IDENTITY_ID"]
-        identity["userPoolSub"] = os_identity["POSTMAN_USERPOOL_SUB"]
+        identity = get_postman_identity(osenv, 1)
     elif pattern2.match(userArn):
         logger.info('Request was from postman, using API test identity.')
-        os_identity = get_postman_identity(osenv, 2)
-        identity["cognitoIdentityId"] = os_identity["POSTMAN_IDENTITY_ID"]
-        identity["userPoolSub"] = os_identity["POSTMAN_USERPOOL_SUB"]
+        identity = get_postman_identity(osenv, 2)
     else:
         if cognito_user_id is None:
             raise Exception("There was no cognitoIdentityId in the API event.")
 
-        identity["cognitoIdentityId"] = cognito_user_id
-        identity["userPoolSub"] = cognito_authentication_provider.split(':')[-1]
-
+        identity = cognito_authentication_provider.split(':')[-1]
         logger.info('cognitoIdentityId was retrieved from event.')
 
     return identity
 
 
 def get_postman_identity(osenv, id):
-    os_identity = {}
     if id == 2:
         try:
-            os_identity["POSTMAN_IDENTITY_ID"] = osenv['POSTMAN_IDENTITY_ID2']
-            os_identity["POSTMAN_USERPOOL_SUB"] = osenv['POSTMAN_USERPOOL_SUB2']
+            os_identity = osenv['POSTMAN_USERPOOL_SUB2']
         except KeyError:
-            raise Exception('POSTMAN_IDENTITY_ID2 and POSTMAN_USERPOOL_SUB2 environment variables not set correctly.')
+            raise Exception('POSTMAN_USERPOOL_SUB2 environment variables not set correctly.')
     else:
         try:
-            os_identity["POSTMAN_IDENTITY_ID"] = osenv['POSTMAN_IDENTITY_ID']
-            os_identity["POSTMAN_USERPOOL_SUB"] = osenv['POSTMAN_USERPOOL_SUB']
+            os_identity = osenv['POSTMAN_USERPOOL_SUB']
         except KeyError:
-            raise Exception('POSTMAN_IDENTITY_ID and POSTMAN_USERPOOL_SUB environment variables not set correctly.')
+            raise Exception('POSTMAN_USERPOOL_SUB environment variables not set correctly.')
 
     return os_identity
 

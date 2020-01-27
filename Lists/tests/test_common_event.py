@@ -259,6 +259,12 @@ class TestGetIdentity:
         identity = common_event.get_identity(api_gateway_postman_event, os.environ)
         assert identity == "12345678-user-api1-1234-abcdefghijkl", "userPoolSub not as expected."
 
+    def test_get_identity_when_postman2_request(self, monkeypatch, api_gateway_postman_event):
+        api_gateway_postman_event['requestContext']['identity']['userArn'] = "arn:aws:iam::123456789012:user/ApiTestUser2"
+        monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB2', '12345678-user-api2-1234-abcdefghijkl')
+        identity = common_event.get_identity(api_gateway_postman_event, os.environ)
+        assert identity == "12345678-user-api2-1234-abcdefghijkl", "userPoolSub not as expected."
+
     def test_get_identity_when_noid(self, api_gateway_event_with_no_identity):
         with pytest.raises(Exception) as e:
             common_event.get_identity(api_gateway_event_with_no_identity, os.environ)

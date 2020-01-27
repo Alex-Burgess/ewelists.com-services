@@ -4,7 +4,7 @@ import boto3
 import logging
 import time
 import uuid
-from notfound import common
+from products import common
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -24,9 +24,8 @@ def handler(event, context):
 def create_main(event):
     try:
         table_name = common.get_table_name(os.environ)
-        identity = common.get_identity(event, os.environ)
         product_info = get_product_info(event)
-        product_id = put_product(table_name, identity, product_info)
+        product_id = put_product(table_name, product_info)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -59,14 +58,15 @@ def get_product_info(event):
     return attribute_details
 
 
-def put_product(table_name, cognito_user_id, product_info):
+def put_product(table_name, product_info):
     product_id = str(uuid.uuid4())
     item = {
         'productId': {'S': product_id},
+        'retailer': {'S': product_info['retailer']},
         'brand': {'S': product_info['brand']},
         'details': {'S': product_info['details']},
-        'productUrl': {'S': product_info['url']},
-        "createdBy": {'S': cognito_user_id},
+        'productUrl': {'S': product_info['productUrl']},
+        'imageUrl': {'S': product_info['imageUrl']},
         'createdAt': {'N': str(int(time.time()))}
     }
 

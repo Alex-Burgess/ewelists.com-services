@@ -43,12 +43,18 @@ class TestGetPostmanIdentity:
     def test_get_postman_identity(self, monkeypatch):
         monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB', '12345678-user-api1-1234-abcdefghijkl')
 
-        identity = common_env_vars.get_postman_identity(os.environ)
+        identity = common_env_vars.get_postman_identity(os.environ, 1)
         assert identity == '12345678-user-api1-1234-abcdefghijkl', "POSTMAN_USERPOOL_SUB not as expected."
+
+    def test_get_postman_identity2(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB2', '12345678-user-api2-1234-abcdefghijkl')
+
+        identity = common_env_vars.get_postman_identity(os.environ, 2)
+        assert identity == '12345678-user-api2-1234-abcdefghijkl', "POSTMAN_USERPOOL_SUB2 not as expected."
 
     def test_get_postman_identity_when_identity_id_missing(self):
         with pytest.raises(Exception) as e:
-            common_env_vars.get_postman_identity(os.environ)
+            common_env_vars.get_postman_identity(os.environ, 1)
         assert str(e.value) == "POSTMAN_USERPOOL_SUB environment variables not set correctly.", "Exception not as expected."
 
 

@@ -18,8 +18,6 @@ logger.addHandler(stream_handler)
 
 @pytest.fixture
 def api_gateway_event():
-    """ Generates API GW Event"""
-
     event = fixtures.api_gateway_base_event()
     event['httpMethod'] = "POST"
     event['body'] = "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"eventDate\": \"25 December 2020\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"
@@ -29,8 +27,6 @@ def api_gateway_event():
 
 @pytest.fixture
 def api_gateway_event2():
-    """ Generates API GW Event"""
-
     event = fixtures.api_gateway_base_event()
     event['httpMethod'] = "POST"
     event['body'] = "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"

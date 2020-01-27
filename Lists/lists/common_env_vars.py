@@ -39,12 +39,17 @@ def get_userpool_id(osenv):
     return userpool_id
 
 
-def get_postman_identity(osenv):
-    try:
-        os_identity = osenv['POSTMAN_USERPOOL_SUB']
-    except KeyError:
-        logger.error('POSTMAN_USERPOOL_SUB environment variables not set correctly.')
-        raise Exception('POSTMAN_USERPOOL_SUB environment variables not set correctly.')
+def get_postman_identity(osenv, id):
+    if id == 2:
+        try:
+            os_identity = osenv['POSTMAN_USERPOOL_SUB2']
+        except KeyError:
+            raise Exception('POSTMAN_USERPOOL_SUB2 environment variables not set correctly.')
+    else:
+        try:
+            os_identity = osenv['POSTMAN_USERPOOL_SUB']
+        except KeyError:
+            raise Exception('POSTMAN_USERPOOL_SUB environment variables not set correctly.')
 
     return os_identity
 

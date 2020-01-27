@@ -1,24 +1,9 @@
-import json
-import os
-
-
-def load_test_data():
-    dirname = os.path.dirname(__file__)
-    filename = os.path.join(dirname, './data.json')
-
-    items = []
-    with open(filename, 'r') as f:
-        for row in f:
-            items.append(json.loads(row))
-    return items
-
-
 def api_gateway_base_event():
     """ Generates API GW Event"""
 
     return {
-        "resource": "/lists",
-        "path": "/lists",
+        "resource": "/notfound",
+        "path": "/notfound",
         "httpMethod": "GET",
         "headers": {
             "Accept": "*/*",
@@ -49,11 +34,11 @@ def api_gateway_base_event():
         "stageVariables": "null",
         "requestContext": {
             "resourceId": "sgzmgr",
-            "resourcePath": "/lists",
+            "resourcePath": "/notfound",
             "httpMethod": "GET",
             "extendedRequestId": "BQGojGkBjoEFsTw=",
             "requestTime": "08/Oct/2019:16:22:40 +0000",
-            "path": "/test/lists",
+            "path": "/test/notfound",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",
@@ -80,44 +65,3 @@ def api_gateway_base_event():
         "body": "null",
         "isBase64Encoded": "false"
     }
-
-
-def signup_event():
-    """ Generates API GW Event"""
-
-    return {
-        "version": "1",
-        "region": "eu-west-1",
-        "userPoolId": "eu-west-1_vqox9Z8q7",
-        "userName": "12345678-user-0003-1234-abcdefghijkl",
-        "callerContext": {
-            "awsSdkVersion": "aws-sdk-unknown-unknown",
-            "clientId": "61pt55apuqgj2jgbsfjmj1efn8"
-        },
-        "triggerSource": "PreSignUp_SignUp",
-        "request": {
-            "userAttributes": {
-                "name": "Test User",
-                "email": "test.user@gmail.com"
-            },
-            "validationData": "null"
-        },
-        "response": {
-            "autoConfirmUser": "false",
-            "autoVerifyEmail": "false",
-            "autoVerifyPhone": "false"
-        }
-    }
-
-
-def signup_social_event():
-    event = signup_event()
-    event['triggerSource'] = "PreSignUp_ExternalProvider"
-    event['request']['userAttributes'] = {
-        "cognito:email_alias": "",
-        "name": "Test User",
-        "cognito:phone_number_alias": "",
-        "email": "test.user@gmail.com"
-    }
-
-    return event
