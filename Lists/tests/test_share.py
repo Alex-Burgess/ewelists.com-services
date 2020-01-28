@@ -105,7 +105,6 @@ class TestCreateSharedEntry:
 
         assert share.create_shared_entry('lists-unittest', user, list_item)
 
-    @pytest.mark.skip(reason="Moto is not throwing an exception when ConditionExpression is true")
     def test_attempt_to_create_duplicate(self, dynamodb_mock):
         user = {"email": "test.user1@gmail.com", "name": "Test User1", "userId": "12345678-user-0001-1234-abcdefghijkl"}
         list_item = {
@@ -118,7 +117,9 @@ class TestCreateSharedEntry:
             'listOwner': {'S': "12345678-user-0001-1234-abcdefghijkl"}
         }
 
-        assert share.create_shared_entry('lists-unittest', user, list_item)
+        with pytest.raises(Exception) as e:
+            share.create_shared_entry('lists-unittest', user, list_item)
+        assert str(e.value) == "User already exists in list.", "Exception not as expected."
 
 
 class TestCreatePendingEntry:
@@ -136,9 +137,8 @@ class TestCreatePendingEntry:
 
         assert share.create_pending_entry('lists-unittest', email, list_item)
 
-    @pytest.mark.skip(reason="Moto is not throwing an exception when ConditionExpression is true")
     def test_attempt_to_create_duplicate(self, dynamodb_mock):
-        email = "test.user30@gmail.com"
+        email = "test.user4@gmail.com"
         list_item = {
             'listId': {'S': "12345678-list-0001-1234-abcdefghijkl"},
             'title': {'S': "Child User1 1st Birthday"},
@@ -149,7 +149,9 @@ class TestCreatePendingEntry:
             'listOwner': {'S': "12345678-user-0001-1234-abcdefghijkl"}
         }
 
-        assert share.create_pending_entry('lists-unittest', email, list_item)
+        with pytest.raises(Exception) as e:
+            share.create_pending_entry('lists-unittest', email, list_item)
+        assert str(e.value) == "User already exists in list.", "Exception not as expected."
 
 
 class TestEmailSubject:

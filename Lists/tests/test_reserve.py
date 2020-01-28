@@ -61,7 +61,7 @@ def dynamodb_mock():
 
 
 class TestReserveMain:
-    @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
+    @pytest.mark.skip(reason="transact_write_items is not implemented for moto. https://github.com/spulec/moto/issues/2424")
     def test_reserve_product_not_yet_reserved(self, monkeypatch, api_gateway_event_prod2, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         response = reserve.reserve_main(api_gateway_event_prod2)
