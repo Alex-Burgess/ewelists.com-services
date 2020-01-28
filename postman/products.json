@@ -1,281 +1,758 @@
 {
 	"info": {
-		"_postman_id": "5859442e-7094-4d33-998a-2bc2a51449a9",
-		"name": "Ewelists (Products)",
+		"_postman_id": "afca16c9-b377-4a2c-9168-822f56af61ce",
+		"name": "Products",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "get product",
-			"event": [
+			"name": "Create, get and delete product",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-						"exec": [
-							"pm.test(\"response is ok\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"response must be valid and have a body\", function () {",
-							"     // assert that the status code is 200",
-							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-							"     // assert that the response has a valid JSON body",
-							"     pm.response.to.be.withBody;",
-							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-							"});",
-							"",
-							"pm.test(\"The returned object should contain the correct product details\", function () {",
-							"    var product_obj = pm.response.json();",
-							"    pm.expect(product_obj.productId.length).to.eql(36);",
-							"    pm.expect(product_obj.brand).to.eql(\"BABYBJÖRN\");",
-							"    pm.expect(product_obj.details).to.eql(\"Travel Cot Easy Go, Anthracite, with transport bag\");",
-							"    pm.expect(product_obj.imageUrl).to.eql(\"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\");",
-							"    pm.expect(product_obj.productUrl).to.eql(\"https://www.amazon.co.uk/dp/B01H24LM58\");",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
+					"name": "create product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"Add variable for new Product ID\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    productId = jsonData[\"productId\"];",
+									"    pm.environment.set(\"p_product_id\", productId);",
+									"});",
+									"",
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"A list Id should be returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var productId = jsonData['productId'];",
+									"    pm.expect(productId.length).to.eql(36);",
+									"});",
+									"",
+									"pm.test(\"Response message should be created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['message'];",
+									"    pm.expect(message).to.eql('success');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
+						},
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "get product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"The returned object should contain the correct product details\", function () {",
+									"    var product_obj = pm.response.json();",
+									"    pm.expect(product_obj.productId.length).to.eql(36);",
+									"    // pm.expect(product_obj.retailer).to.eql(\"amazon\");",
+									"    pm.expect(product_obj.brand).to.eql(\"BABYBJÖRN\");",
+									"    pm.expect(product_obj.details).to.eql(\"Travel Cot Easy Go, Anthracite, with transport bag\");",
+									"    pm.expect(product_obj.imageUrl).to.eql(\"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\");",
+									"    pm.expect(product_obj.productUrl).to.eql(\"https://www.amazon.co.uk/dp/B01H24LM58\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/{{p_product_id}}",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products",
+								"{{p_product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response should confirm deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var deletedBool = jsonData['deleted'];",
+									"    pm.expect(deletedBool).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Clear environment variable\", function() {",
+									"    pm.environment.unset(\"p_product_id\")",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/{{p_product_id}}",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products",
+								"{{p_product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete product that does not exist Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response should by true\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var deletedBool = jsonData['deleted'];",
+									"    pm.expect(deletedBool).to.eql(true);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/12345678",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products",
+								"12345678"
+							]
+						}
+					},
+					"response": []
 				}
 			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "awsv4",
-					"awsv4": [
-						{
-							"key": "secretKey",
-							"value": "{{SecretKey}}",
-							"type": "string"
-						},
-						{
-							"key": "accessKey",
-							"value": "{{AccessKey}}",
-							"type": "string"
-						},
-						{
-							"key": "service",
-							"value": "",
-							"type": "string"
-						},
-						{
-							"key": "region",
-							"value": "eu-west-1",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/12345678-prod-0001-1234-abcdefghijkl",
-					"protocol": "https",
-					"host": [
-						"{{products_url_id}}",
-						"execute-api",
-						"eu-west-1",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"{{env}}",
-						"products",
-						"12345678-prod-0001-1234-abcdefghijkl"
-					]
-				}
-			},
-			"response": []
+			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "search with url",
-			"event": [
+			"name": "Search with url",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-						"exec": [
-							"pm.test(\"response is ok\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"response must be valid and have a body\", function () {",
-							"     // assert that the status code is 200",
-							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-							"     // assert that the response has a valid JSON body",
-							"     pm.response.to.be.withBody;",
-							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-							"});",
-							"",
-							"pm.test(\"The returned object should contain the correct list details\", function () {",
-							"    var product_obj = pm.response.json();",
-							"    pm.expect(product_obj.product.productId.length).to.eql(36);",
-							"    pm.expect(product_obj.product.brand).to.eql(\"BABYBJÖRN\");",
-							"    pm.expect(product_obj.product.details).to.eql(\"Travel Cot Easy Go, Anthracite, with transport bag\");",
-							"    pm.expect(product_obj.product.imageUrl).to.eql(\"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\");",
-							"    pm.expect(product_obj.product.productUrl).to.eql(\"https://www.amazon.co.uk/dp/B01H24LM58\");",
-							"});",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
+					"name": "create product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"Add variable for new Product ID\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    productId = jsonData[\"productId\"];",
+									"    pm.environment.set(\"p_product_id\", productId);",
+									"});",
+									"",
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"A list Id should be returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var productId = jsonData['productId'];",
+									"    pm.expect(productId.length).to.eql(36);",
+									"});",
+									"",
+									"pm.test(\"Response message should be created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['message'];",
+									"    pm.expect(message).to.eql('success');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
+						},
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
 				},
 				{
-					"listen": "prerequest",
-					"script": {
-						"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
-						"exec": [
-							"pm.environment.get(\"list_id\")"
-						],
-						"type": "text/javascript"
-					}
+					"name": "search with url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"The returned object should contain the correct list details\", function () {",
+									"    var product_obj = pm.response.json();",
+									"    pm.expect(product_obj.product.productId.length).to.eql(36);",
+									"    pm.expect(product_obj.product.brand).to.eql(\"BABYBJÖRN\");",
+									"    pm.expect(product_obj.product.details).to.eql(\"Travel Cot Easy Go, Anthracite, with transport bag\");",
+									"    pm.expect(product_obj.product.imageUrl).to.eql(\"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\");",
+									"    pm.expect(product_obj.product.productUrl).to.eql(\"https://www.amazon.co.uk/dp/B01H24LM58\");",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/url/https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB01H24LM58",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products",
+								"url",
+								"https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB01H24LM58"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "search with url for product that does not exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"The returned object should contain the correct list details\", function () {",
+									"    var product_obj = pm.response.json();",
+									"    pm.expect(product_obj.product).to.eql({});",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/url/https%3A%2F%2Fwww.random.co.uk%2Fdp%2FB01H24LM58Missing",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products",
+								"url",
+								"https%3A%2F%2Fwww.random.co.uk%2Fdp%2FB01H24LM58Missing"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "delete product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response should confirm deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var deletedBool = jsonData['deleted'];",
+									"    pm.expect(deletedBool).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Clear environment variable\", function() {",
+									"    pm.environment.unset(\"nf_product_id\")",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/{{p_product_id}}",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products",
+								"{{p_product_id}}"
+							]
+						}
+					},
+					"response": []
 				}
 			],
-			"request": {
-				"auth": {
-					"type": "awsv4",
-					"awsv4": [
-						{
-							"key": "secretKey",
-							"value": "{{SecretKey}}",
-							"type": "string"
-						},
-						{
-							"key": "accessKey",
-							"value": "{{AccessKey}}",
-							"type": "string"
-						},
-						{
-							"key": "service",
-							"value": "",
-							"type": "string"
-						},
-						{
-							"key": "region",
-							"value": "eu-west-1",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/url/https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB01H24LM58",
-					"protocol": "https",
-					"host": [
-						"{{products_url_id}}",
-						"execute-api",
-						"eu-west-1",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"{{env}}",
-						"products",
-						"url",
-						"https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB01H24LM58"
-					]
-				},
-				"description": "Create list"
-			},
-			"response": []
-		},
-		{
-			"name": "search with url for product that does not exist",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-						"exec": [
-							"pm.test(\"response is ok\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"response must be valid and have a body\", function () {",
-							"     // assert that the status code is 200",
-							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-							"     // assert that the response has a valid JSON body",
-							"     pm.response.to.be.withBody;",
-							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-							"});",
-							"",
-							"pm.test(\"The returned object should contain the correct list details\", function () {",
-							"    var product_obj = pm.response.json();",
-							"    pm.expect(product_obj.product).to.eql({});",
-							"});",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
-						"exec": [
-							"pm.environment.get(\"list_id\")"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "awsv4",
-					"awsv4": [
-						{
-							"key": "secretKey",
-							"value": "{{SecretKey}}",
-							"type": "string"
-						},
-						{
-							"key": "accessKey",
-							"value": "{{AccessKey}}",
-							"type": "string"
-						},
-						{
-							"key": "service",
-							"value": "",
-							"type": "string"
-						},
-						{
-							"key": "region",
-							"value": "eu-west-1",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/url/https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB01H24LM58Missing",
-					"protocol": "https",
-					"host": [
-						"{{products_url_id}}",
-						"execute-api",
-						"eu-west-1",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"{{env}}",
-						"products",
-						"url",
-						"https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB01H24LM58Missing"
-					]
-				},
-				"description": "Create list"
-			},
-			"response": []
+			"protocolProfileBehavior": {}
 		}
 	],
 	"protocolProfileBehavior": {}

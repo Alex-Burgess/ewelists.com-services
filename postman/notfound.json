@@ -1,457 +1,664 @@
 {
 	"info": {
-		"_postman_id": "9f73e0ea-003d-4eec-ad3f-6e384eb66299",
-		"name": "Ewelists (NotFound)",
+		"_postman_id": "62c139c3-9504-4eae-9a72-5abdb9772368",
+		"name": "NotFound",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "create",
-			"event": [
+			"name": "Create, get and delete product",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-						"exec": [
-							"pm.test(\"Add variable for new Product ID\", function() {",
-							"    var jsonData = pm.response.json();",
-							"    productId = jsonData[\"productId\"];",
-							"    pm.environment.set(\"product_id\", productId);",
-							"});",
-							"",
-							"pm.test(\"response is ok\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"response must be valid and have a body\", function () {",
-							"     // assert that the status code is 200",
-							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-							"     // assert that the response has a valid JSON body",
-							"     pm.response.to.be.withBody;",
-							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-							"});",
-							"",
-							"pm.test(\"A list Id should be returned\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var productId = jsonData['productId'];",
-							"    pm.expect(productId.length).to.eql(36);",
-							"});",
-							"",
-							"pm.test(\"Response message should be created\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var message = jsonData['message'];",
-							"    pm.expect(message).to.eql('success');",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
+					"name": "create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"Add variable for new Product ID\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    productId = jsonData[\"productId\"];",
+									"    pm.environment.set(\"nf_product_id\", productId);",
+									"});",
+									"",
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"A list Id should be returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var productId = jsonData['productId'];",
+									"    pm.expect(productId.length).to.eql(36);",
+									"});",
+									"",
+									"pm.test(\"Response message should be created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['message'];",
+									"    pm.expect(message).to.eql('success');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"brand\": \"Mamas & Papas\",\n    \"details\": \"Hilston Nursing Chair - Silver\",\n    \"url\": \"https://www.mamasandpapas.com/en-gb/hilston-nursing-chair-duck-egg/p/chnsoa100\"\n}"
+						},
+						"url": {
+							"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound",
+							"protocol": "https",
+							"host": [
+								"{{notfound_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"notfound"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "get product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"The returned object should contain the correct product details\", function () {",
+									"    var product_obj = pm.response.json();",
+									"    pm.expect(product_obj.productId.length).to.eql(36);",
+									"    pm.expect(product_obj.brand).to.eql(\"Mamas & Papas\");",
+									"    pm.expect(product_obj.details).to.eql(\"Hilston Nursing Chair - Silver\");",
+									"    pm.expect(product_obj.productUrl).to.eql(\"https://www.mamasandpapas.com/en-gb/hilston-nursing-chair-duck-egg/p/chnsoa100\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound/{{nf_product_id}}",
+							"protocol": "https",
+							"host": [
+								"{{notfound_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"notfound",
+								"{{nf_product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response should confirm deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var deletedBool = jsonData['deleted'];",
+									"    pm.expect(deletedBool).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Clear environment variable\", function() {",
+									"    pm.environment.unset(\"nf_product_id\")",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound/{{nf_product_id}}",
+							"protocol": "https",
+							"host": [
+								"{{notfound_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"notfound",
+								"{{nf_product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete product that does not exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is 500\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     pm.response.to.be.error;",
+									"     ",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('Product can not be deleted.');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound/12345678",
+							"protocol": "https",
+							"host": [
+								"{{notfound_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"notfound",
+								"12345678"
+							]
+						}
+					},
+					"response": []
 				}
 			],
-			"request": {
-				"auth": {
-					"type": "awsv4",
-					"awsv4": [
-						{
-							"key": "secretKey",
-							"value": "{{SecretKey}}",
-							"type": "string"
-						},
-						{
-							"key": "accessKey",
-							"value": "{{AccessKey}}",
-							"type": "string"
-						},
-						{
-							"key": "service",
-							"value": "",
-							"type": "string"
-						},
-						{
-							"key": "region",
-							"value": "eu-west-1",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"brand\": \"Mamas & Papas\",\n    \"details\": \"Hilston Nursing Chair - Silver\",\n    \"url\": \"https://www.mamasandpapas.com/en-gb/hilston-nursing-chair-duck-egg/p/chnsoa100\"\n}"
-				},
-				"url": {
-					"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound",
-					"protocol": "https",
-					"host": [
-						"{{notfound_url_id}}",
-						"execute-api",
-						"eu-west-1",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"{{env}}",
-						"notfound"
-					]
-				},
-				"description": "Create list"
-			},
-			"response": []
+			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "get product",
-			"event": [
+			"name": "Delete product owned by another user",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-						"exec": [
-							"pm.test(\"response is ok\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"response must be valid and have a body\", function () {",
-							"     // assert that the status code is 200",
-							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-							"     // assert that the response has a valid JSON body",
-							"     pm.response.to.be.withBody;",
-							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-							"});",
-							"",
-							"pm.test(\"The returned object should contain the correct product details\", function () {",
-							"    var product_obj = pm.response.json();",
-							"    pm.expect(product_obj.productId.length).to.eql(36);",
-							"    pm.expect(product_obj.brand).to.eql(\"John Lewis\");",
-							"    pm.expect(product_obj.details).to.eql(\"John Lewis & Partners Safari Mobile\");",
-							"    pm.expect(product_obj.productUrl).to.eql(\"https://www.johnlewis.com/john-lewis-partners-safari-mobile/p3439165\");",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
+					"name": "create product as user 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"Add variable for new Product ID\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    productId = jsonData[\"productId\"];",
+									"    pm.environment.set(\"nf_product_id\", productId);",
+									"});",
+									"",
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"A list Id should be returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var productId = jsonData['productId'];",
+									"    pm.expect(productId.length).to.eql(36);",
+									"});",
+									"",
+									"pm.test(\"Response message should be created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['message'];",
+									"    pm.expect(message).to.eql('success');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"brand\": \"Mamas & Papas\",\n    \"details\": \"Hilston Nursing Chair - Silver\",\n    \"url\": \"https://www.mamasandpapas.com/en-gb/hilston-nursing-chair-duck-egg/p/chnsoa100\"\n}"
+						},
+						"url": {
+							"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound",
+							"protocol": "https",
+							"host": [
+								"{{notfound_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"notfound"
+							]
+						},
+						"description": "Create product as user 1"
+					},
+					"response": []
 				},
 				{
-					"listen": "prerequest",
-					"script": {
-						"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
+					"name": "delete product as user 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is 500\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     pm.response.to.be.error;",
+									"     ",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('Product can not be deleted.');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound/{{nf_product_id}}",
+							"protocol": "https",
+							"host": [
+								"{{notfound_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"notfound",
+								"{{nf_product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clean up as user 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response should confirm deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var deletedBool = jsonData['deleted'];",
+									"    pm.expect(deletedBool).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Clear environment variable\", function() {",
+									"    pm.environment.unset(\"nf_product_id\")",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound/{{nf_product_id}}",
+							"protocol": "https",
+							"host": [
+								"{{notfound_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"notfound",
+								"{{nf_product_id}}"
+							]
+						}
+					},
+					"response": []
 				}
 			],
-			"request": {
-				"auth": {
-					"type": "awsv4",
-					"awsv4": [
-						{
-							"key": "secretKey",
-							"value": "{{SecretKey}}",
-							"type": "string"
-						},
-						{
-							"key": "accessKey",
-							"value": "{{AccessKey}}",
-							"type": "string"
-						},
-						{
-							"key": "service",
-							"value": "",
-							"type": "string"
-						},
-						{
-							"key": "region",
-							"value": "eu-west-1",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound/12345678-notf-0010-1234-abcdefghijkl",
-					"protocol": "https",
-					"host": [
-						"{{notfound_url_id}}",
-						"execute-api",
-						"eu-west-1",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"{{env}}",
-						"notfound",
-						"12345678-notf-0010-1234-abcdefghijkl"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "delete",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-						"exec": [
-							"pm.test(\"response is ok\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"response must be valid and have a body\", function () {",
-							"     // assert that the status code is 200",
-							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-							"     // assert that the response has a valid JSON body",
-							"     pm.response.to.be.withBody;",
-							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-							"});",
-							"",
-							"pm.test(\"Response should confirm deleted\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var deletedBool = jsonData['deleted'];",
-							"    pm.expect(deletedBool).to.eql(true);",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "awsv4",
-					"awsv4": [
-						{
-							"key": "secretKey",
-							"value": "{{SecretKey}}",
-							"type": "string"
-						},
-						{
-							"key": "accessKey",
-							"value": "{{AccessKey}}",
-							"type": "string"
-						},
-						{
-							"key": "service",
-							"value": "",
-							"type": "string"
-						},
-						{
-							"key": "region",
-							"value": "eu-west-1",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound/{{product_id}}",
-					"protocol": "https",
-					"host": [
-						"{{notfound_url_id}}",
-						"execute-api",
-						"eu-west-1",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"{{env}}",
-						"notfound",
-						"{{product_id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "delete product that does not exist",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-						"exec": [
-							"pm.test(\"response is 500\", function () {",
-							"    pm.response.to.have.status(500);",
-							"});",
-							"",
-							"pm.test(\"response must be valid and have a body\", function () {",
-							"     pm.response.to.be.error;",
-							"     ",
-							"     // assert that the response has a valid JSON body",
-							"     pm.response.to.be.withBody;",
-							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-							"});",
-							"",
-							"pm.test(\"Response message should exist\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var message = jsonData['error'];",
-							"    pm.expect(message).to.eql('Product can not be deleted.');",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "awsv4",
-					"awsv4": [
-						{
-							"key": "secretKey",
-							"value": "{{SecretKey}}",
-							"type": "string"
-						},
-						{
-							"key": "accessKey",
-							"value": "{{AccessKey}}",
-							"type": "string"
-						},
-						{
-							"key": "service",
-							"value": "",
-							"type": "string"
-						},
-						{
-							"key": "region",
-							"value": "eu-west-1",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound/12345678",
-					"protocol": "https",
-					"host": [
-						"{{notfound_url_id}}",
-						"execute-api",
-						"eu-west-1",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"{{env}}",
-						"notfound",
-						"12345678"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "delete product not created by user",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-						"exec": [
-							"pm.test(\"response is 500\", function () {",
-							"    pm.response.to.have.status(500);",
-							"});",
-							"",
-							"pm.test(\"response must be valid and have a body\", function () {",
-							"     pm.response.to.be.error;",
-							"     ",
-							"     // assert that the response has a valid JSON body",
-							"     pm.response.to.be.withBody;",
-							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-							"});",
-							"",
-							"pm.test(\"Response message should exist\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    var message = jsonData['error'];",
-							"    pm.expect(message).to.eql('Product can not be deleted.');",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "awsv4",
-					"awsv4": [
-						{
-							"key": "secretKey",
-							"value": "{{SecretKey}}",
-							"type": "string"
-						},
-						{
-							"key": "accessKey",
-							"value": "{{AccessKey}}",
-							"type": "string"
-						},
-						{
-							"key": "service",
-							"value": "",
-							"type": "string"
-						},
-						{
-							"key": "region",
-							"value": "eu-west-1",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "https://{{notfound_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/notfound/12345678-notf-0010-1234-abcdefghijkl",
-					"protocol": "https",
-					"host": [
-						"{{notfound_url_id}}",
-						"execute-api",
-						"eu-west-1",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"{{env}}",
-						"notfound",
-						"12345678-notf-0010-1234-abcdefghijkl"
-					]
-				}
-			},
-			"response": []
+			"description": "Test suite that tests that a user cannot delete a product created by another user.",
+			"protocolProfileBehavior": {}
 		}
 	],
 	"protocolProfileBehavior": {}

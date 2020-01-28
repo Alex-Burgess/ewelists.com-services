@@ -1,0 +1,274 @@
+{
+	"info": {
+		"_postman_id": "3675a8b8-6abd-4b28-8168-f47380e66c42",
+		"name": "Contact",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "contact us when authenticated",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"Add variable for new List ID\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    listId = jsonData[\"listId\"];",
+							"    pm.environment.set(\"list_id\", listId);",
+							"});",
+							"",
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"Response message should be created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData['name']).to.eql('Test User1');",
+							"    pm.expect(jsonData['email']).to.eql('test.user1@gmail.com');",
+							"    pm.expect(jsonData['message']).to.eql('A test message');",
+							"    pm.expect(jsonData['id']).to.be.above(100000);",
+							"    pm.expect(jsonData['id']).to.be.below(999999);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Test User1\",\n    \"email\": \"test.user1@gmail.com\",\n    \"message\": \"A test message\"\n}"
+				},
+				"url": {
+					"raw": "https://{{contact_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/contact",
+					"protocol": "https",
+					"host": [
+						"{{contact_url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"contact"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
+			"name": "contact us when not authenticated",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"Add variable for new List ID\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    listId = jsonData[\"listId\"];",
+							"    pm.environment.set(\"list_id\", listId);",
+							"});",
+							"",
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"Response message should be created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData['name']).to.eql('Test User1');",
+							"    pm.expect(jsonData['email']).to.eql('test.user1@gmail.com');",
+							"    pm.expect(jsonData['message']).to.eql('A test message');",
+							"    pm.expect(jsonData['id']).to.be.above(100000);",
+							"    pm.expect(jsonData['id']).to.be.below(999999);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Test User1\",\n    \"email\": \"test.user1@gmail.com\",\n    \"message\": \"A test message\"\n}"
+				},
+				"url": {
+					"raw": "https://{{contact_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/contact",
+					"protocol": "https",
+					"host": [
+						"{{contact_url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"contact"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		},
+		{
+			"name": "Body empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(500);",
+							"});",
+							"",
+							"pm.test(\"response must be valid and have a body\", function () {",
+							"     // assert that the status code is 200",
+							"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+							"     // assert that the response has a valid JSON body",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+							"});",
+							"",
+							"pm.test(\"Response message should exist\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var message = jsonData['error'];",
+							"    pm.expect(message).to.eql('API Event did not contain name in the body.');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "awsv4",
+					"awsv4": [
+						{
+							"key": "secretKey",
+							"value": "{{SecretKey}}",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "{{AccessKey}}",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "eu-west-1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"
+				},
+				"url": {
+					"raw": "https://{{contact_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/contact",
+					"protocol": "https",
+					"host": [
+						"{{contact_url_id}}",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"{{env}}",
+						"contact"
+					]
+				},
+				"description": "Create list"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
