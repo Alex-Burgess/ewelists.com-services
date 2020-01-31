@@ -263,6 +263,7 @@ Resources:
           USERPOOL_ID: !Sub '{{resolve:ssm:/CognitoUserPoolId/${Environment}:1}}'
           POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
           POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
+          TEMPLATE_NAME: !Sub 'Welcome-${Environment}'
 
   ReserveProductFunction:
     Type: AWS::Serverless::Function
@@ -459,6 +460,15 @@ Resources:
                 Resource:
                   - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}"
                   - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}/*"
+        - PolicyName: EmailPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ses:SendTemplatedEmail'
+                Resource:
+                  - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/*"
 
   Api:
     Type: AWS::Serverless::Api

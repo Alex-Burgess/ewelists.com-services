@@ -5,6 +5,7 @@ import logging
 import random
 import string
 from lists import common, common_env_vars
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -15,6 +16,11 @@ if logger.handlers:
 
 client = boto3.client('cognito-idp')
 dynamodb = boto3.client('dynamodb')
+ses = boto3.client('ses', region_name='eu-west-1')
+
+# Email configuration
+CHARSET = "UTF-8"
+SENDER = "Ewelists <contact@ewelists.com>"
 
 
 def handler(event, context):
@@ -23,13 +29,21 @@ def handler(event, context):
     table_name = common_env_vars.get_table_name(os.environ)
     index_name = common_env_vars.get_table_index(os.environ)
     user_pool_id = common_env_vars.get_userpool_id(os.environ)
+    template = get_template_name(os.environ)
     new_user = get_user_from_event(event)
+    trigger = get_trigger_source_event(event)
     exists = get_user_from_userpool(user_pool_id, new_user['email'])
 
     if exists['exists']:
         logger.info("User exists in userpool.")
         link_accounts(user_pool_id, new_user['email'], exists['user_sub'], new_user['type'], new_user['username'])
         raise Exception("Linked new account to existing user account matching on email address.")
+    elif trigger == 'PreSignUp_AdminCreateUser':
+        logger.info("Admin Creating User Account, remember this could be as part of a social signup.")
+        create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])
+
+        # Send welcome email
+        send(new_user['email'], new_user['name'], template)
     else:
         logger.info("User does not have entry in userpool.")
 
@@ -40,9 +54,6 @@ def handler(event, context):
             new_cognito_user = create_new_cognito_user(user_pool_id, new_user['email'], new_user['name'])
             # Link Accounts
             link_accounts(user_pool_id, new_user['email'], new_cognito_user['user_id'], new_user['type'], new_user['username'])
-
-            # Create entry in table
-            create_user_in_lists_db(table_name, new_cognito_user['user_id'], new_user['email'], new_user['name'])
 
             # Get all the pending shared lists
             pending_lists = get_pending_lists(table_name, index_name, new_user['email'])
@@ -66,9 +77,40 @@ def handler(event, context):
             if len(pending_lists) > 0:
                 create_shared_items(table_name, pending_lists, new_user['username'], new_user['name'])
 
+            # Send welcome email
+            send(new_user['email'], new_user['name'], template)
             logger.info("Allowing signup process to complete for user.")
 
     return event
+
+
+def get_template_name(osenv):
+    try:
+        name = osenv['TEMPLATE_NAME']
+        logger.info("TEMPLATE_NAME environment variable value: " + name)
+    except KeyError:
+        raise Exception('TEMPLATE_NAME environment variable not set correctly.')
+
+    return name
+
+
+def send(email, name, template):
+    try:
+        response = ses.send_templated_email(
+            Source=SENDER,
+            Destination={
+                'ToAddresses': [email],
+            },
+            ReplyToAddresses=[SENDER],
+            Template=template,
+            TemplateData='{ \"name\":\"' + name + '\" }'
+        )
+    except ClientError as e:
+        raise Exception("Could not send welcome email: " + e.response['Error']['Message'])
+    else:
+        logger.info("Email sent! Message ID: " + response['MessageId'])
+
+    return True
 
 
 def get_pending_lists(table_name, index_name, email):
@@ -254,6 +296,10 @@ def get_user_from_event(event):
     logger.info("User object being returned: {}.".format(json.dumps(user)))
 
     return user
+
+
+def get_trigger_source_event(event):
+    return event['triggerSource']
 
 
 def get_user_from_userpool(user_pool_id, email):
