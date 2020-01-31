@@ -1,3 +1,4 @@
+import os
 import json
 import boto3
 import logging
@@ -13,24 +14,22 @@ ses = boto3.client('ses', region_name='eu-west-1')
 
 # Email configuration
 CHARSET = "UTF-8"
-# RECEIVER = "Ewelists <contact@ewelists.com>"
 SENDER = "Ewelists <contact@ewelists.com>"
-SUBJECT = "Welcome to Ewelists"
-TEMPLATE_NAME = "Welcome-test"
 
 
 def handler(event, context):
     try:
         name = get_sender_details(event, 'name')
         email = get_sender_details(event, 'email')
-        send(email, name)
+        template = get_template_name(os.environ)
+        send(email, name, template)
     except Exception as e:
         logger.error("Exception: {}".format(e))
 
     return event
 
 
-def send(email, name):
+def send(email, name, template):
     try:
         response = ses.send_templated_email(
             Source=SENDER,
@@ -38,7 +37,7 @@ def send(email, name):
                 'ToAddresses': [email],
             },
             ReplyToAddresses=[SENDER],
-            Template=TEMPLATE_NAME,
+            Template=template,
             TemplateData='{ \"name\":\"' + name + '\" }'
         )
     except ClientError as e:
@@ -58,3 +57,13 @@ def get_sender_details(event, attribute):
         raise Exception("Could not send welcome email. API Event did not contain " + attribute + " in the body.")
 
     return value
+
+
+def get_template_name(osenv):
+    try:
+        name = osenv['TEMPLATE_NAME']
+        logger.info("TEMPLATE_NAME environment variable value: " + name)
+    except KeyError:
+        raise Exception('TEMPLATE_NAME environment variable not set correctly.')
+
+    return name

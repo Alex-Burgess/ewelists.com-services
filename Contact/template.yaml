@@ -62,6 +62,9 @@ Resources:
       Timeout: 3
       Description: Sends welcome email to new contact
       Role: !GetAtt FunctionRole.Arn
+      Environment:
+        Variables:
+          TEMPLATE_NAME: !Sub 'Welcome-${Environment}'
 
   FunctionRole:
     Type: AWS::IAM::Role
