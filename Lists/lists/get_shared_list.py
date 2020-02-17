@@ -19,6 +19,7 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
+    logger.info("event: {}".format(json.dumps(event)))
     response = get_shared_list_main(event)
     return response
 
@@ -26,10 +27,8 @@ def handler(event, context):
 def get_shared_list_main(event):
     try:
         table_name = common_env_vars.get_table_name(os.environ)
-        identity = common_event.get_identity(event, os.environ)
         list_id = common_event.get_list_id(event)
-        response_items = get_list_query(table_name, identity, list_id)
-        common.confirm_list_shared_with_user(identity, list_id, response_items)
+        response_items = get_list_query(table_name, list_id)
 
         list_object = generate_shared_list_object(response_items)
     except Exception as e:
@@ -68,8 +67,8 @@ def generate_shared_list_object(response_items):
     return list
 
 
-def get_list_query(table_name, cognito_user_id, list_id):
-    logger.info("Querying table {} for list ID {} owned by user ID {} .".format(table_name, cognito_user_id, list_id))
+def get_list_query(table_name, list_id):
+    logger.info("Querying table {} for list ID {}.".format(table_name, list_id))
 
     try:
         response = dynamodb.query(
@@ -83,7 +82,6 @@ def get_list_query(table_name, cognito_user_id, list_id):
         raise Exception("Unexpected error when getting list item from table.")
 
     if len(response['Items']) == 0:
-        logger.info("No query results for List ID {} and user: {}.".format(list_id, cognito_user_id))
-        raise Exception("No query results for List ID {} and user: {}.".format(list_id, cognito_user_id))
+        raise Exception("No query results for List ID {}.".format(list_id))
 
     return response['Items']

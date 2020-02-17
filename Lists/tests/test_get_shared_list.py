@@ -16,6 +16,29 @@ logger.addHandler(stream_handler)
 
 
 @pytest.fixture
+def api_gateway_unauthed_event():
+    event = fixtures.api_gateway_base_event()
+    event['resource'] = "/lists/{id}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl",
+    event['httpMethod'] = "GET"
+    event['pathParameters'] = {"id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['body'] = "null"
+    event['requestContext']['identity'] = {
+        "cognitoIdentityPoolId": "null",
+        "accountId": "null",
+        "cognitoIdentityId": "null",
+        "caller": "null",
+        "accessKey": "null",
+        "cognitoAuthenticationType": "null",
+        "cognitoAuthenticationProvider": "null",
+        "userArn": "null",
+        "user": "null"
+    }
+
+    return event
+
+
+@pytest.fixture
 def api_gateway_event():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/{id}"
@@ -68,26 +91,23 @@ def dynamodb_mock():
 
 class TestGetListQuery:
     def test_get_list_query(self, dynamodb_mock):
-        user_id = "12345678-user-0002-1234-abcdefghijkl"
         list_id = "12345678-list-0001-1234-abcdefghijkl"
-        items = get_shared_list.get_list_query('lists-unittest', user_id, list_id)
+        items = get_shared_list.get_list_query('lists-unittest', list_id)
         assert len(items) == 10, "Number of items deleted was not as expected."
 
     def test_get_list_query_no_table_name(self, dynamodb_mock):
-        user_id = "12345678-user-0002-1234-abcdefghijkl"
         list_id = "12345678-list-0001-1234-abcdefghijkl"
 
         with pytest.raises(Exception) as e:
-            get_shared_list.get_list_query('lists-unittes', user_id, list_id)
+            get_shared_list.get_list_query('lists-unittes', list_id)
         assert str(e.value) == "Unexpected error when getting list item from table.", "Exception not as expected."
 
     def test_get_list_query_for_item_that_does_not_exist(self, dynamodb_mock):
-        user_id = "12345678-user-0002-1234-abcdefghijkl"
         list_id = "12345678-list-0009-1234-abcdefghijkl"
 
         with pytest.raises(Exception) as e:
-            get_shared_list.get_list_query('lists-unittest', user_id, list_id)
-        assert str(e.value) == "No query results for List ID 12345678-list-0009-1234-abcdefghijkl and user: 12345678-user-0002-1234-abcdefghijkl.", "Exception not as expected."
+            get_shared_list.get_list_query('lists-unittest', list_id)
+        assert str(e.value) == "No query results for List ID 12345678-list-0009-1234-abcdefghijkl.", "Exception not as expected."
 
 
 class TestGenerateSharedListObject:
@@ -155,14 +175,26 @@ class TestGetSharedListMain:
 
         assert body['error'] == 'Unexpected error when getting list item from table.', "Get list response did not contain the correct error message."
 
-    def test_get_shared_list_when_not_shared_with_requestor(self, monkeypatch, api_gateway_event, dynamodb_mock):
+    def test_get_shared_list_with_authenticated_user(self, monkeypatch, api_gateway_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         api_gateway_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
 
         response = get_shared_list.get_shared_list_main(api_gateway_event)
         body = json.loads(response['body'])
 
-        assert body['error'] == "List ID 12345678-list-0001-1234-abcdefghijkl did not have a shared item with user 12345678-user-0003-1234-abcdefghijkl.", "Get list response did not contain the correct error message."
+        assert body['list']['listId'] == "12345678-list-0001-1234-abcdefghijkl", "Get list response did not contain a listId."
+        assert len(body['products']) == 3, "Get list response did not contain correct number of products."
+        assert len(body['reserved']) == 2, "Number of products reserved was not 2."
+
+    def test_get_shared_list_with_unauthenticated_user(self, monkeypatch, api_gateway_unauthed_event, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+
+        response = get_shared_list.get_shared_list_main(api_gateway_unauthed_event)
+        body = json.loads(response['body'])
+
+        assert body['list']['listId'] == "12345678-list-0001-1234-abcdefghijkl", "Get list response did not contain a listId."
+        assert len(body['products']) == 3, "Get list response did not contain correct number of products."
+        assert len(body['reserved']) == 2, "Number of products reserved was not 2."
 
 
 def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
