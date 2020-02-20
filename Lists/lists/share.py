@@ -40,7 +40,7 @@ def share_main(event):
         email = common_event.get_user(event)
         email = common.parse_email(email)
         list = common_table_ops.get_list(table_name, identity, list_id)
-        list_owner_name = common_table_ops.get_users_name(table_name, identity)
+        list_owner_name = common_table_ops.get_users_details(table_name, identity)['name']
         common.confirm_owner(identity, list_id, [list])
 
         user = get_user_if_exists(table_name, index_name, email)

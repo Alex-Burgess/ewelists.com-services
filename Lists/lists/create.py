@@ -28,7 +28,7 @@ def create_main(event):
     try:
         table_name = common_env_vars.get_table_name(os.environ)
         identity = common_event.get_identity(event, os.environ)
-        users_name = common_table_ops.get_users_name(table_name, identity)
+        users_name = common_table_ops.get_users_details(table_name, identity)['name']
         listId = generate_list_id()
         attributes = get_attribute_details(event)
         message = put_item_in_table(table_name, identity, listId, attributes, users_name)

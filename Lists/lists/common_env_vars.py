@@ -72,3 +72,13 @@ def get_url(osenv):
         url = 'https://test.ewelists.com'
 
     return url
+
+
+def get_template_name(osenv):
+    try:
+        name = osenv['TEMPLATE_NAME']
+        logger.info("TEMPLATE_NAME environment variable value: " + name)
+    except KeyError:
+        raise Exception('TEMPLATE_NAME environment variable not set correctly.')
+
+    return name

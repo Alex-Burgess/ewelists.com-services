@@ -1,11 +1,18 @@
 # A collection of methods that are common across all modules.
 import logging
+import boto3
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 if logger.handlers:
     handler = logger.handlers[0]
     handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
+
+
+# Email configuration
+ses = boto3.client('ses', region_name='eu-west-1')
+SENDER = "Ewelists <contact@ewelists.com>"
 
 
 def parse_email(email):
@@ -69,3 +76,22 @@ def create_response(code, body):
                     'Access-Control-Allow-Origin': '*'
                 }}
     return response
+
+
+def send_email(email, name, template):
+    try:
+        response = ses.send_templated_email(
+            Source=SENDER,
+            Destination={
+                'ToAddresses': [email],
+            },
+            ReplyToAddresses=[SENDER],
+            Template=template,
+            TemplateData='{ \"name\":\"' + name + '\" }'
+        )
+    except ClientError as e:
+        raise Exception("Could not send welcome email: " + e.response['Error']['Message'])
+    else:
+        logger.info("Email sent! Message ID: " + response['MessageId'])
+
+    return True

@@ -27,7 +27,7 @@ def get_identity(event, osenv):
         logger.info('Request was from postman, using API test identity.')
         identity = common_env_vars.get_postman_identity(osenv, 1)
     elif pattern2.match(userArn):
-        logger.info('Request was from postman, using API test identity.')
+        logger.info('Request was from postman, using API test identity 2.')
         identity = common_env_vars.get_postman_identity(osenv, 2)
     else:
         if user_id is None:
@@ -145,3 +145,30 @@ def get_message(event):
         message = None
 
     return message
+
+
+def get_path_parameter(event, type):
+    try:
+        value = event['pathParameters'][type]
+    except Exception:
+        raise Exception('API Event did not contain a ' + type + ' path parameter.')
+
+    if len(value) == 0:
+        raise Exception('API Event did not contain a ' + type + ' path parameter.')
+
+    value = unquote(value)
+    logger.info(type + " path parameter: " + value)
+
+    return value
+
+
+def get_body_attribute(event, type):
+    body_object = json.loads(event['body'])
+
+    if type in body_object:
+        value = body_object[type]
+    else:
+        raise Exception('API Event did not contain a ' + type + ' body attribute.')
+
+    logger.info(type + ": " + str(value))
+    return value

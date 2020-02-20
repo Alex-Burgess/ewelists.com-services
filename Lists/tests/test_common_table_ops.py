@@ -21,8 +21,15 @@ def dynamodb_mock():
     table = dynamodb.create_table(
         TableName='lists-unittest',
         KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}, {'AttributeName': 'email', 'AttributeType': 'S'}],
+        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
+        GlobalSecondaryIndexes=[{
+            'IndexName': 'email-index',
+            'KeySchema': [{'AttributeName': 'email', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
+            'Projection': {
+                'ProjectionType': 'ALL'
+            }
+        }]
     )
 
     items = fixtures.load_test_data()
@@ -49,17 +56,28 @@ class TestGetList:
         assert str(e.value) == "No list exists with this ID.", "Exception not as expected."
 
 
-class TestGetUsersName:
-    def test_get_users_name(self, dynamodb_mock):
+class TestGetUsersDetails:
+    def test_get_users_details(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
-        name = common_table_ops.get_users_name('lists-unittest', user_id)
-        assert name == "Test User1", "User's name was not as expected."
+        user = common_table_ops.get_users_details('lists-unittest', user_id)
+        assert user['name'] == "Test User1", "User's name was not as expected."
+        assert user['email'] == "test.user1@gmail.com", "User's email was not as expected."
 
     def test_with_invalid_userid(self, dynamodb_mock):
         user_id = '12345678-user-0010-1234-abcdefghijkl'
         with pytest.raises(Exception) as e:
-            common_table_ops.get_users_name('lists-unittest', user_id)
+            common_table_ops.get_users_details('lists-unittest', user_id)
         assert str(e.value) == "No user exists with this ID.", "Exception not as expected."
+
+
+class TestDoesUserHaveAccount:
+    def test_user_does_not_have_account(self, dynamodb_mock):
+        email = 'test.user99@gmail.com'
+        assert not common_table_ops.does_user_have_account('lists-unittest', 'email-index', email)
+
+    def test_user_does_have_account(self, dynamodb_mock):
+        email = 'test.user1@gmail.com'
+        assert common_table_ops.does_user_have_account('lists-unittest', 'email-index', email)
 
 
 class TestGetReservedDetailsItem:
@@ -100,3 +118,45 @@ class TestGetProductItem:
         with pytest.raises(Exception) as e:
             common_table_ops.get_product_item('lists-unittest', list_id, product_id)
         assert str(e.value) == "No product item exists with this ID.", "Exception not as expected."
+
+
+class TestCheckProductNotReservedByUser:
+    def test_check_product_not_reserved_by_user(self, dynamodb_mock):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+        result = common_table_ops.check_product_not_reserved_by_user('lists-unittest', list_id, product_id, user_id)
+
+        assert result, "Product not reserved by user."
+
+    def test_product_already_reserved_by_user(self, dynamodb_mock):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        user_id = '12345678-user-0002-1234-abcdefghijkl'
+
+        with pytest.raises(Exception) as e:
+            common_table_ops.check_product_not_reserved_by_user('lists-unittest', list_id, product_id, user_id)
+        assert str(e.value) == "Product already reserved by user.", "Exception not as expected."
+
+
+@pytest.mark.skip(reason="transact_write_items is not implemented for moto")
+class TestCreateReservation:
+    def test_create_reservation(self, dynamodb_mock):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0002-1234-abcdefghijkl'
+        user_id = '12345678-user-0002-1234-abcdefghijkl'
+        users_name = 'Test User2'
+        new_product_reserved_quantity = 1
+        request_reserve_quantity = 1
+
+        assert common_table_ops.create_reservation('lists-unittest', list_id, product_id, new_product_reserved_quantity, request_reserve_quantity, user_id, users_name)
+
+    def test_create_reservation_with_email(self, dynamodb_mock):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0002-1234-abcdefghijkl'
+        user_id = 'test.user10@gmail.com'
+        users_name = 'Test User10'
+        new_product_reserved_quantity = 1
+        request_reserve_quantity = 1
+
+        assert common_table_ops.create_reservation('lists-unittest', list_id, product_id, new_product_reserved_quantity, request_reserve_quantity, user_id, users_name)

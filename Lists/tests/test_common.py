@@ -113,3 +113,12 @@ class TestCalculateNewReservedQuantity:
         with pytest.raises(Exception) as e:
             common.calculate_new_reserved_quantity(product_item, 3)
         assert str(e.value) == "Reserved quantity for product (1) could not be updated by 3 as exceeds required quantity (3).", "Exception message not correct."
+
+
+@pytest.mark.skip(reason="Not sure how to mock ses.")
+class TestSendEmail:
+    def test_send_email(self):
+        email = 'eweuser8@gmail.com'
+        name = 'Ewe User8'
+        template = 'reserve-template'
+        assert common.send_email(email, name, template)

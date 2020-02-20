@@ -96,6 +96,18 @@ def api_gateway_reserve_event():
 
 
 @pytest.fixture
+def api_gateway_reserve_with_email_event():
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user99%40gmail.com"
+    event['httpMethod'] = "POST"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99%40gmail.com"}
+    event['body'] = "{\n    \"quantity\": 2,\n    \"name\": \"Test User99\"\n}"
+
+    return event
+
+
+@pytest.fixture
 def api_gateway_share_event():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/{id}/share/{user}"
@@ -274,3 +286,33 @@ class TestGetIdentity:
         with pytest.raises(Exception) as e:
             common_event.get_identity(api_gateway_postman_event, os.environ)
         assert str(e.value) == "POSTMAN_USERPOOL_SUB environment variables not set correctly.", "Exception not as expected."
+
+
+class TestGetPathParameter:
+    def test_get_email(self, api_gateway_reserve_with_email_event):
+        email = common_event.get_path_parameter(api_gateway_reserve_with_email_event, 'email')
+        assert email == 'test.user99@gmail.com', "Path parameter returned from API event was not as expected."
+
+    def test_get_product_id(self, api_gateway_reserve_with_email_event):
+        id = common_event.get_path_parameter(api_gateway_reserve_with_email_event, 'productid')
+        assert id == '12345678-prod-0001-1234-abcdefghijkl', "Path parameter returned from API event was not as expected."
+
+    def test_get_parameter_not_present(self, api_gateway_reserve_with_email_event):
+        with pytest.raises(Exception) as e:
+            common_event.get_path_parameter(api_gateway_reserve_with_email_event, 'helloworld')
+        assert str(e.value) == "API Event did not contain a helloworld path parameter.", "Exception not as expected."
+
+
+class TestGetBodyAttribute:
+    def test_get_quantity(self, api_gateway_reserve_with_email_event):
+        quantity = common_event.get_body_attribute(api_gateway_reserve_with_email_event, 'quantity')
+        assert quantity == 2, "Body attribute returned from API event was not as expected."
+
+    def test_get_name(self, api_gateway_reserve_with_email_event):
+        name = common_event.get_body_attribute(api_gateway_reserve_with_email_event, 'name')
+        assert name == 'Test User99', "Body attribute returned from API event was not as expected."
+
+    def test_get_body_attribute_not_present(self, api_gateway_reserve_with_email_event):
+        with pytest.raises(Exception) as e:
+            common_event.get_body_attribute(api_gateway_reserve_with_email_event, 'helloworld')
+        assert str(e.value) == "API Event did not contain a helloworld body attribute.", "Exception not as expected."

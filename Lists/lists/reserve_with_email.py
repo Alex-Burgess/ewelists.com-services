@@ -1,6 +1,5 @@
 import json
 import os
-import boto3
 import logging
 from lists import common
 from lists import common_env_vars
@@ -14,9 +13,6 @@ if logger.handlers:
     handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
 
 
-dynamodb = boto3.client('dynamodb')
-
-
 def handler(event, context):
     response = reserve_main(event)
     return response
@@ -25,15 +21,20 @@ def handler(event, context):
 def reserve_main(event):
     try:
         table_name = common_env_vars.get_table_name(os.environ)
+        index_name = common_env_vars.get_table_index(os.environ)
         template = common_env_vars.get_template_name(os.environ)
         list_id = common_event.get_list_id(event)
         product_id = common_event.get_product_id(event)
-        request_reserve_quantity = common_event.get_quantity(event)
+        request_reserve_quantity = common_event.get_body_attribute(event, 'quantity')
 
         # Step 1 - check if reserved item exists
-        identity = common_event.get_identity(event, os.environ)
-        common_table_ops.check_product_not_reserved_by_user(table_name, list_id, product_id, identity)
-        user = common_table_ops.get_users_details(table_name, identity)
+        email = common_event.get_path_parameter(event, 'email')
+        name = common_event.get_body_attribute(event, 'name')
+
+        common_table_ops.check_product_not_reserved_by_user(table_name, list_id, product_id, email)
+
+        if common_table_ops.does_user_have_account(table_name, index_name, email):
+            raise Exception("User has an account, login required before product can be reserved.")
 
         # Step 2 - get product item.
         product_item = common_table_ops.get_product_item(table_name, list_id, product_id)
@@ -42,10 +43,10 @@ def reserve_main(event):
         new_product_reserved_quantity = common.calculate_new_reserved_quantity(product_item, request_reserve_quantity)
 
         # Step 4 - Update, in one transaction, the product reserved quantity and create reserved item.
-        common_table_ops.create_reservation(table_name, list_id, product_id, new_product_reserved_quantity, request_reserve_quantity, identity, user['name'])
+        common_table_ops.create_reservation(table_name, list_id, product_id, new_product_reserved_quantity, request_reserve_quantity, email, name)
 
         # Step 5 - Send reserve confirmation email
-        common.send_email(user['email'], user['name'], template)
+        common.send_email(email, name, template)
 
     except Exception as e:
         logger.error("Exception: {}".format(e))

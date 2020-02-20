@@ -73,3 +73,15 @@ class TestGetUrl:
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-prod')
         url = common_env_vars.get_url(os.environ)
         assert url == "https://ewelists.com", "Url was not correct."
+
+
+class TestGetTemplateName:
+    def test_get_template_name(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'reserve-template')
+        template_name = common_env_vars.get_template_name(os.environ)
+        assert template_name == "reserve-template", "TEMPLATE_NAME from os environment variables was not as expected."
+
+    def test_get_table_name_os_var_not_set(self):
+        with pytest.raises(Exception) as e:
+            common_env_vars.get_template_name(os.environ)
+        assert str(e.value) == "TEMPLATE_NAME environment variable not set correctly.", "Exception not as expected."

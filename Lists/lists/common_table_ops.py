@@ -1,5 +1,7 @@
 import boto3
 import logging
+import time
+import json
 from lists.common_entities import Product, Reserved
 from botocore.exceptions import ClientError
 
@@ -35,7 +37,7 @@ def get_list(table_name, cognito_user_id, list_id):
     return response['Item']
 
 
-def get_users_name(table_name, user_id):
+def get_users_details(table_name, user_id):
     key = {
         'PK': {'S': "USER#" + user_id},
         'SK': {'S': "USER#" + user_id}
@@ -54,10 +56,32 @@ def get_users_name(table_name, user_id):
         logger.info("No user id {} was found.".format(user_id))
         raise Exception("No user exists with this ID.")
 
-    if 'name' not in response['Item']:
-        return response['Item']['email']['S']
+    user = {
+        'email': response['Item']['email']['S'],
+        'name': response['Item']['name']['S']
+    }
 
-    return response['Item']['name']['S']
+    return user
+
+
+def does_user_have_account(table_name, index_name, email):
+    try:
+        response = dynamodb.query(
+            TableName=table_name,
+            IndexName=index_name,
+            KeyConditionExpression="email = :email",
+            ExpressionAttributeValues={":email":  {'S': email}}
+        )
+    except Exception as e:
+        logger.info("Exception: " + str(e))
+        raise Exception("Unexpected error when getting user from table.")
+
+    for item in response['Items']:
+        if item['PK']['S'].startswith("USER"):
+            logger.info("User with email {} was found.".format(email))
+            return True
+
+    return False
 
 
 def get_product_item(table_name, list_id, product_id):
@@ -109,3 +133,71 @@ def get_reserved_details_item(table_name, list_id, product_id, user_id):
     logger.info("Reserved Item: {}".format(item))
 
     return Reserved(item).get_details()
+
+
+def check_product_not_reserved_by_user(table_name, list_id, product_id, user_id):
+    key = {
+        'PK': {'S': "LIST#" + list_id},
+        'SK': {'S': "RESERVED#" + product_id + "#" + user_id}
+    }
+
+    try:
+        response = dynamodb.get_item(
+            TableName=table_name,
+            Key=key
+        )
+        logger.info("Get reserved item response: {}".format(response))
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+
+    if 'Item' in response:
+        logger.info("Reserved product was found for list {}, product id {} and user {}.".format(list_id, product_id, user_id))
+        raise Exception("Product already reserved by user.")
+
+    return True
+
+
+def create_reservation(table_name, list_id, product_id, new_product_reserved_quantity, request_reserve_quantity, user_id, users_name):
+    product_key = {
+        'PK': {'S': "LIST#{}".format(list_id)},
+        'SK': {'S': "PRODUCT#{}".format(product_id)}
+    }
+
+    reserved_item = {
+        'PK': {'S': "LIST#{}".format(list_id)},
+        'SK': {'S': "RESERVED#{}#{}".format(product_id, user_id)},
+        'name': {'S': users_name},
+        'productId': {'S': product_id},
+        'userId': {'S': user_id},
+        'quantity': {'N': str(request_reserve_quantity)},
+        'reservedAt': {'N': str(int(time.time()))}
+    }
+
+    try:
+        response = dynamodb.transact_write_items(
+            TransactItems=[
+                {
+                    'Update': {
+                        'TableName': table_name,
+                        'Key': product_key,
+                        'UpdateExpression': "set reserved = :r",
+                        'ExpressionAttributeValues': {
+                            ':r': {'N': str(new_product_reserved_quantity)},
+                        }
+                    }
+                },
+                {
+                    'Put': {
+                        'TableName': table_name,
+                        'Item': reserved_item
+                    }
+                }
+            ]
+        )
+
+        logger.info("Attributes updated: " + json.dumps(response))
+    except Exception as e:
+        logger.info("Transaction write exception: " + str(e))
+        raise Exception("Unexpected error when unreserving product.")
+
+    return True

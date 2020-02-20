@@ -3,7 +3,7 @@ import os
 import json
 import boto3
 from moto import mock_dynamodb2
-from lists import reserve
+from lists import reserve_with_email
 from tests import fixtures
 
 import sys
@@ -16,24 +16,48 @@ logger.addHandler(stream_handler)
 
 @pytest.fixture
 def api_gateway_event_prod1():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/reserve/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user99@gmail.com"
     event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 2\n}"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+    event['body'] = "{\n    \"quantity\": 2,\n    \"name\": \"Test User99\"\n}"
 
     return event
 
 
 @pytest.fixture
 def api_gateway_event_prod2():
-    event = fixtures.api_gateway_base_event()
+    event = fixtures.api_gateway_no_auth_base_event()
     event['resource'] = "/lists/{id}/reserve/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0002-1234-abcdefghijkl"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0002-1234-abcdefghijkl/email/test.user99@gmail.com"
     event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 1\n}"
+    event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+    event['body'] = "{\n    \"quantity\": 1,\n    \"name\": \"Test User99\"\n}"
+
+    return event
+
+
+@pytest.fixture
+def api_gateway_event_prod3():
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0003-1234-abcdefghijkl/email/test.user99@gmail.com"
+    event['httpMethod'] = "POST"
+    event['pathParameters'] = {"productid": "12345678-prod-0003-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+    event['body'] = "{\n    \"quantity\": 1,\n    \"name\": \"Test User99\"\n}"
+
+    return event
+
+
+@pytest.fixture
+def api_gateway_event_existing_user():
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user1@gmail.com"
+    event['httpMethod'] = "POST"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
+    event['body'] = "{\n    \"quantity\": 1,\n    \"name\": \"Test User1\"\n}"
 
     return event
 
@@ -47,8 +71,15 @@ def dynamodb_mock():
     table = dynamodb.create_table(
         TableName='lists-unittest',
         KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}, {'AttributeName': 'email', 'AttributeType': 'S'}],
+        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
+        GlobalSecondaryIndexes=[{
+            'IndexName': 'email-index',
+            'KeySchema': [{'AttributeName': 'email', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
+            'Projection': {
+                'ProjectionType': 'ALL'
+            }
+        }]
     )
 
     items = fixtures.load_test_data()
@@ -64,7 +95,7 @@ class TestReserveMain:
     @pytest.mark.skip(reason="transact_write_items is not implemented for moto. https://github.com/spulec/moto/issues/2424")
     def test_reserve_product_not_yet_reserved(self, monkeypatch, api_gateway_event_prod2, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        response = reserve.reserve_main(api_gateway_event_prod2)
+        response = reserve_with_email.reserve_main(api_gateway_event_prod2)
         body = json.loads(response['body'])
         assert body['reserved'], "Reserve response was not true."
 
@@ -94,7 +125,7 @@ class TestReserveMain:
     def test_reserve_product_with_one_reserved(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
-        response = reserve.reserve_main(api_gateway_event_prod1)
+        response = reserve_with_email.reserve_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
         assert body['reserved'], "Reserve response was not true."
 
@@ -124,9 +155,9 @@ class TestReserveMain:
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
 
-        api_gateway_event_prod1['body'] = "{\n    \"quantity\": 4,\n    \"message\": \"Happy birthday to you!\"\n}"
+        api_gateway_event_prod1['body'] = "{\n    \"quantity\": 4,\n    \"name\": \"Test User99\"\n}"
 
-        response = reserve.reserve_main(api_gateway_event_prod1)
+        response = reserve_with_email.reserve_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
         assert body['error'] == 'Reserved quantity for product (2) could not be updated by 4 as exceeds required quantity (3).', "Reserve error was not as expected."
 
@@ -134,27 +165,34 @@ class TestReserveMain:
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
 
-        api_gateway_event_prod1['pathParameters'] = {"productid": "12345678-prod-0100-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+        api_gateway_event_prod1['pathParameters'] = {"productid": "12345678-prod-0100-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
 
-        response = reserve.reserve_main(api_gateway_event_prod1)
+        response = reserve_with_email.reserve_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
         assert body['error'] == 'No product item exists with this ID.', "Reserve error was not as expected."
 
-    def test_reserve_product_already_reserved_by_user(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
+    def test_reserve_product_already_reserved_by_user(self, monkeypatch, api_gateway_event_prod3, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
 
-        api_gateway_event_prod1['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0002-1234-abcdefghijkl"
-
-        response = reserve.reserve_main(api_gateway_event_prod1)
+        response = reserve_with_email.reserve_main(api_gateway_event_prod3)
         body = json.loads(response['body'])
         assert body['error'] == 'Product already reserved by user.', "Reserve error was not as expected."
+
+    def test_reserve_with_user_that_has_account(self, monkeypatch, api_gateway_event_existing_user, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+        monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
+
+        response = reserve_with_email.reserve_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'User has an account, login required before product can be reserved.', "Reserve error was not as expected."
 
 
 @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
 def test_handler(api_gateway_event_prod1, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    response = reserve.handler(api_gateway_event_prod1, None)
+    response = reserve_with_email.handler(api_gateway_event_prod1, None)
     body = json.loads(response['body'])
 
     assert response['statusCode'] == 200
