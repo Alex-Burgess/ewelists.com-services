@@ -14,6 +14,9 @@ if logger.handlers:
 
 
 def handler(event, context):
+    logger.info("Event: {}".format(json.dumps(event)))
+    logger.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
+    logger.info("Body attributes: {}".format(json.dumps(event['body'])))
     response = unreserve_main(event)
     return response
 

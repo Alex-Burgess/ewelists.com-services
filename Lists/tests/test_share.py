@@ -347,12 +347,12 @@ class TestShareMain:
     def test_empty_user_in_event(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
-        api_gateway_share_event['pathParameters']['user'] = ''
+        api_gateway_share_event['pathParameters']['user'] = 'null'
 
         response = share.share_main(api_gateway_share_event)
         body = json.loads(response['body'])
 
-        assert body['error'] == 'API Event did not contain a user path parameter.', "Error was not as expected."
+        assert body['error'] == 'Path contained a null user parameter.', "Error was not as expected."
 
 
 def test_handler(api_gateway_share_event, monkeypatch, ses_mock, dynamodb_mock):

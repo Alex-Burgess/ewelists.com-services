@@ -60,6 +60,18 @@ def api_gateway_event_with_email():
 
 
 @pytest.fixture
+def api_gateway_event_with_null_email():
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/null"
+    event['httpMethod'] = "DELETE"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "null"}
+    event['body'] = "{\n    \"name\": \"Test User99\"\n}"
+
+    return event
+
+
+@pytest.fixture
 def dynamodb_mock():
     mock = mock_dynamodb2()
     mock.start()
@@ -188,3 +200,20 @@ class TestGetUser:
         assert user['email'] == 'test.user99@gmail.com'
         assert user['name'] == 'Test User99'
         assert not user['exists']
+
+    def test_get_user_when_email_null(self, api_gateway_event_with_null_email):
+        with pytest.raises(Exception) as e:
+            common.get_user(api_gateway_event_with_null_email, os.environ, 'lists-unittest')
+        assert str(e.value) == "Path contained a null email parameter.", "Exception message not correct."
+
+    def test_get_user_when_body_empty(self, api_gateway_event_with_email):
+        api_gateway_event_with_email['body'] = None
+        with pytest.raises(Exception) as e:
+            common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest')
+        assert str(e.value) == "Body was missing required attributes.", "Exception message not correct."
+
+    def test_get_user_when_name_not_in_body(self, api_gateway_event_with_email):
+        api_gateway_event_with_email['body'] = "{\n    \"wrongname\": \"Test User99\"\n}"
+        with pytest.raises(Exception) as e:
+            common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest')
+        assert str(e.value) == "API Event did not contain a name body attribute.", "Exception message not correct."

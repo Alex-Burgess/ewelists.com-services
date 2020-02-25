@@ -130,13 +130,13 @@ def get_message(event):
 
 
 def get_path_parameter(event, type):
-    try:
-        value = event['pathParameters'][type]
-    except Exception:
-        raise Exception('API Event did not contain a ' + type + ' path parameter.')
+    if type not in event['pathParameters']:
+        raise Exception("Path did not contain a " + type + " parameter.")
 
-    if len(value) == 0:
-        raise Exception('API Event did not contain a ' + type + ' path parameter.')
+    value = event['pathParameters'][type]
+
+    if value == "null":
+        raise Exception("Path contained a null " + type + " parameter.")
 
     value = unquote(value)
     logger.info(type + " path parameter: " + value)
@@ -145,6 +145,9 @@ def get_path_parameter(event, type):
 
 
 def get_body_attribute(event, type):
+    if not event['body']:
+        raise Exception("Body was missing required attributes.")
+
     body_object = json.loads(event['body'])
 
     if type in body_object:

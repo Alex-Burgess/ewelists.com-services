@@ -106,6 +106,7 @@ def get_user(event, osenv, table_name):
         user['id'] = common_event.get_path_parameter(event, 'email')
         user['email'] = common_event.get_path_parameter(event, 'email')
         user['name'] = common_event.get_body_attribute(event, 'name')
+
         user['exists'] = False
     else:
         user['id'] = common_event.get_identity(event, osenv)

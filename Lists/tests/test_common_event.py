@@ -284,7 +284,14 @@ class TestGetPathParameter:
     def test_get_parameter_not_present(self, api_gateway_reserve_with_email_event):
         with pytest.raises(Exception) as e:
             common_event.get_path_parameter(api_gateway_reserve_with_email_event, 'helloworld')
-        assert str(e.value) == "API Event did not contain a helloworld path parameter.", "Exception not as expected."
+        assert str(e.value) == "Path did not contain a helloworld parameter.", "Exception not as expected."
+
+    def test_get_parameter_when_null(self, api_gateway_reserve_with_email_event):
+        api_gateway_reserve_with_email_event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/null"
+        api_gateway_reserve_with_email_event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "null"}
+        with pytest.raises(Exception) as e:
+            common_event.get_path_parameter(api_gateway_reserve_with_email_event, 'email')
+        assert str(e.value) == "Path contained a null email parameter.", "Exception not as expected."
 
 
 class TestGetBodyAttribute:
@@ -300,3 +307,9 @@ class TestGetBodyAttribute:
         with pytest.raises(Exception) as e:
             common_event.get_body_attribute(api_gateway_reserve_with_email_event, 'helloworld')
         assert str(e.value) == "API Event did not contain a helloworld body attribute.", "Exception not as expected."
+
+    def test_get_user_when_body_empty(self, api_gateway_reserve_with_email_event):
+        api_gateway_reserve_with_email_event['body'] = None
+        with pytest.raises(Exception) as e:
+            common_event.get_body_attribute(api_gateway_reserve_with_email_event, 'name')
+        assert str(e.value) == "Body was missing required attributes.", "Exception message not correct."
