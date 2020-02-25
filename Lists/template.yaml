@@ -278,15 +278,22 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          INDEX_NAME: "email-index"
           POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
           POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
           TEMPLATE_NAME: !Sub 'Reserve-Confirmation-${Environment}'
       Events:
-        CreateList:
+        Reserve:
           Type: Api
           Properties:
             RestApiId: !Ref Api
             Path: /lists/{id}/reserve/{productId}
+            Method: POST
+        ReserveWithEmail:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /lists/{id}/reserve/{productId}/email/{email}
             Method: POST
 
   UnreserveProductFunction:
@@ -305,11 +312,17 @@ Resources:
           POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
           POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
       Events:
-        CreateList:
+        Unreserve:
           Type: Api
           Properties:
             RestApiId: !Ref Api
             Path: /lists/{id}/reserve/{productId}
+            Method: DELETE
+        UnreserveWithEmail:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /lists/{id}/reserve/{productId}/email/{email}
             Method: DELETE
 
   UpdateProductReservationFunction:
@@ -334,29 +347,6 @@ Resources:
             RestApiId: !Ref Api
             Path: /lists/{id}/reserve/{productId}
             Method: PUT
-
-  ReserveProductWithEmailFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub '${ServiceName}-reserveproductwithemail-${Environment}'
-      Handler: lists/reserve_with_email.handler
-      Runtime: python3.6
-      MemorySize: 512
-      Timeout: 3
-      Description: Reserves a product that is added to a list, from a user that supplied their email and name.
-      Role: !GetAtt FunctionRole.Arn
-      Environment:
-        Variables:
-          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
-          INDEX_NAME: "email-index"
-          TEMPLATE_NAME: !Sub 'Reserve-Confirmation-${Environment}'
-      Events:
-        CreateList:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /lists/{id}/reserve/{productId}/email/{email}
-            Method: POST
 
   ShareListFunction:
     Type: AWS::Serverless::Function
@@ -849,7 +839,7 @@ Resources:
                     Access-Control-Allow-Origin:
                       type: "string"
               x-amazon-apigateway-integration:
-                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ReserveProductWithEmailFunction.Arn}/invocations'
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ReserveProductFunction.Arn}/invocations'
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 type: "aws_proxy"

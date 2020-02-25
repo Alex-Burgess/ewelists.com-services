@@ -180,9 +180,11 @@ class TestGetUser:
         assert user['id'] == '12345678-user-0003-1234-abcdefghijkl'
         assert user['email'] == 'test.user3@gmail.com'
         assert user['name'] == 'Test User3'
+        assert user['exists']
 
     def test_get_user_with_email(self, api_gateway_event_with_email):
         user = common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest')
         assert user['id'] == 'test.user99@gmail.com'
         assert user['email'] == 'test.user99@gmail.com'
         assert user['name'] == 'Test User99'
+        assert not user['exists']

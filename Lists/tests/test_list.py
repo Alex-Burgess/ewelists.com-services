@@ -75,12 +75,6 @@ class TestGetLists:
         assert lists_response['shared'][0] == shared_list1, "Details of the list shared with user was not as expected."
         assert lists_response['shared'][1] == shared_list2, "Details of the list shared with user was not as expected."
 
-    def test_get_lists_for_requestor_with_no_name(self, dynamodb_mock):
-        user_id = '12345678-user-0002-1234-abcdefghijkl'
-        lists_response = list.get_lists('lists-unittest', 'userId-index', user_id)
-
-        assert lists_response['user'] == {"name": "test.user2@gmail.com", "email": "test.user2@gmail.com", "userId": "12345678-user-0002-1234-abcdefghijkl"}, "Test user was not as expected."
-
     def test_get_lists_bad_table_name(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
 
