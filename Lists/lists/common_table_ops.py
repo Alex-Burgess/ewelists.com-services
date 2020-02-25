@@ -201,3 +201,51 @@ def create_reservation(table_name, list_id, product_id, new_product_reserved_qua
         raise Exception("Unexpected error when unreserving product.")
 
     return True
+
+
+def unreserve_product(table_name, list_id, product_id, user_id, new_product_reserved_quantity):
+    product_key = {
+        'PK': {'S': "LIST#{}".format(list_id)},
+        'SK': {'S': "PRODUCT#{}".format(product_id)}
+    }
+
+    reserved_key = {
+        'PK': {'S': "LIST#{}".format(list_id)},
+        'SK': {'S': "RESERVED#{}#{}".format(product_id, user_id)}
+    }
+
+    condition = {
+        ':PK': {'S': "LIST#{}".format(list_id)},
+        ':SK': {'S': "RESERVED#{}#{}".format(product_id, user_id)}
+    }
+
+    try:
+        response = dynamodb.transact_write_items(
+            TransactItems=[
+                {
+                    'Update': {
+                        'TableName': table_name,
+                        'Key': product_key,
+                        'UpdateExpression': "set reserved = :r",
+                        'ExpressionAttributeValues': {
+                            ':r': {'N': str(new_product_reserved_quantity)},
+                        }
+                    }
+                },
+                {
+                    'Delete': {
+                        'TableName': table_name,
+                        'Key': reserved_key,
+                        'ConditionExpression': "PK = :PK AND SK = :SK",
+                        'ExpressionAttributeValues': condition
+                    }
+                }
+            ]
+        )
+
+        logger.info("Attributes updated: " + json.dumps(response))
+    except Exception as e:
+        logger.info("Transaction write exception: " + str(e))
+        raise Exception("Unexpected error when unreserving product.")
+
+    return True
