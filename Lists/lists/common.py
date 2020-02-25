@@ -1,6 +1,8 @@
 # A collection of methods that are common across all modules.
 import logging
 import boto3
+from lists import common_event
+from lists import common_table_ops
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
@@ -95,3 +97,19 @@ def send_email(email, name, template):
         logger.info("Email sent! Message ID: " + response['MessageId'])
 
     return True
+
+
+def get_user(event, osenv, table_name):
+    user = {}
+
+    if 'email' in event['pathParameters']:
+        user['id'] = common_event.get_path_parameter(event, 'email')
+        user['email'] = common_event.get_path_parameter(event, 'email')
+        user['name'] = common_event.get_body_attribute(event, 'name')
+    else:
+        user['id'] = common_event.get_identity(event, osenv)
+        attributes = common_table_ops.get_users_details(table_name, user['id'])
+        user['email'] = attributes['email']
+        user['name'] = attributes['name']
+
+    return user

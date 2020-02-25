@@ -69,24 +69,6 @@ def get_product_id(event):
     return product_id
 
 
-def get_user(event):
-    try:
-        user = event['pathParameters']['user']
-        logger.info("User parameter: " + user)
-    except Exception:
-        logger.error("API Event did not contain an user in the path parameters.")
-        raise Exception('API Event did not contain a user in the path parameters.')
-
-    if len(user) == 0:
-        logger.error("List ID was empty.")
-        raise Exception('API Event did not contain a user in the path parameters.')
-
-    user = unquote(user)
-    logger.info("Decoded email: " + user)
-
-    return user
-
-
 def get_quantity(event):
     try:
         body_object = json.loads(event['body'])

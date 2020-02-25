@@ -182,22 +182,6 @@ class TestGetListIdFromPath:
         assert str(e.value) == "API Event did not contain a List ID in the path parameters.", "Exception not as expected."
 
 
-class TestGetUser:
-    def test_get_email(self, api_gateway_share_event):
-        email = common_event.get_user(api_gateway_share_event)
-        assert email == "test.user3@gmail.com", "List ID returned from API event was not as expected."
-
-    def test_get_userId(self, api_gateway_unshare_shared_event):
-        userId = common_event.get_user(api_gateway_unshare_shared_event)
-        assert userId == "12345678-user-0002-1234-abcdefghijkl", "List ID returned from API event was not as expected."
-
-    def test_get_user_when_not_present(self, api_gateway_share_event):
-        api_gateway_share_event['pathParameters']['user'] = ''
-        with pytest.raises(Exception) as e:
-            common_event.get_user(api_gateway_share_event)
-        assert str(e.value) == "API Event did not contain a user in the path parameters.", "Exception not as expected."
-
-
 class TestGetProductIdFromPath:
     def test_get_product_id(self, api_gateway_add_product_event):
         product_id = common_event.get_product_id(api_gateway_add_product_event)

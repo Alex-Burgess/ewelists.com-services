@@ -21,7 +21,19 @@ def api_gateway_event():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
     event['httpMethod'] = "DELETE"
     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0002-1234-abcdefghijkl"
+    event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
+
+    return event
+
+
+@pytest.fixture
+def api_gateway_event_with_email():
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user99@gmail.com"
+    event['httpMethod'] = "DELETE"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+    event['body'] = "{\n    \"name\": \"Test User99\"\n}"
 
     return event
 
@@ -47,14 +59,6 @@ def dynamodb_mock():
     yield
     # teardown: stop moto server
     mock.stop()
-
-
-class TestUpdateTable:
-    @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-    def test_update_items(self, dynamodb_mock):
-        product_id = '12345678-prod-0001-1234-abcdefghijkl'
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        assert unreserve.update_product_and_delete_reserved_item('lists-unittest', list_id, product_id, 2)
 
 
 class TestUnreserveMain:
@@ -111,6 +115,18 @@ class TestUnreserveMain:
 
 @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
 def test_handler(api_gateway_event_prod1, monkeypatch, dynamodb_mock):
+    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    response = unreserve.handler(api_gateway_event, None)
+    body = json.loads(response['body'])
+
+    assert response['statusCode'] == 200
+    assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
+
+    assert body['reserved']
+
+
+@pytest.mark.skip(reason="transact_write_items is not implemented for moto")
+def test_handler_with_email(api_gateway_event_with_email, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
     response = unreserve.handler(api_gateway_event, None)
     body = json.loads(response['body'])

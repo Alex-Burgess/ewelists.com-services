@@ -33,10 +33,10 @@ def unshare_main(event):
         share_type = common_event.get_share_type(event)
 
         if share_type == "SHARED":
-            user_id = common_event.get_user(event)
+            user_id = common_event.get_path_parameter(event, 'user')
             delete_shared_item(table_name, list_id, user_id)
         elif share_type == "PENDING":
-            email = common_event.get_user(event)
+            email = common_event.get_path_parameter(event, 'user')
             delete_pending_item(table_name, list_id, email)
         else:
             raise Exception('Shared user had wrong type.')

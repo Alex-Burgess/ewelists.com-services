@@ -98,7 +98,7 @@ class TestGetItemsAssociatedWithList:
     def test_get_items_associated_with_list(self, dynamodb_mock):
         list_id = '12345678-list-0001-1234-abcdefghijkl'
         items = delete.get_items_associated_with_list('lists-unittest', list_id)
-        assert len(items) == 10, "Number of items deleted was not as expected."
+        assert len(items) == 12, "Number of items deleted was not as expected."
 
 
 class TestDeleteMain:
@@ -110,7 +110,7 @@ class TestDeleteMain:
 
         assert body['deleted'], "Delete main response did not contain the correct status."
         assert len(body['listId']) == 36, "Create main response did not contain a listId."
-        assert body['message'] == 'Deleted all items [10] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete main response did not contain the correct message."
+        assert body['message'] == 'Deleted all items [12] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete main response did not contain the correct message."
 
     def test_delete_main_with_bad_table_name(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
@@ -143,4 +143,4 @@ def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
     assert re.match('{"deleted": .*}', response['body']), "Response body was not as expected."
 
     body = json.loads(response['body'])
-    assert body['count'] == 10, "Number of items deleted was not as expected."
+    assert body['count'] == 12, "Number of items deleted was not as expected."

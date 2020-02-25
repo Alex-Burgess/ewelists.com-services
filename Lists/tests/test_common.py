@@ -1,4 +1,7 @@
 import pytest
+import os
+import boto3
+from moto import mock_dynamodb2
 from lists import common
 from tests import fixtures
 
@@ -30,6 +33,53 @@ def list_query_response():
     ]
 
     return response
+
+
+@pytest.fixture
+def api_gateway_event():
+    event = fixtures.api_gateway_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
+    event['httpMethod'] = "DELETE"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
+
+    return event
+
+
+@pytest.fixture
+def api_gateway_event_with_email():
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user99@gmail.com"
+    event['httpMethod'] = "DELETE"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+    event['body'] = "{\n    \"name\": \"Test User99\"\n}"
+
+    return event
+
+
+@pytest.fixture
+def dynamodb_mock():
+    mock = mock_dynamodb2()
+    mock.start()
+    dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
+
+    table = dynamodb.create_table(
+        TableName='lists-unittest',
+        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
+        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
+        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+    )
+
+    items = fixtures.load_test_data()
+
+    for item in items:
+        table.put_item(TableName='lists-unittest', Item=item)
+
+    yield
+    # teardown: stop moto server
+    mock.stop()
 
 
 def test_create_response():
@@ -122,3 +172,17 @@ class TestSendEmail:
         name = 'Ewe User8'
         template = 'reserve-template'
         assert common.send_email(email, name, template)
+
+
+class TestGetUser:
+    def test_get_authed_user(self, dynamodb_mock, api_gateway_event):
+        user = common.get_user(api_gateway_event, os.environ, 'lists-unittest')
+        assert user['id'] == '12345678-user-0003-1234-abcdefghijkl'
+        assert user['email'] == 'test.user3@gmail.com'
+        assert user['name'] == 'Test User3'
+
+    def test_get_user_with_email(self, api_gateway_event_with_email):
+        user = common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest')
+        assert user['id'] == 'test.user99@gmail.com'
+        assert user['email'] == 'test.user99@gmail.com'
+        assert user['name'] == 'Test User99'

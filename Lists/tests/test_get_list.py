@@ -72,7 +72,7 @@ class TestGetListQuery:
         user_id = "12345678-user-0001-1234-abcdefghijkl"
         list_id = "12345678-list-0001-1234-abcdefghijkl"
         items = get_list.get_list_query('lists-unittest', user_id, list_id)
-        assert len(items) == 10, "Number of items returned was not as expected."
+        assert len(items) == 12, "Number of items returned was not as expected."
 
     def test_get_list_query_wrong_table(self, dynamodb_mock):
         user_id = "12345678-user-0001-1234-abcdefghijkl"
@@ -127,15 +127,19 @@ class TestGetListMain:
         assert body['list']['occasion'] == "Birthday", "Occasion was not correct."
         assert body['list']['imageUrl'] == "/images/celebration-default.jpg", "Image url was not correct."
 
-        assert len(body['products']) == 3, "Get list response did not contain correct number of products."
+        assert len(body['products']) == 4, "Get list response did not contain correct number of products."
         assert body['products']["12345678-prod-0001-1234-abcdefghijkl"] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "quantity": 3, "reserved": 2, "type": "products"}, "Product object not correct."
         assert body['products']["12345678-prod-0002-1234-abcdefghijkl"] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "type": "products"}, "Product object not correct."
+        assert body['products']["12345678-prod-0003-1234-abcdefghijkl"] == {"productId": "12345678-prod-0003-1234-abcdefghijkl", "quantity": 1, "reserved": 1, "type": "products"}, "Product object not correct."
         assert body['products']["12345678-notf-0010-1234-abcdefghijkl"] == {"productId": "12345678-notf-0010-1234-abcdefghijkl", "quantity": 2, "reserved": 1, "type": "notfound"}, "Product object not correct."
 
+        assert len(body['reserved']) == 4, "Get list response did not contain correct number of reservations."
         assert body['reserved'][0] == {"productId": "12345678-notf-0010-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
         assert body['reserved'][1] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
         assert body['reserved'][2] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User3", "userId": "12345678-user-0003-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
+        assert body['reserved'][3] == {"productId": "12345678-prod-0003-1234-abcdefghijkl", "name": "Test User99", "userId": "test.user99@gmail.com", "quantity": 1}, "Reserved object not correct."
 
+        # TODO delete shared.
         assert len(body['shared']) == 2, "Get list response did not contain correct number of products."
         assert body['shared']['test.user4@gmail.com'] == {"email": "test.user4@gmail.com", "type": "PENDING"}, "Shared list of users not expected"
         assert body['shared']['test.user2@gmail.com'] == {"userId": "12345678-user-0002-1234-abcdefghijkl", "type": "SHARED", "email": "test.user2@gmail.com", "name": "Test User2"}, "Shared list of users not expected"

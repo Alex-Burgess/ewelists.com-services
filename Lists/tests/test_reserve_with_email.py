@@ -153,6 +153,7 @@ class TestReserveMain:
 
     def test_over_reserve_product(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
 
         api_gateway_event_prod1['body'] = "{\n    \"quantity\": 4,\n    \"name\": \"Test User99\"\n}"
@@ -163,6 +164,7 @@ class TestReserveMain:
 
     def test_reserve_product_not_added_to_list(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
 
         api_gateway_event_prod1['pathParameters'] = {"productid": "12345678-prod-0100-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
@@ -173,6 +175,7 @@ class TestReserveMain:
 
     def test_reserve_product_already_reserved_by_user(self, monkeypatch, api_gateway_event_prod3, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
 
         response = reserve_with_email.reserve_main(api_gateway_event_prod3)

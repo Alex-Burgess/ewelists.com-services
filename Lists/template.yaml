@@ -867,20 +867,18 @@ Resources:
             #     passthroughBehavior: "when_no_match"
             #     httpMethod: "POST"
             #     type: "aws_proxy"
-            # delete:
-            #   responses:
-            #     "200":
-            #       description: "200 response"
-            #       headers:
-            #         Access-Control-Allow-Origin:
-            #           type: "string"
-            #   security:
-            #   - sigv4: []
-            #   x-amazon-apigateway-integration:
-            #     uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UnreserveProductFunction.Arn}/invocations'
-            #     passthroughBehavior: "when_no_match"
-            #     httpMethod: "POST"
-            #     type: "aws_proxy"
+            delete:
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UnreserveProductFunction.Arn}/invocations'
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                type: "aws_proxy"
             options:
               consumes:
               - "application/json"
