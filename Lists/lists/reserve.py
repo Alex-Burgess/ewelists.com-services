@@ -1,7 +1,10 @@
 import json
 import os
+import time
+import uuid
 import boto3
 import logging
+from botocore.exceptions import ClientError
 from lists import common
 from lists import common_env_vars
 from lists import common_event
@@ -15,6 +18,9 @@ if logger.handlers:
 
 
 dynamodb = boto3.client('dynamodb')
+# Email configuration
+ses = boto3.client('ses', region_name='eu-west-1')
+SENDER = "Ewelists <contact@ewelists.com>"
 
 
 def handler(event, context):
@@ -28,6 +34,7 @@ def reserve_main(event):
         index_name = common_env_vars.get_table_index(os.environ)
         template = common_env_vars.get_template_name(os.environ)
         list_id = common_event.get_list_id(event)
+        list_title = common_event.get_body_attribute(event, 'title')
         product_id = common_event.get_product_id(event)
         request_reserve_quantity = common_event.get_quantity(event)
 
@@ -46,10 +53,11 @@ def reserve_main(event):
         new_product_reserved_quantity = common.calculate_new_reserved_quantity(product_item, request_reserve_quantity)
 
         # Step 4 - Update, in one transaction, the product reserved quantity and create reserved item.
-        common_table_ops.create_reservation(table_name, list_id, product_id, new_product_reserved_quantity, request_reserve_quantity, user['id'], user['name'])
+        resv_id = str(uuid.uuid4())
+        create_reservation(table_name, resv_id, list_id, list_title, product_id, new_product_reserved_quantity, request_reserve_quantity, user)
 
         # Step 5 - Send reserve confirmation email
-        common.send_email(user['email'], user['name'], template)
+        send_email(user['email'], user['name'], resv_id, template)
 
     except Exception as e:
         logger.error("Exception: {}".format(e))
@@ -57,6 +65,90 @@ def reserve_main(event):
         logger.info("Returning response: {}".format(response))
         return response
 
-    data = {'reserved': True}
+    data = {'reservation_id': resv_id}
     response = common.create_response(200, json.dumps(data))
     return response
+
+
+def create_reservation(table_name, resv_id, list_id, list_title, product_id, new_product_reserved_quantity, request_reserve_quantity, user):
+    product_key = {
+        'PK': {'S': "LIST#{}".format(list_id)},
+        'SK': {'S': "PRODUCT#{}".format(product_id)}
+    }
+
+    reserved_item = {
+        'PK': {'S': "LIST#{}".format(list_id)},
+        'SK': {'S': "RESERVED#{}#{}".format(product_id, user['id'])},
+        'name': {'S': user['name']},
+        'productId': {'S': product_id},
+        'userId': {'S': user['id']},
+        'quantity': {'N': str(request_reserve_quantity)},
+        'reservedAt': {'N': str(int(time.time()))}
+    }
+
+    reservation_item = {
+        'PK': {'S': "RESERVATION#{}".format(resv_id)},
+        'SK': {'S': "RESERVATION#{}".format(resv_id)},
+        'userId': {'S': user['id']},
+        'email': {'S': user['email']},
+        'name': {'S': user['id']},
+        'listId': {'S': list_id},
+        'title': {'S': list_title},
+        'productId': {'S': product_id},
+        'quantity': {'S': str(request_reserve_quantity)},
+        'state': {'S': 'reserved'}
+    }
+
+    try:
+        response = dynamodb.transact_write_items(
+            TransactItems=[
+                {
+                    'Update': {
+                        'TableName': table_name,
+                        'Key': product_key,
+                        'UpdateExpression': "set reserved = :r",
+                        'ExpressionAttributeValues': {
+                            ':r': {'N': str(new_product_reserved_quantity)},
+                        }
+                    }
+                },
+                {
+                    'Put': {
+                        'TableName': table_name,
+                        'Item': reserved_item
+                    }
+                },
+                {
+                    'Put': {
+                        'TableName': table_name,
+                        'Item': reservation_item
+                    }
+                }
+            ]
+        )
+
+        logger.info("Attributes updated: " + json.dumps(response))
+    except Exception as e:
+        logger.info("Transaction write exception: " + str(e))
+        raise Exception("Unexpected error when reserving product.")
+
+    return True
+
+
+def send_email(email, name, resv_id, template):
+    try:
+        response = ses.send_templated_email(
+            Source=SENDER,
+            Destination={
+                'ToAddresses': [email],
+            },
+            ReplyToAddresses=[SENDER],
+            Template=template,
+            TemplateData='{ \"name\":\"' + name + '\" }'
+        )
+    except ClientError as e:
+        raise Exception("Could not send reserve email: " + e.response['Error']['Message'])
+    else:
+        logger.info("Email sent! Message ID: " + response['MessageId'])
+
+    return True

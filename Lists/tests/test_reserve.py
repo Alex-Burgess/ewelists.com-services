@@ -21,7 +21,7 @@ def api_gateway_event_prod1():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 2\n}"
+    event['body'] = "{\n    \"quantity\": 2,\n    \"title\": \"Child User1 1st Birthday\"\n}"
 
     return event
 
@@ -33,7 +33,7 @@ def api_gateway_event_prod2():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0002-1234-abcdefghijkl"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 1\n}"
+    event['body'] = "{\n    \"quantity\": 1,\n    \"title\": \"Child User1 1st Birthday\"\n}"
 
     return event
 
@@ -45,7 +45,7 @@ def api_gateway_event_existing_user():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user1@gmail.com"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
-    event['body'] = "{\n    \"quantity\": 1,\n    \"name\": \"Test User1\"\n}"
+    event['body'] = "{\n    \"quantity\": 1,\n    \"title\": \"Child User1 1st Birthday\",\n    \"name\": \"Test User1\"\n}"
 
     return event
 
@@ -77,6 +77,41 @@ def dynamodb_mock():
 
     yield
     mock.stop()
+
+
+@pytest.mark.skip(reason="transact_write_items is not implemented for moto")
+class TestCreateReservation:
+    def test_create_reservation(self, dynamodb_mock):
+        user = {
+            'id': '12345678-user-0002-1234-abcdefghijkl',
+            'email': 'test.user2@gmail.com',
+            'name': 'Test User2'
+        }
+
+        resv_id = '12345678-resv-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        list_title = 'Child User1 1st Birthday'
+        product_id = '12345678-prod-0002-1234-abcdefghijkl'
+        new_product_reserved_quantity = 1
+        request_reserve_quantity = 1
+
+        assert reserve.create_reservation('lists-unittest', resv_id, list_id, list_title, product_id, new_product_reserved_quantity, request_reserve_quantity, user)
+
+    def test_create_reservation_with_email(self, dynamodb_mock):
+        user = {
+            'id': 'test.user10@gmail.com',
+            'email': 'test.user10@gmail.com',
+            'name': 'Test User10'
+        }
+
+        resv_id = '12345678-resv-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        list_title = 'Child User1 1st Birthday'
+        product_id = '12345678-prod-0002-1234-abcdefghijkl'
+        new_product_reserved_quantity = 1
+        request_reserve_quantity = 1
+
+        assert reserve.create_reservation('lists-unittest', resv_id, list_id, list_title, product_id, new_product_reserved_quantity, request_reserve_quantity, user)
 
 
 class TestReserveMain:
@@ -144,7 +179,7 @@ class TestReserveMain:
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
 
-        api_gateway_event_prod1['body'] = "{\n    \"quantity\": 4,\n    \"message\": \"Happy birthday to you!\"\n}"
+        api_gateway_event_prod1['body'] = "{\n    \"quantity\": 4,\n    \"title\": \"Child User1 1st Birthday\",\n    \"message\": \"Happy birthday to you!\"\n}"
 
         response = reserve.reserve_main(api_gateway_event_prod1)
         body = json.loads(response['body'])

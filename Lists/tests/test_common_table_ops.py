@@ -140,29 +140,6 @@ class TestCheckProductNotReservedByUser:
 
 
 @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-class TestCreateReservation:
-    def test_create_reservation(self, dynamodb_mock):
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        product_id = '12345678-prod-0002-1234-abcdefghijkl'
-        user_id = '12345678-user-0002-1234-abcdefghijkl'
-        users_name = 'Test User2'
-        new_product_reserved_quantity = 1
-        request_reserve_quantity = 1
-
-        assert common_table_ops.create_reservation('lists-unittest', list_id, product_id, new_product_reserved_quantity, request_reserve_quantity, user_id, users_name)
-
-    def test_create_reservation_with_email(self, dynamodb_mock):
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        product_id = '12345678-prod-0002-1234-abcdefghijkl'
-        user_id = 'test.user10@gmail.com'
-        users_name = 'Test User10'
-        new_product_reserved_quantity = 1
-        request_reserve_quantity = 1
-
-        assert common_table_ops.create_reservation('lists-unittest', list_id, product_id, new_product_reserved_quantity, request_reserve_quantity, user_id, users_name)
-
-
-@pytest.mark.skip(reason="transact_write_items is not implemented for moto")
 class TestUnreserveProduct:
     def test_unreserve(self, dynamodb_mock):
         list_id = '12345678-list-0001-1234-abcdefghijkl'
