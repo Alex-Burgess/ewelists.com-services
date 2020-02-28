@@ -37,7 +37,7 @@ def list_main(event):
 
 
 def get_lists(table_name, index_name, cognito_user_id):
-    response_data = {"user": None, "owned": [], "shared": []}
+    response_data = {"user": None, "owned": []}
 
     logger.info("Querying table")
 
@@ -65,11 +65,7 @@ def get_lists(table_name, index_name, cognito_user_id):
                     logger.info("Adding owner list item to response data. ({})".format(item))
                     list_details = List(item).get_details()
                     response_data['owned'].append(list_details)
-            elif item['SK']['S'] == 'SHARED#' + cognito_user_id:
-                if item['listOwner']['S'] != cognito_user_id:
-                    logger.info("Adding list shared with user to response data. ({})".format(item))
-                    list_details = List(item).get_details()
-                    response_data['shared'].append(list_details)
+
     else:
         logger.info("0 lists were returned.")
 

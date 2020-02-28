@@ -160,23 +160,6 @@ def get_user(event, osenv, table_name):
     return user
 
 
-# TODO - delete when delete share modules.
-def get_share_type(event):
-    try:
-        body_object = json.loads(event['body'])
-        share_type = body_object['share_type']
-        logger.info("Product type: " + str(share_type))
-    except Exception:
-        logger.error("API Event did not contain a share type in the body.")
-        raise Exception('API Event did not contain a share type in the body.')
-
-    if (share_type != 'SHARED') and (share_type != 'PENDING'):
-        logger.error("API Event did not contain a share type of SHARED or PENDING.")
-        raise Exception('API Event did not contain a share type of SHARED or PENDING.')
-
-    return share_type
-
-
 def get_product_type(event):
     try:
         body_object = json.loads(event['body'])

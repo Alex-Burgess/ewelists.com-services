@@ -31,9 +31,6 @@ def api_gateway_get_list_event():
 def list_query_response():
     response = [
         {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
-        {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'SHARED#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, "shared_user_name": {"S": "Test User1"}, "shared_user_email": {"S": "test.user1@gmail.com"}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
-        {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'SHARED#12345678-user-0002-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0002-1234-abcdefghijkl'}, "shared_user_name": {"S": "Test User2"}, "shared_user_email": {"S": "test.user2@gmail.com"}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
-        {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'PENDING#test.user4@gmail.com'}, "shared_user_email": {"S": "test.user4@gmail.com"}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}},
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "quantity": {"N": "2"}, "reserved": {"N": "1"}, "type": {"S": "products"}},
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-prod-0002-1234-abcdefghijkl"}, "quantity": {"N": "3"}, "reserved": {"N": "1"}, "type": {"S": "products"}},
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-notf-0010-1234-abcdefghijkl"}, "quantity": {"N": "2"}, "reserved": {"N": "0"}, "type": {"S": "notfound"}},
@@ -72,7 +69,7 @@ class TestGetListQuery:
         user_id = "12345678-user-0001-1234-abcdefghijkl"
         list_id = "12345678-list-0001-1234-abcdefghijkl"
         items = get_list.get_list_query('lists-unittest', user_id, list_id)
-        assert len(items) == 12, "Number of items returned was not as expected."
+        assert len(items) == 9, "Number of items returned was not as expected."
 
     def test_get_list_query_wrong_table(self, dynamodb_mock):
         user_id = "12345678-user-0001-1234-abcdefghijkl"
@@ -108,10 +105,6 @@ class TestGenerateListObject:
         assert items['reserved'][0] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
         assert items['reserved'][1] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
 
-        assert len(items['shared']) == 2, "Get list response did not contain correct number of products."
-        assert items['shared']['test.user4@gmail.com'] == {"email": "test.user4@gmail.com", "type": "PENDING"}, "Shared list of users not expected"
-        assert items['shared']['test.user2@gmail.com'] == {"userId": "12345678-user-0002-1234-abcdefghijkl", "email": "test.user2@gmail.com", "name": "Test User2", "type": "SHARED"}, "Shared list of users not expected"
-
 
 class TestGetListMain:
     def test_get_list_main(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
@@ -138,11 +131,6 @@ class TestGetListMain:
         assert body['reserved'][1] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
         assert body['reserved'][2] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User3", "userId": "12345678-user-0003-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday"}, "Reserved object not correct."
         assert body['reserved'][3] == {"productId": "12345678-prod-0003-1234-abcdefghijkl", "name": "Test User99", "userId": "test.user99@gmail.com", "quantity": 1}, "Reserved object not correct."
-
-        # TODO delete shared.
-        assert len(body['shared']) == 2, "Get list response did not contain correct number of products."
-        assert body['shared']['test.user4@gmail.com'] == {"email": "test.user4@gmail.com", "type": "PENDING"}, "Shared list of users not expected"
-        assert body['shared']['test.user2@gmail.com'] == {"userId": "12345678-user-0002-1234-abcdefghijkl", "type": "SHARED", "email": "test.user2@gmail.com", "name": "Test User2"}, "Shared list of users not expected"
 
     def test_get_list_with_no_date(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

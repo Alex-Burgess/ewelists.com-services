@@ -5,7 +5,6 @@ import logging
 import random
 import string
 from lists import common
-from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -27,9 +26,8 @@ def handler(event, context):
     logger.info("SignUp Trigger event: " + json.dumps(event))
 
     table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-    index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
     user_pool_id = common.get_env_variable(os.environ, 'USERPOOL_ID')
-    template = get_template_name(os.environ)
+    template = common.get_env_variable(os.environ, 'TEMPLATE_NAME')
     new_user = get_user_from_event(event)
     trigger = get_trigger_source_event(event)
     exists = get_user_from_userpool(user_pool_id, new_user['email'])
@@ -43,7 +41,7 @@ def handler(event, context):
         create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])
 
         # Send welcome email
-        send(new_user['email'], new_user['name'], template)
+        common.send(new_user['email'], new_user['name'], template)
     else:
         logger.info("User does not have entry in userpool.")
 
@@ -55,13 +53,6 @@ def handler(event, context):
             # Link Accounts
             link_accounts(user_pool_id, new_user['email'], new_cognito_user['user_id'], new_user['type'], new_user['username'])
 
-            # Get all the pending shared lists
-            pending_lists = get_pending_lists(table_name, index_name, new_user['email'])
-
-            # Transaction to delete pending item and add SHARED item
-            if len(pending_lists) > 0:
-                create_shared_items(table_name, pending_lists, new_user['username'], new_user['name'])
-
             # Set random password, otherwise congito account will stay in FORCE_CHANGED_PASSWORD state and user won't be able to reset password.
             set_random_password(user_pool_id, new_user['email'])
 
@@ -71,106 +62,11 @@ def handler(event, context):
             logger.info("New User is using username and password..")
             create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])
 
-            # Get all the pending shared lists
-            pending_lists = get_pending_lists(table_name, index_name, new_user['email'])
-
-            if len(pending_lists) > 0:
-                create_shared_items(table_name, pending_lists, new_user['username'], new_user['name'])
-
             # Send welcome email
-            send(new_user['email'], new_user['name'], template)
+            common.send(new_user['email'], new_user['name'], template)
             logger.info("Allowing signup process to complete for user.")
 
     return event
-
-
-def get_template_name(osenv):
-    try:
-        name = osenv['TEMPLATE_NAME']
-        logger.info("TEMPLATE_NAME environment variable value: " + name)
-    except KeyError:
-        raise Exception('TEMPLATE_NAME environment variable not set correctly.')
-
-    return name
-
-
-def send(email, name, template):
-    try:
-        response = ses.send_templated_email(
-            Source=SENDER,
-            Destination={
-                'ToAddresses': [email],
-            },
-            ReplyToAddresses=[SENDER],
-            Template=template,
-            TemplateData='{ \"name\":\"' + name + '\" }'
-        )
-    except ClientError as e:
-        raise Exception("Could not send welcome email: " + e.response['Error']['Message'])
-    else:
-        logger.info("Email sent! Message ID: " + response['MessageId'])
-
-    return True
-
-
-def get_pending_lists(table_name, index_name, email):
-    try:
-        response = dynamodb.query(
-            TableName=table_name,
-            IndexName=index_name,
-            KeyConditionExpression="SK = :SK",
-            ExpressionAttributeValues={":SK":  {'S': "PENDING#" + email}}
-        )
-        logger.info("All items in query response. ({})".format(response['Items']))
-    except Exception as e:
-        logger.info("Exception: " + str(e))
-        raise Exception("Unexpected error when getting pending lists from table.")
-
-    return response['Items']
-
-
-def create_shared_items(table_name, pending_items, sub, name):
-    for pending_list in pending_items:
-        pending_key = {
-            'PK': {'S': pending_list['PK']['S']},
-            'SK': {'S': pending_list['SK']['S']}
-        }
-
-        delete_condition = {
-            ':PK': {'S': pending_list['PK']['S']},
-            ':SK': {'S': pending_list['SK']['S']}
-        }
-
-        shared_item = pending_list
-        shared_item['SK'] = {'S': 'SHARED#' + sub}
-        shared_item['userId'] = {'S': sub}
-        shared_item['shared_user_name'] = {'S': name}
-
-        try:
-            response = dynamodb.transact_write_items(
-                TransactItems=[
-                    {
-                        'Put': {
-                            'TableName': table_name,
-                            'Item': shared_item
-                        }
-                    },
-                    {
-                        'Delete': {
-                            'TableName': table_name,
-                            'Key': pending_key,
-                            'ConditionExpression': "PK = :PK AND SK = :SK",
-                            'ExpressionAttributeValues': delete_condition
-                        }
-                    }
-                ]
-            )
-            logger.info("Attributes updated: " + json.dumps(response))
-        except Exception as e:
-            logger.info("Transaction write exception: " + str(e))
-            raise Exception("Unexpected error when unreserving product.")
-
-    return True
 
 
 def set_random_password(user_pool_id, email):

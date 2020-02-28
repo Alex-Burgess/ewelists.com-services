@@ -93,7 +93,7 @@ class TestGetListQuery:
     def test_get_list_query(self, dynamodb_mock):
         list_id = "12345678-list-0001-1234-abcdefghijkl"
         items = get_shared_list.get_list_query('lists-unittest', list_id)
-        assert len(items) == 12, "Number of items deleted was not as expected."
+        assert len(items) == 9, "Number of items deleted was not as expected."
 
     def test_get_list_query_no_table_name(self, dynamodb_mock):
         list_id = "12345678-list-0001-1234-abcdefghijkl"

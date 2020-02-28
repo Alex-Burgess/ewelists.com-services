@@ -102,29 +102,3 @@ class Reserved:
             reserved['message'] = self.message
 
         return reserved
-
-
-class Shared:
-
-    def __init__(self, item):
-        self.type = item.get('SK').get('S').split("#")[0]
-        self.email = item.get('shared_user_email').get('S')
-
-        if self.type == "SHARED":
-            self.userId = item.get('userId').get('S')
-            self.name = item.get('shared_user_name').get('S')
-
-    def __repr__(self):
-        return "Shared<{} -- {} -- {} -- {}>".format(self.email, self.type, self.name, self.email)
-
-    def get_details(self):
-        shared = {
-            'email': self.email,
-            'type': self.type,
-        }
-
-        if self.type == "SHARED":
-            shared['userId'] = self.userId
-            shared['name'] = self.name
-
-        return shared

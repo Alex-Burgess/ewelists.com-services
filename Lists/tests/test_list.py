@@ -77,12 +77,6 @@ class TestGetLists:
         assert lists_response['owned'][0] == owned_list1, "Details of the list owned by user was not as expected."
         assert lists_response['owned'][1] == owned_list2, "Details of the list owned by user was not as expected."
 
-        shared_list1 = {"listId": "12345678-list-0003-1234-abcdefghijkl", 'listOwner': '12345678-user-0002-1234-abcdefghijkl', "title": "Child User2 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User2 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
-        shared_list2 = {"listId": "12345678-list-0004-1234-abcdefghijkl", 'listOwner': '12345678-user-0002-1234-abcdefghijkl', "title": "Child User3 Christmas List", "occasion": "Christmas", "description": "A gift list for Child User3 Christmas.", "imageUrl": "/images/christmas-default.jpg"}
-        assert len(lists_response['shared']) == 2, "User should only have 2 lists shared with them."
-        assert lists_response['shared'][0] == shared_list1, "Details of the list shared with user was not as expected."
-        assert lists_response['shared'][1] == shared_list2, "Details of the list shared with user was not as expected."
-
     def test_get_lists_bad_table_name(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
 
@@ -101,7 +95,6 @@ class TestGetLists:
         user_id = '12345678-user-0003-1234-abcdefghijkl'
         lists_response = list.get_lists('lists-unittest', 'userId-index', user_id)
         assert len(lists_response['owned']) == 0, "Number of lists was not 0."
-        assert len(lists_response['shared']) == 0, "Number of lists was not 0."
 
 
 class TestListMain:
@@ -110,7 +103,6 @@ class TestListMain:
         body = json.loads(response['body'])
 
         assert len(body['owned']) == 2, "Number of lists returned was not as expected."
-        assert len(body['shared']) == 2, "Number of lists returned was not as expected."
 
     def test_list_main_no_table(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
@@ -126,7 +118,6 @@ class TestListMain:
         body = json.loads(response['body'])
 
         assert len(body['owned']) == 0, "Number of lists returned was not as expected."
-        assert len(body['shared']) == 0, "Number of lists returned was not as expected."
 
 
 def test_handler(api_gateway_event, env_vars, dynamodb_mock):

@@ -3,7 +3,7 @@ import os
 import boto3
 import logging
 from lists import common
-from lists.common_entities import List, Product, Reserved, Shared
+from lists.common_entities import List, Product, Reserved
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
@@ -40,7 +40,7 @@ def get_list_main(event):
 
 
 def generate_list_object(response_items):
-    list = {"list": None, "products": {}, "reserved": [], "shared": {}}
+    list = {"list": None, "products": {}, "reserved": []}
 
     for item in response_items:
         if item['SK']['S'].startswith("USER"):
@@ -55,17 +55,6 @@ def generate_list_object(response_items):
             logger.info("Reserved Item: {}".format(item))
             reserved = Reserved(item).get_details()
             list['reserved'].append(reserved)
-        elif item['SK']['S'].startswith("SHARED"):
-            if item.get('SK').get('S').split("#")[1] != item['listOwner']['S']:
-                logger.info("Shared Item: {}".format(item))
-                shared = Shared(item).get_details()
-                email = shared['email']
-                list['shared'][email] = shared
-        elif item['SK']['S'].startswith("PENDING"):
-            logger.info("Pending shared Item: {}".format(item))
-            shared = Shared(item).get_details()
-            email = shared['email']
-            list['shared'][email] = shared
 
     return list
 

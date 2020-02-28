@@ -333,28 +333,6 @@ class TestGetUser:
         assert str(e.value) == "API Event did not contain a name body attribute.", "Exception message not correct."
 
 
-class TestGetShareType:
-    def test_get_share_type_shared(self, api_gateway_unshare_shared_event):
-        type = common.get_share_type(api_gateway_unshare_shared_event)
-        assert type == 'SHARED', "Shared type returned from API event was not as expected."
-
-    def test_get_share_type_pending(self, api_gateway_unshare_pending_event):
-        type = common.get_share_type(api_gateway_unshare_pending_event)
-        assert type == 'PENDING', "Shared type returned from API event was not as expected."
-
-    def test_get_wrong_share_type(self, api_gateway_unshare_pending_event):
-        api_gateway_unshare_pending_event['body'] = "{\n    \"share_type\": \"WRONG\"\n}"
-        with pytest.raises(Exception) as e:
-            common.get_share_type(api_gateway_unshare_pending_event)
-        assert str(e.value) == "API Event did not contain a share type of SHARED or PENDING.", "Exception not as expected."
-
-    def test_get_share_type_with_no_body(self, api_gateway_unshare_pending_event):
-        api_gateway_unshare_pending_event['body'] = None
-        with pytest.raises(Exception) as e:
-            common.get_share_type(api_gateway_unshare_pending_event)
-        assert str(e.value) == "API Event did not contain a share type in the body.", "Exception not as expected."
-
-
 class TestGetProductType:
     def test_get_product_type(self, api_gateway_add_product_event):
         product = common.get_product_type(api_gateway_add_product_event)

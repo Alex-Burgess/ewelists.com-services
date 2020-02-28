@@ -1,4 +1,4 @@
-from lists.common_entities import User, List, Product, Reserved, Shared
+from lists.common_entities import User, List, Product, Reserved
 import sys
 import logging
 logger = logging.getLogger()
@@ -80,21 +80,3 @@ class TestReserved:
         assert reserved['name'] == "Test User2", "Reserved name was not correct."
         assert not reserved.get('message'), "Reserved message was not correct."
         assert reserved['userId'] == '12345678-user-0002-1234-abcdefghijkl', "Reserved userId was not correct."
-
-
-class TestShared:
-    def test_get_shared_user(self):
-        shared_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "SHARED#12345678-user-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "shared_user_name": {"S": "Test User 2"}, "shared_user_email": {"S": "test.user2@gmail.com"}, "title": {"S": "Child User1 1st Birthday"}, "occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listOwner": {"S": "12345678-user-0001-1234-abcdefghijkl"}, "createdAt": {"N": "2018-09-01T10:00:00"}, "description": {"S": "A gift list for Child User1 birthday."}, "eventDate": {"S": "31 October 2018"}, "imageUrl": {"S": "/images/celebration-default.jpg"}}
-        shared = Shared(shared_item).get_details()
-
-        assert shared['userId'] == '12345678-user-0002-1234-abcdefghijkl', "Shared user ID was not correct."
-        assert shared['email'] == "test.user2@gmail.com", "Shared user email was not correct."
-        assert shared['name'] == "Test User 2", "Shared user name was not correct."
-        assert shared['type'] == "SHARED", "Shared type name was not correct."
-
-    def test_get_pending_user(self):
-        shared_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PENDING#test.user4@gmail.com"}, "shared_user_email": {"S": "test.user4@gmail.com"}, "title": {"S": "Child User1 1st Birthday"}, "occasion": {"S": "Birthday"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listOwner": {"S": "12345678-user-0001-1234-abcdefghijkl"}, "createdAt": {"N": "2018-09-01T10:00:00"}, "description": {"S": "A gift list for Child User1 birthday."}, "eventDate": {"S": "31 October 2018"}, "imageUrl": {"S": "/images/celebration-default.jpg"}}
-        shared = Shared(shared_item).get_details()
-
-        assert shared['email'] == "test.user4@gmail.com", "Shared user email was not correct."
-        assert shared['type'] == "PENDING", "Shared type name was not correct."
