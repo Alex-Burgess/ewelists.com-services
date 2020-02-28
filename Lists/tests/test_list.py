@@ -16,6 +16,14 @@ logger.addHandler(stream_handler)
 
 
 @pytest.fixture
+def env_vars(monkeypatch):
+    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    monkeypatch.setitem(os.environ, 'INDEX_NAME', 'userId-index')
+
+    return monkeypatch
+
+
+@pytest.fixture
 def api_gateway_event():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/"
@@ -97,9 +105,7 @@ class TestGetLists:
 
 
 class TestListMain:
-    def test_list_main(self, api_gateway_event, monkeypatch, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'userId-index')
+    def test_list_main(self, api_gateway_event, env_vars, dynamodb_mock):
         response = list.list_main(api_gateway_event)
         body = json.loads(response['body'])
 
@@ -114,9 +120,7 @@ class TestListMain:
 
         assert body['error'] == 'Unexpected error when getting lists from table.', "Exception was not as expected."
 
-    def test_list_main_user_with_no_lists(self, api_gateway_event, monkeypatch, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'userId-index')
+    def test_list_main_user_with_no_lists(self, api_gateway_event, env_vars, dynamodb_mock):
         api_gateway_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
         response = list.list_main(api_gateway_event)
         body = json.loads(response['body'])
@@ -125,9 +129,7 @@ class TestListMain:
         assert len(body['shared']) == 0, "Number of lists returned was not as expected."
 
 
-def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
-    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    monkeypatch.setitem(os.environ, 'INDEX_NAME', 'userId-index')
+def test_handler(api_gateway_event, env_vars, dynamodb_mock):
     response = list.handler(api_gateway_event, None)
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}

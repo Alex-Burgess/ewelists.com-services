@@ -5,7 +5,6 @@ import time
 import logging
 from lists import common
 from lists import common_table_ops
-from lists import common_env_vars
 from lists import common_event
 from lists.common_entities import User
 from botocore.exceptions import ClientError
@@ -32,9 +31,9 @@ def handler(event, context):
 
 def share_main(event):
     try:
-        table_name = common_env_vars.get_table_name(os.environ)
-        index_name = common_env_vars.get_table_index(os.environ)
-        url = common_env_vars.get_url(os.environ)
+        table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
+        index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
+        domain_name = common.get_env_variable(os.environ, 'DOMAIN_NAME')
         identity = common_event.get_identity(event, os.environ)
         list_id = common_event.get_list_id(event)
         email = common_event.get_path_parameter(event, 'user')
@@ -49,7 +48,7 @@ def share_main(event):
 
         if user:
             create_shared_entry(table_name, user, list)
-            share_exists_url = exist_url(url, list_id)
+            share_exists_url = exist_url(domain_name, list_id)
             body_text = shared_email_text(user['name'], list_owner_name, list['title']['S'], share_exists_url)
             body_html = shared_email_html(user['name'], list_owner_name, list['title']['S'], share_exists_url)
             send_email(email, body_text, body_html, subject)
@@ -59,7 +58,7 @@ def share_main(event):
             }
         else:
             create_pending_entry(table_name, email, list)
-            share_signup_url = signup_url(url, list_id)
+            share_signup_url = signup_url(domain_name, list_id)
             body_text = pending_email_text(list_owner_name, list['title']['S'], share_signup_url)
             body_html = pending_email_html(list_owner_name, list['title']['S'], share_signup_url)
             send_email(email, body_text, body_html, subject)

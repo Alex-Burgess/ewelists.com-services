@@ -1,13 +1,9 @@
 import json
 import os
-import time
-import uuid
 import boto3
 import logging
 from lists import common
-from lists import common_env_vars
 from lists import common_event
-from lists import common_table_ops
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -27,7 +23,7 @@ def handler(event, context):
 
 def reservation_main(event):
     try:
-        table_name = common_env_vars.get_table_name(os.environ)
+        table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         resv_id = common_event.get_path_parameter(event, 'id')
 
     except Exception as e:

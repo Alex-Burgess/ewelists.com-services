@@ -3,7 +3,6 @@ import os
 import boto3
 import logging
 from lists import common
-from lists import common_env_vars
 from lists import common_event
 from lists.common_entities import List, Product, Reserved, Shared
 from botocore.exceptions import ClientError
@@ -25,7 +24,7 @@ def handler(event, context):
 
 def get_list_main(event):
     try:
-        table_name = common_env_vars.get_table_name(os.environ)
+        table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         identity = common_event.get_identity(event, os.environ)
         list_id = common_event.get_list_id(event)
         response_items = get_list_query(table_name, identity, list_id)

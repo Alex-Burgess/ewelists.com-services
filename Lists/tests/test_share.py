@@ -16,6 +16,15 @@ logger.addHandler(stream_handler)
 
 
 @pytest.fixture
+def env_vars(monkeypatch):
+    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://test.ewelists.com')
+
+    return monkeypatch
+
+
+@pytest.fixture
 def api_gateway_share_event():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/{id}/share/{user}"
@@ -229,9 +238,7 @@ class TestSendEmail:
 
 
 class TestShareMain:
-    def test_share_when_user_exists(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    def test_share_when_user_exists(self, ses_mock, dynamodb_mock, env_vars, api_gateway_share_event):
         response = share.share_main(api_gateway_share_event)
         body = json.loads(response['body'])
 
@@ -260,9 +267,7 @@ class TestShareMain:
         assert test_response['Item']['description']['S'] == 'A gift list for Child User1 birthday.', "Item attribute not as expected."
         assert test_response['Item']['imageUrl']['S'] == '/images/celebration-default.jpg', "Item attribute not as expected."
 
-    def test_share_when_user_does_not_exist(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    def test_share_when_user_does_not_exist(self, ses_mock, dynamodb_mock, env_vars, api_gateway_share_event):
         api_gateway_share_event['pathParameters']['user'] = 'test.user20@gmail.com'
 
         response = share.share_main(api_gateway_share_event)
@@ -289,9 +294,7 @@ class TestShareMain:
         assert test_response['Item']['description']['S'] == 'A gift list for Child User1 birthday.', "Item attribute not as expected."
         assert test_response['Item']['imageUrl']['S'] == '/images/celebration-default.jpg', "Item attribute not as expected."
 
-    def test_share_with_email_with_spaces_and_capitals(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    def test_share_with_email_with_spaces_and_capitals(self, ses_mock, dynamodb_mock, env_vars, api_gateway_share_event):
         api_gateway_share_event['pathParameters'] = {"user": " Test.user3%40gmail.com ", "id": "12345678-list-0001-1234-abcdefghijkl"}
         response = share.share_main(api_gateway_share_event)
         body = json.loads(response['body'])
@@ -301,9 +304,7 @@ class TestShareMain:
         assert body['user']['name'] == 'Test User3', "User attribute was not as expected."
         assert body['user']['type'] == 'SHARED', "User attribute was not as expected."
 
-    def test_share_with_googlemail_dot_com_email(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    def test_share_with_googlemail_dot_com_email(self, ses_mock, dynamodb_mock, env_vars, api_gateway_share_event):
         api_gateway_share_event['pathParameters'] = {"user": "test.user3%40googlemail.com ", "id": "12345678-list-0001-1234-abcdefghijkl"}
         response = share.share_main(api_gateway_share_event)
         body = json.loads(response['body'])
@@ -313,9 +314,7 @@ class TestShareMain:
         assert body['user']['name'] == 'Test User3', "User attribute was not as expected."
         assert body['user']['type'] == 'SHARED', "User attribute was not as expected."
 
-    def test_requestor_is_not_list_owner(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    def test_requestor_is_not_list_owner(self, ses_mock, dynamodb_mock, env_vars, api_gateway_share_event):
         user = '12345678-user-0010-1234-abcdefghijkl'
         api_gateway_share_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:" + user
 
@@ -324,9 +323,7 @@ class TestShareMain:
 
         assert body['error'] == 'No list exists with this ID.', "Error was not as expected."
 
-    def test_list_does_not_exist(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    def test_list_does_not_exist(self, ses_mock, dynamodb_mock, env_vars, api_gateway_share_event):
         api_gateway_share_event['pathParameters']['id'] = "12345678-list-0020-1234-abcdefghijkl"
 
         response = share.share_main(api_gateway_share_event)
@@ -334,9 +331,7 @@ class TestShareMain:
 
         assert body['error'] == 'No list exists with this ID.', "Error was not as expected."
 
-    def test_empty_list_in_event(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    def test_empty_list_in_event(self, ses_mock, dynamodb_mock, env_vars, api_gateway_share_event):
         api_gateway_share_event['pathParameters']['id'] = None
 
         response = share.share_main(api_gateway_share_event)
@@ -344,9 +339,7 @@ class TestShareMain:
 
         assert body['error'] == 'API Event did not contain a List ID in the path parameters.', "Error was not as expected."
 
-    def test_empty_user_in_event(self, ses_mock, dynamodb_mock, monkeypatch, api_gateway_share_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    def test_empty_user_in_event(self, ses_mock, dynamodb_mock, env_vars, api_gateway_share_event):
         api_gateway_share_event['pathParameters']['user'] = 'null'
 
         response = share.share_main(api_gateway_share_event)
@@ -355,9 +348,7 @@ class TestShareMain:
         assert body['error'] == 'Path contained a null user parameter.', "Error was not as expected."
 
 
-def test_handler(api_gateway_share_event, monkeypatch, ses_mock, dynamodb_mock):
-    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+def test_handler(api_gateway_share_event, env_vars, ses_mock, dynamodb_mock):
     response = share.handler(api_gateway_share_event, None)
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}

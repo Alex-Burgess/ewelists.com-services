@@ -5,7 +5,6 @@ import logging
 import time
 import uuid
 from lists import common
-from lists import common_env_vars
 from lists import common_event
 from lists import common_table_ops
 
@@ -26,7 +25,7 @@ def handler(event, context):
 
 def create_main(event):
     try:
-        table_name = common_env_vars.get_table_name(os.environ)
+        table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         identity = common_event.get_identity(event, os.environ)
         users_name = common_table_ops.get_users_details(table_name, identity)['name']
         listId = generate_list_id()

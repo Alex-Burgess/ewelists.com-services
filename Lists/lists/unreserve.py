@@ -2,7 +2,6 @@ import json
 import os
 import logging
 from lists import common
-from lists import common_env_vars
 from lists import common_event
 from lists import common_table_ops
 
@@ -14,7 +13,6 @@ if logger.handlers:
 
 
 def handler(event, context):
-    logger.info("Event: {}".format(json.dumps(event)))
     logger.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
     logger.info("Body attributes: {}".format(json.dumps(event['body'])))
     response = unreserve_main(event)
@@ -23,7 +21,7 @@ def handler(event, context):
 
 def unreserve_main(event):
     try:
-        table_name = common_env_vars.get_table_name(os.environ)
+        table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         list_id = common_event.get_list_id(event)
         product_id = common_event.get_product_id(event)
 

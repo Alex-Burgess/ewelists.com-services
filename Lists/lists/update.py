@@ -3,7 +3,6 @@ import os
 import boto3
 import logging
 from lists import common
-from lists import common_env_vars
 from lists import common_event
 
 logger = logging.getLogger()
@@ -23,7 +22,7 @@ def handler(event, context):
 
 def update_list_main(event):
     try:
-        table_name = common_env_vars.get_table_name(os.environ)
+        table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         identity = common_event.get_identity(event, os.environ)
         list_id = common_event.get_list_id(event)
         attribute_details = get_attribute_details(event)

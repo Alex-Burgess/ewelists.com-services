@@ -4,7 +4,7 @@ import json
 import logging
 import random
 import string
-from lists import common, common_env_vars
+from lists import common
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
@@ -26,9 +26,9 @@ SENDER = "Ewelists <contact@ewelists.com>"
 def handler(event, context):
     logger.info("SignUp Trigger event: " + json.dumps(event))
 
-    table_name = common_env_vars.get_table_name(os.environ)
-    index_name = common_env_vars.get_table_index(os.environ)
-    user_pool_id = common_env_vars.get_userpool_id(os.environ)
+    table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
+    index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
+    user_pool_id = common.get_env_variable(os.environ, 'USERPOOL_ID')
     template = get_template_name(os.environ)
     new_user = get_user_from_event(event)
     trigger = get_trigger_source_event(event)

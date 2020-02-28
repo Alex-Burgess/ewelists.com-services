@@ -15,6 +15,16 @@ logger.addHandler(stream_handler)
 
 
 @pytest.fixture
+def env_vars(monkeypatch):
+    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
+    monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://test.ewelists.com')
+
+    return monkeypatch
+
+
+@pytest.fixture
 def api_gateway_event_prod1():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/{id}/reserve/{productid}"
@@ -182,8 +192,7 @@ class TestCreateEmailData:
 
 class TestReserveMain:
     @pytest.mark.skip(reason="transact_write_items is not implemented for moto. https://github.com/spulec/moto/issues/2424")
-    def test_reserve_product_not_yet_reserved(self, monkeypatch, api_gateway_event_prod2, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    def test_reserve_product_not_yet_reserved(self, env_vars, api_gateway_event_prod2, dynamodb_mock):
         response = reserve.reserve_main(api_gateway_event_prod2)
         body = json.loads(response['body'])
         assert body['reserved'], "Reserve response was not true."
@@ -211,9 +220,7 @@ class TestReserveMain:
         assert reserved_details_response['Item']['quantity']['N'] == '1', "Quantity not as expected."
 
     @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-    def test_reserve_product_with_one_reserved(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-
+    def test_reserve_product_with_one_reserved(self, env_vars, api_gateway_event_prod1, dynamodb_mock):
         response = reserve.reserve_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
         assert body['reserved'], "Reserve response was not true."
@@ -240,12 +247,7 @@ class TestReserveMain:
         assert reserved_details_response['Item']['SK']['S'] == 'RESERVED#PRODUCT#12345678-prod-0001-1234-abcdefghijkl', "SK not as expected."
         assert reserved_details_response['Item']['quantity']['N'] == '2', "Quantity not as expected."
 
-    def test_over_reserve_product(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
-        monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
-        monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://website')
-
+    def test_over_reserve_product(self, env_vars, api_gateway_event_prod1, dynamodb_mock):
         api_gateway_event_prod1['body'] = json.dumps({
             "quantity": 4,
             "title": "Child User1 1st Birthday",
@@ -262,44 +264,28 @@ class TestReserveMain:
         body = json.loads(response['body'])
         assert body['error'] == 'Reserved quantity for product (2) could not be updated by 4 as exceeds required quantity (3).', "Reserve error was not as expected."
 
-    def test_reserve_product_not_added_to_list(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
-        monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
-        monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://website')
-
+    def test_reserve_product_not_added_to_list(self, env_vars, api_gateway_event_prod1, dynamodb_mock):
         api_gateway_event_prod1['pathParameters'] = {"productid": "12345678-prod-0100-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
 
         response = reserve.reserve_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
         assert body['error'] == 'No product item exists with this ID.', "Reserve error was not as expected."
 
-    def test_reserve_product_already_reserved_by_user(self, monkeypatch, api_gateway_event_prod1, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
-        monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
-        monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://website')
-
+    def test_reserve_product_already_reserved_by_user(self, env_vars, api_gateway_event_prod1, dynamodb_mock):
         api_gateway_event_prod1['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0002-1234-abcdefghijkl"
 
         response = reserve.reserve_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
         assert body['error'] == 'Product already reserved by user.', "Reserve error was not as expected."
 
-    def test_reserve_with_user_that_has_account(self, monkeypatch, api_gateway_event_existing_user, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
-        monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
-        monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://website')
-
+    def test_reserve_with_user_that_has_account(self, env_vars, api_gateway_event_existing_user, dynamodb_mock):
         response = reserve.reserve_main(api_gateway_event_existing_user)
         body = json.loads(response['body'])
         assert body['error'] == 'User has an account, login required before product can be reserved.', "Reserve error was not as expected."
 
 
 @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-def test_handler(api_gateway_event_prod1, monkeypatch, dynamodb_mock):
-    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+def test_handler(api_gateway_event_prod1, env_vars, dynamodb_mock):
     response = reserve.handler(api_gateway_event_prod1, None)
     body = json.loads(response['body'])
 

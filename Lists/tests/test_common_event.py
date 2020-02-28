@@ -269,7 +269,7 @@ class TestGetIdentity:
     def test_get_identity_when_postman_request_and_with_no_osvars(self, api_gateway_postman_event):
         with pytest.raises(Exception) as e:
             common_event.get_identity(api_gateway_postman_event, os.environ)
-        assert str(e.value) == "POSTMAN_USERPOOL_SUB environment variables not set correctly.", "Exception not as expected."
+        assert str(e.value) == "POSTMAN_USERPOOL_SUB environment variable not set correctly.", "Exception not as expected."
 
 
 class TestGetPathParameter:

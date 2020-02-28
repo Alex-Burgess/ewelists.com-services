@@ -1,7 +1,7 @@
 import logging
 import re
 import json
-from lists import common_env_vars
+from lists import common
 from urllib.parse import unquote
 
 logger = logging.getLogger()
@@ -25,10 +25,10 @@ def get_identity(event, osenv):
     pattern2 = re.compile("^arn:aws:iam::[0-9]{12}:user/ApiTestUser2$")
     if pattern.match(userArn):
         logger.info('Request was from postman, using API test identity.')
-        identity = common_env_vars.get_postman_identity(osenv, 1)
+        identity = common.get_env_variable(osenv, 'POSTMAN_USERPOOL_SUB')
     elif pattern2.match(userArn):
         logger.info('Request was from postman, using API test identity 2.')
-        identity = common_env_vars.get_postman_identity(osenv, 2)
+        identity = common.get_env_variable(osenv, 'POSTMAN_USERPOOL_SUB2')
     else:
         if user_id is None:
             raise Exception("There was no cognitoIdentityId in the API event.")
