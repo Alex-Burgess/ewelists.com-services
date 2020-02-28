@@ -2,9 +2,7 @@ import json
 import os
 import boto3
 import logging
-from lists import common
-from lists import common_table_ops
-from lists import common_event
+from lists import common, common_table_ops
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -24,18 +22,18 @@ def handler(event, context):
 def unshare_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-        identity = common_event.get_identity(event, os.environ)
-        list_id = common_event.get_list_id(event)
+        identity = common.get_identity(event, os.environ)
+        list_id = common.get_path_parameter(event, 'id')
         list = common_table_ops.get_list(table_name, identity, list_id)
         common.confirm_owner(identity, list_id, [list])
 
-        share_type = common_event.get_share_type(event)
+        share_type = common.get_share_type(event)
 
         if share_type == "SHARED":
-            user_id = common_event.get_path_parameter(event, 'user')
+            user_id = common.get_path_parameter(event, 'user')
             delete_shared_item(table_name, list_id, user_id)
         elif share_type == "PENDING":
-            email = common_event.get_path_parameter(event, 'user')
+            email = common.get_path_parameter(event, 'user')
             delete_pending_item(table_name, list_id, email)
         else:
             raise Exception('Shared user had wrong type.')

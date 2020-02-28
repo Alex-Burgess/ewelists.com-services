@@ -1,9 +1,7 @@
 import json
 import os
 import logging
-from lists import common
-from lists import common_event
-from lists import common_table_ops
+from lists import common, common_table_ops
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -22,8 +20,8 @@ def handler(event, context):
 def unreserve_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-        list_id = common_event.get_list_id(event)
-        product_id = common_event.get_product_id(event)
+        list_id = common.get_path_parameter(event, 'id')
+        product_id = common.get_path_parameter(event, 'productid')
 
         # Step 1 - get identity (which could be from sign in, or email in path, or encrypted parameter)
         id = common.get_user(event, os.environ, table_name)['id']

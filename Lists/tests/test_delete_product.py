@@ -110,10 +110,10 @@ class TestDeleteProductMain:
 
     def test_delete_product_with_no_product_id(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['productid'] = None
+        api_gateway_event['pathParameters']['productid'] = "null"
         response = delete_product.delete_product_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == "API Event did not contain a Product ID in the path parameters.", "Error not as expected."
+        assert body['error'] == "Path contained a null productid parameter.", "Error not as expected."
 
 
 def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):

@@ -3,7 +3,6 @@ import os
 import boto3
 import logging
 from lists import common
-from lists import common_event
 from lists.common_entities import List, Product, Reserved
 from botocore.exceptions import ClientError
 
@@ -26,7 +25,7 @@ def handler(event, context):
 def get_shared_list_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-        list_id = common_event.get_list_id(event)
+        list_id = common.get_path_parameter(event, 'id')
         response_items = get_list_query(table_name, list_id)
 
         list_object = generate_shared_list_object(response_items)

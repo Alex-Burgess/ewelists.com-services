@@ -1,6 +1,5 @@
 import boto3
 import logging
-import time
 import json
 from lists.common_entities import Product, Reserved
 from botocore.exceptions import ClientError

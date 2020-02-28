@@ -2,9 +2,7 @@ import json
 import os
 import boto3
 import logging
-from lists import common
-from lists import common_event
-from lists import common_table_ops
+from lists import common, common_table_ops
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -25,10 +23,10 @@ def handler(event, context):
 def update_reserve_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-        identity = common_event.get_identity(event, os.environ)
-        list_id = common_event.get_list_id(event)
-        product_id = common_event.get_product_id(event)
-        request_reserve_quantity = common_event.get_quantity(event)
+        identity = common.get_identity(event, os.environ)
+        list_id = common.get_path_parameter(event, 'id')
+        product_id = common.get_path_parameter(event, 'productid')
+        request_reserve_quantity = common.get_body_attribute(event, 'quantity')
 
         # Step 1 - get reserved item and product item.
         reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, identity)

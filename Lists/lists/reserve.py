@@ -5,9 +5,7 @@ import uuid
 import boto3
 import logging
 from botocore.exceptions import ClientError
-from lists import common
-from lists import common_event
-from lists import common_table_ops
+from lists import common, common_table_ops
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -33,11 +31,11 @@ def reserve_main(event):
         index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
         template = common.get_env_variable(os.environ, 'TEMPLATE_NAME')
         domain_name = common.get_env_variable(os.environ, 'DOMAIN_NAME')
-        list_id = common_event.get_list_id(event)
-        list_title = common_event.get_body_attribute(event, 'title')
-        product_id = common_event.get_product_id(event)
-        product = common_event.get_body_attribute(event, 'product')
-        request_reserve_quantity = common_event.get_quantity(event)
+        list_id = common.get_path_parameter(event, 'id')
+        list_title = common.get_body_attribute(event, 'title')
+        product_id = common.get_path_parameter(event, 'productid')
+        product = common.get_body_attribute(event, 'product')
+        request_reserve_quantity = common.get_body_attribute(event, 'quantity')
 
         # Step 1 - check if reserved item exists
         user = common.get_user(event, os.environ, table_name)

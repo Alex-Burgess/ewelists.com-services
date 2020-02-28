@@ -96,7 +96,7 @@ class TestUpdateProductMain:
         api_gateway_event['body'] = ''
         response = update_product.update_product_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == "API Event did not contain the quantity in the body.", "Error not as expected."
+        assert body['error'] == "Body was missing required attributes.", "Error not as expected."
 
     def test_update_product_with_not_owner(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
@@ -114,10 +114,10 @@ class TestUpdateProductMain:
 
     def test_add_product_with_no_product_id(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['productid'] = ''
+        api_gateway_event['pathParameters']['productid'] = 'null'
         response = update_product.update_product_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == "API Event did not contain a Product ID in the path parameters.", "Error not as expected."
+        assert body['error'] == "Path contained a null productid parameter.", "Error not as expected."
 
 
 def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):

@@ -3,7 +3,6 @@ import os
 import boto3
 import logging
 from lists import common
-from lists import common_event
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
@@ -26,8 +25,8 @@ def handler(event, context):
 def delete_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-        identity = common_event.get_identity(event, os.environ)
-        list_id = common_event.get_list_id(event)
+        identity = common.get_identity(event, os.environ)
+        list_id = common.get_path_parameter(event, 'id')
         items = get_items_associated_with_list(table_name, list_id)
         common.confirm_owner(identity, list_id, items)
         message = delete_items(table_name, identity, list_id, items)

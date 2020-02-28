@@ -3,9 +3,7 @@ import os
 import boto3
 import time
 import logging
-from lists import common
-from lists import common_table_ops
-from lists import common_event
+from lists import common, common_table_ops
 from lists.common_entities import User
 from botocore.exceptions import ClientError
 
@@ -34,9 +32,9 @@ def share_main(event):
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
         domain_name = common.get_env_variable(os.environ, 'DOMAIN_NAME')
-        identity = common_event.get_identity(event, os.environ)
-        list_id = common_event.get_list_id(event)
-        email = common_event.get_path_parameter(event, 'user')
+        identity = common.get_identity(event, os.environ)
+        list_id = common.get_path_parameter(event, 'id')
+        email = common.get_path_parameter(event, 'user')
         email = common.parse_email(email)
         list = common_table_ops.get_list(table_name, identity, list_id)
         list_owner_name = common_table_ops.get_users_details(table_name, identity)['name']

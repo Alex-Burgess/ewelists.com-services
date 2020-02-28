@@ -332,12 +332,12 @@ class TestShareMain:
         assert body['error'] == 'No list exists with this ID.', "Error was not as expected."
 
     def test_empty_list_in_event(self, ses_mock, dynamodb_mock, env_vars, api_gateway_share_event):
-        api_gateway_share_event['pathParameters']['id'] = None
+        api_gateway_share_event['pathParameters']['id'] = 'null'
 
         response = share.share_main(api_gateway_share_event)
         body = json.loads(response['body'])
 
-        assert body['error'] == 'API Event did not contain a List ID in the path parameters.', "Error was not as expected."
+        assert body['error'] == 'Path contained a null id parameter.', "Error was not as expected."
 
     def test_empty_user_in_event(self, ses_mock, dynamodb_mock, env_vars, api_gateway_share_event):
         api_gateway_share_event['pathParameters']['user'] = 'null'

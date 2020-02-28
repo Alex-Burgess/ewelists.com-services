@@ -3,7 +3,6 @@ import os
 import boto3
 import logging
 from lists import common
-from lists import common_event
 from lists.common_entities import User, List
 
 logger = logging.getLogger()
@@ -25,7 +24,7 @@ def list_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
-        identity = common_event.get_identity(event, os.environ)
+        identity = common.get_identity(event, os.environ)
         usersLists = get_lists(table_name, index_name, identity)
     except Exception as e:
         logger.error("Exception: {}".format(e))

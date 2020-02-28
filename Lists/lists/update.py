@@ -3,7 +3,6 @@ import os
 import boto3
 import logging
 from lists import common
-from lists import common_event
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -23,8 +22,8 @@ def handler(event, context):
 def update_list_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-        identity = common_event.get_identity(event, os.environ)
-        list_id = common_event.get_list_id(event)
+        identity = common.get_identity(event, os.environ)
+        list_id = common.get_path_parameter(event, 'id')
         attribute_details = get_attribute_details(event)
         items = get_items_to_update(table_name, list_id)
         common.confirm_owner(identity, list_id, items)
