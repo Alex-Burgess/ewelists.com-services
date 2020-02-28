@@ -106,6 +106,18 @@ def test_create_response():
     assert response == expected_response, "Create_response did not return the expected response value."
 
 
+class TestGetEnvironmentVariable:
+    def test_get_variable(self, monkeypatch):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-test')
+        table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
+        assert table_name == "lists-test", "Table name from os environment variables was not as expected."
+
+    def test_get_with_variable_not_set(self):
+        with pytest.raises(Exception) as e:
+            common.get_env_variable(os.environ, 'TABLE_NAME')
+        assert str(e.value) == "TABLE_NAME environment variable not set correctly.", "Exception not as expected."
+
+
 class TestParseEmail:
     def test_parse_email(self):
         assert common.parse_email(' Test.user@gmail.com ') == 'test.user@gmail.com'

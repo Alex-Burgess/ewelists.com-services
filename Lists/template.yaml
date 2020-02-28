@@ -282,6 +282,9 @@ Resources:
           POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
           POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
           TEMPLATE_NAME: !Sub 'Reserve-Confirmation-${Environment}'
+          DOMAIN_NAME: !If [Prod, !Sub "'https://${DomainName}'",
+                          !If [Staging, !Sub "'https://${Environment}.${DomainName}'", "http://localhost:3000"]
+                        ]
       Events:
         Reserve:
           Type: Api

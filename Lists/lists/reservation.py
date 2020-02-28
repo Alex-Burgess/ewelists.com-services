@@ -43,6 +43,7 @@ def reservation_main(event):
         'list_id': '3205c3b8-4b0d-4e99-b097-c1deb559788e',
         'list_title': 'This is a List',
         'product_id': '12345678-blog-e002-1234-abcdefghijkl',
+        'product_type': 'products',
         'quantity': 1,
         'state': 'reserved',
     }

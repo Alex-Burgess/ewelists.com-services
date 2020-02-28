@@ -21,7 +21,17 @@ def api_gateway_event_prod1():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 2,\n    \"title\": \"Child User1 1st Birthday\"\n}"
+    event['body'] = json.dumps({
+        "quantity": 2,
+        "title": "Child User1 1st Birthday",
+        "product": {
+            "type": "products",
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+    })
 
     return event
 
@@ -33,7 +43,17 @@ def api_gateway_event_prod2():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0002-1234-abcdefghijkl"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 1,\n    \"title\": \"Child User1 1st Birthday\"\n}"
+    event['body'] = json.dumps({
+        "quantity": 1,
+        "title": "Child User1 1st Birthday",
+        "product": {
+            "type": "products",
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+    })
 
     return event
 
@@ -45,7 +65,18 @@ def api_gateway_event_existing_user():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user1@gmail.com"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
-    event['body'] = "{\n    \"quantity\": 1,\n    \"title\": \"Child User1 1st Birthday\",\n    \"name\": \"Test User1\"\n}"
+    event['body'] = json.dumps({
+        "quantity": 1,
+        "title": "Child User1 1st Birthday",
+        "name": "Test User1",
+        "product": {
+            "type": "products",
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+    })
 
     return event
 
@@ -114,6 +145,41 @@ class TestCreateReservation:
         assert reserve.create_reservation('lists-unittest', resv_id, list_id, list_title, product_id, new_product_reserved_quantity, request_reserve_quantity, user)
 
 
+class TestCreateEmailData:
+    def test_create_email_data(self):
+        domain_name = 'http://localhost:3000'
+        name = 'Test User'
+        resv_id = '12345678-resv-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        list_title = 'Test List Title'
+        quantity = 2
+        product = {
+            "type": "products",
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+
+        data = reserve.create_email_data(domain_name, name, resv_id, list_id, list_title, quantity, product)
+
+        expected_data = {
+            "name": "Test User",
+            "list_title": "Test List Title",
+            "list_url": "http://localhost:3000/lists/12345678-list-0001-1234-abcdefghijkl",
+            "quantity": 2,
+            "confirm_url": "http://localhost:3000/purchased/12345678-resv-0001-1234-abcdefghijkl",
+            "edit_url": "http://localhost:3000/edit-reservation/12345678-resv-0001-1234-abcdefghijkl",
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "product_url": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "image_url": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+
+        assert len(data) == 10, "Number of fields in email data was not as expected."
+        assert data == expected_data, "Email data json object was not as expected."
+
+
 class TestReserveMain:
     @pytest.mark.skip(reason="transact_write_items is not implemented for moto. https://github.com/spulec/moto/issues/2424")
     def test_reserve_product_not_yet_reserved(self, monkeypatch, api_gateway_event_prod2, dynamodb_mock):
@@ -178,8 +244,19 @@ class TestReserveMain:
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
+        monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://website')
 
-        api_gateway_event_prod1['body'] = "{\n    \"quantity\": 4,\n    \"title\": \"Child User1 1st Birthday\",\n    \"message\": \"Happy birthday to you!\"\n}"
+        api_gateway_event_prod1['body'] = json.dumps({
+            "quantity": 4,
+            "title": "Child User1 1st Birthday",
+            "product": {
+                "type": "products",
+                "brand": "Mamas and Papas",
+                "details": "Balloon Print Zip All-in-One",
+                "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+                "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+            }
+        })
 
         response = reserve.reserve_main(api_gateway_event_prod1)
         body = json.loads(response['body'])
@@ -189,6 +266,7 @@ class TestReserveMain:
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
+        monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://website')
 
         api_gateway_event_prod1['pathParameters'] = {"productid": "12345678-prod-0100-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
 
@@ -200,6 +278,7 @@ class TestReserveMain:
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
+        monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://website')
 
         api_gateway_event_prod1['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0002-1234-abcdefghijkl"
 
@@ -211,6 +290,7 @@ class TestReserveMain:
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
         monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
+        monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://website')
 
         response = reserve.reserve_main(api_gateway_event_existing_user)
         body = json.loads(response['body'])

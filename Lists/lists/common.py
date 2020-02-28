@@ -17,6 +17,16 @@ ses = boto3.client('ses', region_name='eu-west-1')
 SENDER = "Ewelists <contact@ewelists.com>"
 
 
+def get_env_variable(osenv, name):
+    try:
+        variable = osenv[name]
+        logger.info(name + " environment variable value: " + variable)
+    except KeyError:
+        raise Exception(name + ' environment variable not set correctly.')
+
+    return variable
+
+
 def parse_email(email):
     email = email.strip()
     email = email.lower()
