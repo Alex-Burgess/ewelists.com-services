@@ -60,8 +60,7 @@ class TestDeleteItems:
             {"PK": {'S': "LIST#{}".format(list_id)}, 'SK': {'S': "USER#{}".format(user_id)}},
         ]
 
-        message = delete.delete_items('lists-unittest', user_id, list_id, items)
-        assert message == 'Deleted all items [1] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete message was not as expected."
+        assert delete.delete_items('lists-unittest', user_id, list_id, items)
 
     def test_delete_product_item(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
@@ -70,8 +69,7 @@ class TestDeleteItems:
             {"PK": {'S': "LIST#{}".format(list_id)}, 'SK': {'S': "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "quantity": 1, "reserved": 0}
         ]
 
-        message = delete.delete_items('lists-unittest', user_id, list_id, items)
-        assert message == 'Deleted all items [1] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete message was not as expected."
+        assert delete.delete_items('lists-unittest', user_id, list_id, items)
 
     def test_delete_multiple_list_items(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
@@ -82,8 +80,7 @@ class TestDeleteItems:
             {"PK": {'S': "LIST#{}".format(list_id)}, 'SK': {'S': "PRODUCT#{}".format(product_id)}}
         ]
 
-        message = delete.delete_items('lists-unittest', user_id, list_id, item_keys)
-        assert message == 'Deleted all items [2] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete message was not as expected."
+        assert delete.delete_items('lists-unittest', user_id, list_id, item_keys)
 
     # @pytest.mark.skip(reason="Moto is not throwing an exception when deleting with ConditionExpression")
     # def test_delete_item_no_list(self, dynamodb_mock):
@@ -111,7 +108,6 @@ class TestDeleteMain:
 
         assert body['deleted'], "Delete main response did not contain the correct status."
         assert len(body['listId']) == 36, "Create main response did not contain a listId."
-        assert body['message'] == 'Deleted all items [9] for List ID: 12345678-list-0001-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.', "Delete main response did not contain the correct message."
 
     def test_delete_main_with_bad_table_name(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')

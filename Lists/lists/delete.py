@@ -29,14 +29,14 @@ def delete_main(event):
         list_id = common.get_path_parameter(event, 'id')
         items = get_items_associated_with_list(table_name, list_id)
         common.confirm_owner(identity, list_id, items)
-        message = delete_items(table_name, identity, list_id, items)
+        delete_items(table_name, identity, list_id, items)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
         logger.info("Returning response: {}".format(response))
         return response
 
-    data = {'deleted': True, 'listId': list_id, 'message': message, "count": len(items)}
+    data = {'deleted': True, 'listId': list_id, "count": len(items)}
 
     response = common.create_response(200, json.dumps(data))
     return response
@@ -68,8 +68,7 @@ def delete_items(table_name, cognito_user_id, list_id, items):
                 raise
 
     logger.info("Deleted all items [{}] for List ID: {} and user: {}.".format(len(items), list_id, cognito_user_id)),
-    message = "Deleted all items [{}] for List ID: {} and user: {}.".format(len(items), list_id, cognito_user_id)
-    return message
+    return True
 
 
 def get_items_associated_with_list(table_name, list_id):
