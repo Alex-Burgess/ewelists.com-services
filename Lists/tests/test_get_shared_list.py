@@ -105,9 +105,9 @@ class TestGetListQuery:
         assert str(e.value) == "No query results for List ID 12345678-list-0009-1234-abcdefghijkl.", "Exception not as expected."
 
 
-class TestGenerateSharedListObject:
-    def test_generate_shared_list_object(self, list_query_response):
-        items = get_shared_list.generate_shared_list_object(list_query_response)
+class TestGenerateListObject:
+    def test_generate_list_object(self, list_query_response):
+        items = get_shared_list.generate_list_object(list_query_response)
         assert items['list']['listId'] == "12345678-list-0001-1234-abcdefghijkl", "ListId was incorrect."
         assert items['list']['title'] == "Child User1 1st Birthday", "List title was incorrect."
         assert items['list']['description'] == "A gift list for Child User1 birthday.", "List description was incorrect."

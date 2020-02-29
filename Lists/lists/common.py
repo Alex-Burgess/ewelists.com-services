@@ -92,17 +92,6 @@ def confirm_owner(user_id, list_id, response_items):
     return True
 
 
-def confirm_list_shared_with_user(user_id, list_id, response_items):
-    shared_user = 'SHARED#' + user_id
-    for item in response_items:
-        if item['PK']['S'].startswith("LIST") and item['SK']['S'] == shared_user:
-            log.info("Confirmed list {} is shared with user {}".format(list_id, user_id))
-            return True
-
-    log.info("List ID {} did not have a shared item with user {}.".format(list_id, user_id))
-    raise Exception("List ID {} did not have a shared item with user {}.".format(list_id, user_id))
-
-
 def create_response(code, body):
     log.info("Creating response with status code ({}) and body ({})".format(code, body))
     response = {'statusCode': code,

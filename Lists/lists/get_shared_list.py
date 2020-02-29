@@ -22,7 +22,7 @@ def get_shared_list_main(event):
         list_id = common.get_path_parameter(event, 'id')
         response_items = get_list_query(table_name, list_id)
 
-        list_object = generate_shared_list_object(response_items)
+        list_object = generate_list_object(response_items)
     except Exception as e:
         log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -33,7 +33,7 @@ def get_shared_list_main(event):
     return response
 
 
-def generate_shared_list_object(response_items):
+def generate_list_object(response_items):
     list = {"list": None, "products": {}, "reserved": {}}
 
     for item in response_items:

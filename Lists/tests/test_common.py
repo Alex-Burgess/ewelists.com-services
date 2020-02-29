@@ -236,27 +236,6 @@ class TestConfirmOwner:
         assert str(e.value) == "Owner of List ID 12345678-list-0001-1234-abcdefghijkl did not match user id of requestor: 12345678-user-0002-1234-abcdefghijkl.", "Exception not thrown for list not being owned by user."
 
 
-class TestConfirmListSharedWithUser:
-    def test_confirm_list_shared_with_self(self, list_query_response):
-        user_id = '12345678-user-0001-1234-abcdefghijkl'
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        result = common.confirm_list_shared_with_user(user_id, list_id, list_query_response)
-        assert result, "List should be shared with user."
-
-    def test_confirm_list_shared_with_user(self, list_query_response):
-        user_id = '12345678-user-0002-1234-abcdefghijkl'
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        result = common.confirm_list_shared_with_user(user_id, list_id, list_query_response)
-        assert result, "List should be shared with user."
-
-    def test_confirm_list_not_shared_with_user(self, list_query_response):
-        user_id = '12345678-user-0010-1234-abcdefghijkl'
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        with pytest.raises(Exception) as e:
-            common.confirm_list_shared_with_user(user_id, list_id, list_query_response)
-        assert str(e.value) == "List ID 12345678-list-0001-1234-abcdefghijkl did not have a shared item with user 12345678-user-0010-1234-abcdefghijkl.", "Exception not thrown for list not being shared with user."
-
-
 class TestCalculateNewReservedQuantity:
     def test_subtract_1(self):
         product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
