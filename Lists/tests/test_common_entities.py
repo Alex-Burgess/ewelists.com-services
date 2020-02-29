@@ -1,10 +1,7 @@
 from lists.common_entities import User, List, Product, Reserved
-import sys
-import logging
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-stream_handler = logging.StreamHandler(sys.stdout)
-logger.addHandler(stream_handler)
+from lists import logger
+
+log = logger.setup_logger()
 
 
 class TestUser:

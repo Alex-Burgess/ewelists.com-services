@@ -1,17 +1,11 @@
 import json
 import os
 import boto3
-import logging
 import time
 import uuid
-from lists import common, common_table_ops
+from lists import common, common_table_ops, logger
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-if logger.handlers:
-    handler = logger.handlers[0]
-    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
-
+log = logger.setup_logger()
 
 dynamodb = boto3.client('dynamodb')
 
@@ -30,7 +24,7 @@ def create_main(event):
         attributes = get_attribute_details(event)
         put_item_in_table(table_name, identity, listId, attributes, users_name)
     except Exception as e:
-        logger.error("Exception: {}".format(e))
+        log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
         return response
 
@@ -58,10 +52,10 @@ def put_item_in_table(table_name, cognito_user_id, listId, attributes, users_nam
         item['eventDate'] = {'S': attributes['eventDate']}
 
     try:
-        logger.info("Put owned item for lists table: {}".format(item))
+        log.info("Put owned item for lists table: {}".format(item))
         dynamodb.put_item(TableName=table_name, Item=item)
     except Exception as e:
-        logger.error("List could not be created: {}".format(e))
+        log.error("List could not be created: {}".format(e))
         raise Exception('List could not be created.')
 
     return True
@@ -69,7 +63,7 @@ def put_item_in_table(table_name, cognito_user_id, listId, attributes, users_nam
 
 def generate_list_id():
     newlistId = str(uuid.uuid4())
-    logger.info("Generated List ID: {}".format(newlistId))
+    log.info("Generated List ID: {}".format(newlistId))
 
     return newlistId
 
@@ -80,13 +74,13 @@ def get_attribute_details(event):
 
     try:
         body = event['body']
-        logger.info("Event body: " + json.dumps(body))
+        log.info("Event body: " + json.dumps(body))
     except Exception:
         raise Exception('API Event was empty.')
 
     try:
         attribute_details = json.loads(body)
-        logger.info("Attributes for create: " + json.dumps(attribute_details))
+        log.info("Attributes for create: " + json.dumps(attribute_details))
     except Exception:
         raise Exception('API Event did not contain a valid body.')
 

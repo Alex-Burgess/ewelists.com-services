@@ -1,21 +1,15 @@
 import json
 import os
 import boto3
-import logging
-from lists import common, common_table_ops
+from lists import common, common_table_ops, logger
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-if logger.handlers:
-    handler = logger.handlers[0]
-    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
-
+log = logger.setup_logger()
 
 dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    logger.info("Update product event: " + json.dumps(event))
+    log.info("Update product event: " + json.dumps(event))
     response = update_reserve_main(event)
     return response
 
@@ -43,9 +37,9 @@ def update_reserve_main(event):
         update_product_and_update_reserved_item(table_name, list_id, product_id, identity, new_product_reserved_quantity, request_reserve_quantity)
 
     except Exception as e:
-        logger.error("Exception: {}".format(e))
+        log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
-        logger.info("Returning response: {}".format(response))
+        log.info("Returning response: {}".format(response))
         return response
 
     data = {'updated': True}
@@ -58,12 +52,12 @@ def calculate_difference_to_reserved_item_quantity(reserved_item, new_quantity):
 
     if new_quantity <= 0:
         message = "Reserved quantity ({}) for product ({}) for user ({}) cannot be reduced to 0.".format(reserved_item['quantity'], reserved_item['productId'], reserved_item['userId'])
-        logger.info(message)
+        log.info(message)
         raise Exception(message)
 
     if difference == 0:
         message = "There was no difference in update request to reserved item."
-        logger.info(message)
+        log.info(message)
         raise Exception(message)
 
     return difference
@@ -106,9 +100,9 @@ def update_product_and_update_reserved_item(table_name, list_id, product_id, use
             ]
         )
 
-        logger.info("Attributes updated: " + json.dumps(response))
+        log.info("Attributes updated: " + json.dumps(response))
     except Exception as e:
-        logger.info("Transaction write exception: " + str(e))
+        log.info("Transaction write exception: " + str(e))
         raise Exception("Unexpected error when unreserving product.")
 
     return True

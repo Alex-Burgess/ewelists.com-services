@@ -1,21 +1,15 @@
 import json
 import os
 import boto3
-import logging
-from lists import common
+from lists import common, logger
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-if logger.handlers:
-    handler = logger.handlers[0]
-    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
-
+log = logger.setup_logger()
 
 dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    logger.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
+    log.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
     response = reservation_main(event)
     return response
 
@@ -26,9 +20,9 @@ def reservation_main(event):
         resv_id = common.get_path_parameter(event, 'id')
 
     except Exception as e:
-        logger.error("Exception: {}".format(e))
+        log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
-        logger.info("Returning response: {}".format(response))
+        log.info("Returning response: {}".format(response))
         return response
 
     data = {

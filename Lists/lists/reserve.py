@@ -3,19 +3,13 @@ import os
 import time
 import uuid
 import boto3
-import logging
 from botocore.exceptions import ClientError
-from lists import common, common_table_ops
+from lists import common, common_table_ops, logger
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-if logger.handlers:
-    handler = logger.handlers[0]
-    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
-
+log = logger.setup_logger()
 
 dynamodb = boto3.client('dynamodb')
-# Email configuration
+
 ses = boto3.client('ses', region_name='eu-west-1')
 SENDER = "Ewelists <contact@ewelists.com>"
 
@@ -60,9 +54,9 @@ def reserve_main(event):
         send_email(user['email'], template, data)
 
     except Exception as e:
-        logger.error("Exception: {}".format(e))
+        log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
-        logger.info("Returning response: {}".format(response))
+        log.info("Returning response: {}".format(response))
         return response
 
     data = {'reservation_id': resv_id}
@@ -130,9 +124,9 @@ def create_reservation(table_name, resv_id, list_id, list_title, product_id, pro
             ]
         )
 
-        logger.info("Attributes updated: " + json.dumps(response))
+        log.info("Attributes updated: " + json.dumps(response))
     except Exception as e:
-        logger.info("Transaction write exception: " + str(e))
+        log.info("Transaction write exception: " + str(e))
         raise Exception("Unexpected error when reserving product.")
 
     return True
@@ -169,6 +163,6 @@ def send_email(email, template, template_data):
     except ClientError as e:
         raise Exception("Could not send reserve email: " + e.response['Error']['Message'])
     else:
-        logger.info("Email sent! Message ID: " + response['MessageId'])
+        log.info("Email sent! Message ID: " + response['MessageId'])
 
     return True

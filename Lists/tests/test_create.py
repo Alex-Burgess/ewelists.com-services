@@ -5,15 +5,10 @@ import json
 import copy
 import boto3
 from moto import mock_dynamodb2
-from lists import create
+from lists import create, logger
 from tests import fixtures
 
-import sys
-import logging
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-stream_handler = logging.StreamHandler(sys.stdout)
-logger.addHandler(stream_handler)
+log = logger.setup_test_logger()
 
 
 @pytest.fixture

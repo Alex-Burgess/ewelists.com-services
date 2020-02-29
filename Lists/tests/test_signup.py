@@ -2,15 +2,10 @@ import pytest
 import uuid
 import boto3
 from moto import mock_dynamodb2, mock_cognitoidp
-from lists import signup
+from lists import signup, logger
 from tests import fixtures
 
-import sys
-import logging
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-stream_handler = logging.StreamHandler(sys.stdout)
-logger.addHandler(stream_handler)
+log = logger.setup_logger()
 
 
 @pytest.fixture

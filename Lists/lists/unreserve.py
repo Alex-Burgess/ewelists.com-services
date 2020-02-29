@@ -1,18 +1,13 @@
 import json
 import os
-import logging
-from lists import common, common_table_ops
+from lists import common, common_table_ops, logger
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-if logger.handlers:
-    handler = logger.handlers[0]
-    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
+log = logger.setup_logger()
 
 
 def handler(event, context):
-    logger.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
-    logger.info("Body attributes: {}".format(json.dumps(event['body'])))
+    log.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
+    log.info("Body attributes: {}".format(json.dumps(event['body'])))
     response = unreserve_main(event)
     return response
 
@@ -36,9 +31,9 @@ def unreserve_main(event):
         # Step 4 - Delete reserved details item and update product reserved quantities
         common_table_ops.unreserve_product(table_name, list_id, product_id, id, new_product_reserved_quantity)
     except Exception as e:
-        logger.error("Exception: {}".format(e))
+        log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
-        logger.info("Returning response: {}".format(response))
+        log.info("Returning response: {}".format(response))
         return response
 
     data = {'unreserved': True}

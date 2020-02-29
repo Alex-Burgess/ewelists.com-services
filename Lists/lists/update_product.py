@@ -1,16 +1,10 @@
 import json
 import os
 import boto3
-import logging
-from lists import common, common_table_ops
+from lists import common, common_table_ops, logger
 from botocore.exceptions import ClientError
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-if logger.handlers:
-    handler = logger.handlers[0]
-    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
-
+log = logger.setup_logger()
 
 dynamodb = boto3.client('dynamodb')
 
@@ -33,9 +27,9 @@ def update_product_main(event):
 
         quantity = update_product_item(table_name, list_id, product_id, quantity)
     except Exception as e:
-        logger.error("Exception: {}".format(e))
+        log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
-        logger.info("Returning response: {}".format(response))
+        log.info("Returning response: {}".format(response))
         return response
 
     data = {'quantity': quantity}
@@ -50,7 +44,7 @@ def update_product_item(table_name, list_id, product_id, quantity):
     }
 
     try:
-        logger.info("Updating quantity of product item ({}) to {}".format(key, quantity))
+        log.info("Updating quantity of product item ({}) to {}".format(key, quantity))
         response = dynamodb.update_item(
             TableName=table_name,
             Key=key,
@@ -62,15 +56,15 @@ def update_product_item(table_name, list_id, product_id, quantity):
             ReturnValues="UPDATED_NEW"
         )
     except ClientError as e:
-        logger.error("Exception: {}.".format(e))
-        logger.error("Product could not be updated. Error code: {}. Error message: {}".format(e.response['Error']['Code'], e.response['Error']['Message']))
+        log.error("Exception: {}.".format(e))
+        log.error("Product could not be updated. Error code: {}. Error message: {}".format(e.response['Error']['Code'], e.response['Error']['Message']))
 
         if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
             raise Exception('Product did not exist.')
         else:
             raise Exception('Unexpected error when updating product.')
 
-    logger.info("Add response: {}".format(response))
+    log.info("Add response: {}".format(response))
 
     if 'quantity' in response['Attributes']:
         quantity = int(response['Attributes']['quantity']['N'])

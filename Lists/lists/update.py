@@ -1,15 +1,9 @@
 import json
 import os
 import boto3
-import logging
-from lists import common
+from lists import common, logger
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-if logger.handlers:
-    handler = logger.handlers[0]
-    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
-
+log = logger.setup_logger()
 
 dynamodb = boto3.client('dynamodb')
 
@@ -29,9 +23,9 @@ def update_list_main(event):
         common.confirm_owner(identity, list_id, items)
         updated_attributes = update_list(table_name, items, attribute_details)
     except Exception as e:
-        logger.error("Exception: {}".format(e))
+        log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
-        logger.info("Returning response: {}".format(response))
+        log.info("Returning response: {}".format(response))
         return response
 
     response = common.create_response(200, json.dumps(updated_attributes))
@@ -44,28 +38,28 @@ def get_attribute_details(event):
 
     try:
         body = event['body']
-        logger.info("Event body: " + json.dumps(body))
+        log.info("Event body: " + json.dumps(body))
     except Exception:
-        logger.error("API Event was empty.")
+        log.error("API Event was empty.")
         raise Exception('API Event was empty.')
 
     try:
         update_attributes = json.loads(body)
     except Exception:
-        logger.error("API Event did not contain a valid body.")
+        log.error("API Event did not contain a valid body.")
         raise Exception('API Event did not contain a valid body.')
 
     expected_keys = ["title", "description", "eventDate", "occasion", "imageUrl"]
 
     if list(update_attributes.keys()) != expected_keys:
-        logger.error("Event body did not contain the expected keys " + str(expected_keys) + ".")
+        log.error("Event body did not contain the expected keys " + str(expected_keys) + ".")
         raise Exception("Event body did not contain the expected keys " + str(expected_keys) + ".")
 
     return update_attributes
 
 
 def get_items_to_update(table_name, list_id):
-    logger.info("Querying table {} to find all items associated with list id {}".format(table_name, list_id))
+    log.info("Querying table {} to find all items associated with list id {}".format(table_name, list_id))
 
     try:
         response = dynamodb.query(
@@ -73,19 +67,19 @@ def get_items_to_update(table_name, list_id):
             KeyConditionExpression="PK = :PK",
             ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
         )
-        logger.info("All items in query response. ({})".format(response['Items']))
+        log.info("All items in query response. ({})".format(response['Items']))
     except Exception as e:
-        logger.info("Exception: " + str(e))
+        log.info("Exception: " + str(e))
         raise Exception("Unexpected error when getting lists from table.")
 
     if len(response['Items']) == 0:
-        logger.info("No items for the list {} were found.".format(list_id))
+        log.info("No items for the list {} were found.".format(list_id))
         raise Exception("No list exists with this ID.")
 
     items = []
     for item in response['Items']:
         if item['SK']['S'].startswith("USER") or item['SK']['S'].startswith("SHARE") or item['SK']['S'].startswith("PENDING"):
-            logger.info("Adding item to list of items to update: {}".format(item))
+            log.info("Adding item to list of items to update: {}".format(item))
             items.append(item)
 
     return items
@@ -94,7 +88,7 @@ def get_items_to_update(table_name, list_id):
 def update_list(table_name, items, new_attribute_values):
     update_results = []
     for item in items:
-        logger.info("Updating item with PK ({}), SK ({}) with attribute values: {}".format(item['PK']['S'], item['SK']['S'], json.dumps(new_attribute_values)))
+        log.info("Updating item with PK ({}), SK ({}) with attribute values: {}".format(item['PK']['S'], item['SK']['S'], json.dumps(new_attribute_values)))
 
         key = {
             'PK': {'S': item['PK']['S']},
@@ -122,10 +116,10 @@ def update_list(table_name, items, new_attribute_values):
             )
 
         except Exception as e:
-            logger.info("update item exception: " + str(e))
+            log.info("update item exception: " + str(e))
             raise Exception("Unexpected error when updating the list item.")
 
-        logger.info("Attributes updated: " + json.dumps(response['Attributes']))
+        log.info("Attributes updated: " + json.dumps(response['Attributes']))
 
         updates = {}
         for attribute in response['Attributes']:

@@ -1,15 +1,9 @@
 import json
 import os
 import boto3
-import logging
-from lists import common, common_table_ops
+from lists import common, common_table_ops, logger
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-if logger.handlers:
-    handler = logger.handlers[0]
-    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
-
+log = logger.setup_logger()
 
 dynamodb = boto3.client('dynamodb')
 
@@ -31,9 +25,9 @@ def delete_product_main(event):
 
         message = delete_product_item(table_name, list_id, product_id)
     except Exception as e:
-        logger.error("Exception: {}".format(e))
+        log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
-        logger.info("Returning response: {}".format(response))
+        log.info("Returning response: {}".format(response))
         return response
 
     data = {'message': message}
@@ -53,7 +47,7 @@ def delete_product_item(table_name, list_id, product_id):
     }
 
     try:
-        logger.info("Deleting product item: {}".format(key))
+        log.info("Deleting product item: {}".format(key))
         response = dynamodb.delete_item(
             TableName=table_name,
             Key=key,
@@ -61,9 +55,9 @@ def delete_product_item(table_name, list_id, product_id):
             ExpressionAttributeValues=condition
         )
     except Exception as e:
-        logger.error("Product could not be deleted: {}".format(e))
+        log.error("Product could not be deleted: {}".format(e))
         raise Exception('Product could not be deleted.')
 
-    logger.info("Delete response: {}".format(response))
+    log.info("Delete response: {}".format(response))
 
     return True

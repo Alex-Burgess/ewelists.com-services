@@ -1,16 +1,10 @@
 import json
 import os
 import boto3
-import logging
-from lists import common
+from lists import common, logger
 from lists.common_entities import User, List
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-if logger.handlers:
-    handler = logger.handlers[0]
-    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
-
+log = logger.setup_logger()
 
 dynamodb = boto3.client('dynamodb')
 
@@ -27,9 +21,9 @@ def list_main(event):
         identity = common.get_identity(event, os.environ)
         usersLists = get_lists(table_name, index_name, identity)
     except Exception as e:
-        logger.error("Exception: {}".format(e))
+        log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
-        logger.info("Returning response: {}".format(response))
+        log.info("Returning response: {}".format(response))
         return response
 
     response = common.create_response(200, json.dumps(usersLists))
@@ -39,7 +33,7 @@ def list_main(event):
 def get_lists(table_name, index_name, cognito_user_id):
     response_data = {"user": None, "owned": []}
 
-    logger.info("Querying table")
+    log.info("Querying table")
 
     try:
         response = dynamodb.query(
@@ -48,25 +42,25 @@ def get_lists(table_name, index_name, cognito_user_id):
             KeyConditionExpression="userId = :userId",
             ExpressionAttributeValues={":userId":  {'S': cognito_user_id}}
         )
-        logger.info("All items in query response. ({})".format(response['Items']))
+        log.info("All items in query response. ({})".format(response['Items']))
     except Exception as e:
-        logger.info("Exception: " + str(e))
+        log.info("Exception: " + str(e))
         raise Exception("Unexpected error when getting lists from table.")
 
     if len(response['Items']) > 0:
         for item in response['Items']:
-            logger.info("Checking response item: {}".format(item))
+            log.info("Checking response item: {}".format(item))
             if item['PK']['S'] == item['SK']['S']:
-                logger.info("Adding user item to response data. ({})".format(item))
+                log.info("Adding user item to response data. ({})".format(item))
                 user = User(item)
                 response_data['user'] = user.get_basic_details()
             elif item['SK']['S'] == 'USER#' + cognito_user_id:
                 if item['listOwner']['S'] == cognito_user_id:
-                    logger.info("Adding owner list item to response data. ({})".format(item))
+                    log.info("Adding owner list item to response data. ({})".format(item))
                     list_details = List(item).get_details()
                     response_data['owned'].append(list_details)
 
     else:
-        logger.info("0 lists were returned.")
+        log.info("0 lists were returned.")
 
     return response_data

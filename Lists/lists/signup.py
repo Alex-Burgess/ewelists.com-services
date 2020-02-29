@@ -1,17 +1,11 @@
 import os
 import boto3
 import json
-import logging
 import random
 import string
-from lists import common
+from lists import common, logger
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-if logger.handlers:
-    handler = logger.handlers[0]
-    handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
-
+log = logger.setup_logger()
 
 client = boto3.client('cognito-idp')
 dynamodb = boto3.client('dynamodb')
@@ -23,7 +17,7 @@ SENDER = "Ewelists <contact@ewelists.com>"
 
 
 def handler(event, context):
-    logger.info("SignUp Trigger event: " + json.dumps(event))
+    log.info("SignUp Trigger event: " + json.dumps(event))
 
     table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
     user_pool_id = common.get_env_variable(os.environ, 'USERPOOL_ID')
@@ -33,20 +27,20 @@ def handler(event, context):
     exists = get_user_from_userpool(user_pool_id, new_user['email'])
 
     if exists['exists']:
-        logger.info("User exists in userpool.")
+        log.info("User exists in userpool.")
         link_accounts(user_pool_id, new_user['email'], exists['user_sub'], new_user['type'], new_user['username'])
         raise Exception("Linked new account to existing user account matching on email address.")
     elif trigger == 'PreSignUp_AdminCreateUser':
-        logger.info("Admin Creating User Account, remember this could be as part of a social signup.")
+        log.info("Admin Creating User Account, remember this could be as part of a social signup.")
         create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])
 
         # Send welcome email
         common.send(new_user['email'], new_user['name'], template)
     else:
-        logger.info("User does not have entry in userpool.")
+        log.info("User does not have entry in userpool.")
 
         if new_user['type'] == 'Google' or new_user['type'] == 'Facebook' or new_user['type'] == 'LoginWithAmazon':
-            logger.info("Creating new cognito user.")
+            log.info("Creating new cognito user.")
 
             # Create new cognito user
             new_cognito_user = create_new_cognito_user(user_pool_id, new_user['email'], new_user['name'])
@@ -56,21 +50,21 @@ def handler(event, context):
             # Set random password, otherwise congito account will stay in FORCE_CHANGED_PASSWORD state and user won't be able to reset password.
             set_random_password(user_pool_id, new_user['email'])
 
-            logger.info("Completed signup process for user. Raising exception to prevent normal signup process from continuing as not required.")
+            log.info("Completed signup process for user. Raising exception to prevent normal signup process from continuing as not required.")
             raise Exception("Sign up process complete for user.")
         else:
-            logger.info("New User is using username and password..")
+            log.info("New User is using username and password..")
             create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])
 
             # Send welcome email
             common.send(new_user['email'], new_user['name'], template)
-            logger.info("Allowing signup process to complete for user.")
+            log.info("Allowing signup process to complete for user.")
 
     return event
 
 
 def set_random_password(user_pool_id, email):
-    logger.info("Using admin_set_user_password to push user out of FORCE_CHANGED_PASSWORD state.")
+    log.info("Using admin_set_user_password to push user out of FORCE_CHANGED_PASSWORD state.")
     password = '!' + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(12))
 
     try:
@@ -80,7 +74,7 @@ def set_random_password(user_pool_id, email):
             Password=password,
             Permanent=True
         )
-        logger.info("Random password for the user set.")
+        log.info("Random password for the user set.")
 
         client.admin_update_user_attributes(
             UserPoolId=user_pool_id,
@@ -90,7 +84,7 @@ def set_random_password(user_pool_id, email):
             ]
         )
     except Exception as e:
-        logger.error("There was an issue confirming the users account: " + str(e))
+        log.error("There was an issue confirming the users account: " + str(e))
 
     return True
 
@@ -109,11 +103,11 @@ def create_new_cognito_user(user_pool_id, email, name):
             MessageAction='SUPPRESS',
         )
     except Exception as e:
-        logger.error("Account could not be created: " + str(e))
+        log.error("Account could not be created: " + str(e))
         raise Exception('Account could not be created.')
 
-    logger.info("Link response: " + json.dumps(response['User']['Username']))
-    logger.info("Link response: " + json.dumps(response['User']['Attributes']))
+    log.info("Link response: " + json.dumps(response['User']['Username']))
+    log.info("Link response: " + json.dumps(response['User']['Attributes']))
 
     result['created'] = True
     result['user_id'] = response['User']['Username']
@@ -122,7 +116,7 @@ def create_new_cognito_user(user_pool_id, email, name):
 
 
 def link_accounts(user_pool_id, email, existing_sub, new_type, new_id):
-    logger.info("Linking accounts with email {}. {} account ID ({}). Existing user pool identity ({}).".format(email, new_type, new_id, existing_sub))
+    log.info("Linking accounts with email {}. {} account ID ({}). Existing user pool identity ({}).".format(email, new_type, new_id, existing_sub))
 
     try:
         response = client.admin_link_provider_for_user(
@@ -138,16 +132,16 @@ def link_accounts(user_pool_id, email, existing_sub, new_type, new_id):
                 'ProviderAttributeValue': new_id
             }
         )
-        logger.info("Link response: " + json.dumps(response))
+        log.info("Link response: " + json.dumps(response))
     except Exception as e:
-        logger.error("Accounts could not be joined: " + str(e))
+        log.error("Accounts could not be joined: " + str(e))
         raise Exception('Accounts could not be joined.')
 
     return True
 
 
 def create_user_in_lists_db(table_name, sub, email, name):
-    logger.info("Creating entry in table {} for user with email {} (sub: {}).".format(table_name, email, sub))
+    log.info("Creating entry in table {} for user with email {} (sub: {}).".format(table_name, email, sub))
 
     user_item = {
         'PK': {'S': "USER#{}".format(sub)},
@@ -160,10 +154,10 @@ def create_user_in_lists_db(table_name, sub, email, name):
         user_item['name'] = {'S': name}
 
     try:
-        logger.info("Put user item in lists table: {}".format(user_item))
+        log.info("Put user item in lists table: {}".format(user_item))
         dynamodb.put_item(TableName=table_name, Item=user_item)
     except Exception as e:
-        logger.error("User entry could not be created: {}".format(e))
+        log.error("User entry could not be created: {}".format(e))
         raise Exception('User entry could not be created.')
 
     return True
@@ -189,7 +183,7 @@ def get_user_from_event(event):
         user['type'] = "Cognito"
         user['username'] = event['userName']
 
-    logger.info("User object being returned: {}.".format(json.dumps(user)))
+    log.info("User object being returned: {}.".format(json.dumps(user)))
 
     return user
 
@@ -199,7 +193,7 @@ def get_trigger_source_event(event):
 
 
 def get_user_from_userpool(user_pool_id, email):
-    logger.info("Check if userpool has an entry already for user with email: " + email)
+    log.info("Check if userpool has an entry already for user with email: " + email)
 
     response = client.list_users(
         UserPoolId=user_pool_id,
@@ -211,17 +205,17 @@ def get_user_from_userpool(user_pool_id, email):
         Filter='email ="' + email + '"'
     )
 
-    logger.info("Number of users returned {}: ".format(len(response['Users'])))
+    log.info("Number of users returned {}: ".format(len(response['Users'])))
 
     check_result = {}
     if len(response['Users']) > 0:
-        logger.info("Entry existed in userpool with email {}: {}".format(email, response['Users'][0]['Username']))
-        logger.info("Attributes: {}".format(response['Users'][0]['Attributes']))
+        log.info("Entry existed in userpool with email {}: {}".format(email, response['Users'][0]['Username']))
+        log.info("Attributes: {}".format(response['Users'][0]['Attributes']))
         check_result['exists'] = True
         check_result['user_sub'] = response['Users'][0]['Username']
         check_result['user_attributes'] = response['Users'][0]['Attributes']
     else:
-        logger.info("No entry existed in userpool with email {}.".format(email))
+        log.info("No entry existed in userpool with email {}.".format(email))
         check_result['exists'] = False
 
     return check_result
