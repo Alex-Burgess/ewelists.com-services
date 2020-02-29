@@ -28,14 +28,13 @@ def create_main(event):
         users_name = common_table_ops.get_users_details(table_name, identity)['name']
         listId = generate_list_id()
         attributes = get_attribute_details(event)
-        message = put_item_in_table(table_name, identity, listId, attributes, users_name)
+        put_item_in_table(table_name, identity, listId, attributes, users_name)
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
-        logger.info("Returning response: {}".format(response))
         return response
 
-    data = {'listId': listId, 'message': message}
+    data = {'listId': listId}
 
     response = common.create_response(200, json.dumps(data))
     return response
@@ -65,22 +64,10 @@ def put_item_in_table(table_name, cognito_user_id, listId, attributes, users_nam
         logger.error("List could not be created: {}".format(e))
         raise Exception('List could not be created.')
 
-    try:
-        item['SK']['S'] = "SHARED#{}".format(cognito_user_id)
-        item['shared_user_name'] = {'S': users_name}
-        logger.info("Put shared item for lists table: {}".format(item))
-        dynamodb.put_item(TableName=table_name, Item=item)
-    except Exception as e:
-        logger.error("List shared item for owner could not be created: {}".format(e))
-        raise Exception('List shared item for owner could not be created.')
-
-    message = "List was created."
-
-    return message
+    return True
 
 
 def generate_list_id():
-    # Generate a random uid
     newlistId = str(uuid.uuid4())
     logger.info("Generated List ID: {}".format(newlistId))
 
@@ -95,14 +82,12 @@ def get_attribute_details(event):
         body = event['body']
         logger.info("Event body: " + json.dumps(body))
     except Exception:
-        logger.error("API Event was empty.")
         raise Exception('API Event was empty.')
 
     try:
         attribute_details = json.loads(body)
         logger.info("Attributes for create: " + json.dumps(attribute_details))
     except Exception:
-        logger.error("API Event did not contain a valid body.")
         raise Exception('API Event did not contain a valid body.')
 
     return attribute_details

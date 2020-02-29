@@ -95,8 +95,7 @@ class TestPutItemInTable:
             'imageUrl': '/images/celebration-default.jpg'
         }
 
-        message = create.put_item_in_table('lists-unittest', user_id, list_id, attributes, users_name)
-        assert message == "List was created.", "Put item message not as expected."
+        assert create.put_item_in_table('lists-unittest', user_id, list_id, attributes, users_name)
 
         # Check the table was updated with right number of items
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
@@ -106,13 +105,11 @@ class TestPutItemInTable:
             KeyConditionExpression="PK = :PK",
             ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
         )
-        assert len(test_response['Items']) == 2, "Number of items for new list should be 2."
+        assert len(test_response['Items']) == 1, "Number of items for new list should be 1."
 
         assert test_response['Items'][0]['PK']['S'] == 'LIST#12345678-list-0012-1234-abcdefghijkl', "Attribute of item was not as expected."
-        assert test_response['Items'][0]['SK']['S'] == "SHARED#12345678-user-0001-1234-abcdefghijkl", "Attribute was not as expected."
+        assert test_response['Items'][0]['SK']['S'] == "USER#12345678-user-0001-1234-abcdefghijkl", "Attribute was not as expected."
         assert test_response['Items'][0]['userId']['S'] == "12345678-user-0001-1234-abcdefghijkl", "Attribute was not as expected."
-        assert test_response['Items'][0]['shared_user_name']['S'] == "Test User1", "Attribute was not as expected."
-        # assert test_response['Items'][0]['shared_user_email']['S'] == "test.user1@gmail.com", "Attribute was not as expected."
         assert test_response['Items'][0]['title']['S'] == "My Test List", "Attribute was not as expected."
         assert test_response['Items'][0]['eventDate']['S'] == "25 December 2020", "Attribute was not as expected."
         assert test_response['Items'][0]['occasion']['S'] == "Birthday", "Attribute was not as expected."
@@ -121,10 +118,6 @@ class TestPutItemInTable:
         assert len(test_response['Items'][0]['createdAt']['N']) == 10, "Attribute was not as expected."
         assert test_response['Items'][0]['description']['S'] == "Test description for the list.", "Attribute was not as expected."
         assert test_response['Items'][0]['imageUrl']['S'] == '/images/celebration-default.jpg', "imageurl of item was not as expected."
-
-        assert test_response['Items'][1]['PK']['S'] == 'LIST#12345678-list-0012-1234-abcdefghijkl', "PK of item was not as expected."
-        assert test_response['Items'][1]['imageUrl']['S'] == '/images/celebration-default.jpg', "imageurl of item was not as expected."
-        assert test_response['Items'][1]['eventDate']['S'] == "25 December 2020", "Attribute was not as expected."
 
     def test_put_item_in_table_with_bad_name(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
@@ -150,7 +143,6 @@ class TestCreateMain:
         response = create.create_main(api_gateway_event)
         body = json.loads(response['body'])
 
-        assert body['message'] == 'List was created.', "Create main response did not contain the correct message."
         assert len(body['listId']) == 36, "Create main response did not contain a listId."
 
     def test_create_main_no_date(self, monkeypatch, api_gateway_event2, dynamodb_mock):
@@ -159,7 +151,6 @@ class TestCreateMain:
         response = create.create_main(api_gateway_event2)
         body = json.loads(response['body'])
 
-        assert body['message'] == 'List was created.', "Create main response did not contain the correct message."
         assert len(body['listId']) == 36, "Create main response did not contain a listId."
 
     def test_create_main_with_no_event_body(self, monkeypatch, api_gateway_event, dynamodb_mock):

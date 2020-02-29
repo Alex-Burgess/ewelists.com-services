@@ -39,12 +39,6 @@
 									"    var listId = jsonData['listId'];",
 									"    pm.expect(listId.length).to.eql(36);",
 									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.eql('List was created.');",
-									"});",
 									""
 								],
 								"type": "text/javascript"
@@ -131,11 +125,6 @@
 									"pm.test(\"The user should own 1 lists\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData['owned'].length).to.eql(1);",
-									"});",
-									"",
-									"pm.test(\"The user should have 0 lists shared with them\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData['shared'].length).to.eql(0);",
 									"});",
 									"",
 									"pm.test(\"The returned object should contain the correct list details\", function () {",
@@ -240,12 +229,6 @@
 									"pm.test(\"Expected list of reserved products were not correct\", function () {",
 									"    var list_obj = pm.response.json();",
 									"    pm.expect(list_obj.reserved.length).to.eql(0);",
-									"});",
-									"",
-									"pm.test(\"Expected shared users objects was not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    var shared_keys = Object.keys(list_obj.shared)",
-									"    pm.expect(shared_keys.length).to.eql(0);",
 									"});",
 									""
 								],
@@ -446,7 +429,7 @@
 									"pm.test(\"Response should have a delete count\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(2);",
+									"    pm.expect(count).to.eql(1);",
 									"});",
 									"",
 									"pm.test(\"Response message should confirm delete successfull\", function () {",
@@ -580,12 +563,6 @@
 									"    var listId = jsonData['listId'];",
 									"    pm.expect(listId.length).to.eql(36);",
 									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.eql('List was created.');",
-									"});",
 									""
 								],
 								"type": "text/javascript"
@@ -674,12 +651,6 @@
 									"    var listId = jsonData['listId'];",
 									"    pm.expect(listId.length).to.eql(36);",
 									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.eql('List was created.');",
-									"});",
 									""
 								],
 								"type": "text/javascript"
@@ -766,11 +737,6 @@
 									"pm.test(\"The user should own 2 lists\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData['owned'].length).to.eql(2);",
-									"});",
-									"",
-									"pm.test(\"The user should have 0 lists shared with them\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData['shared'].length).to.eql(0);",
 									"});",
 									"",
 									"pm.test(\"The returned object should contain the correct list details\", function () {",
@@ -862,7 +828,7 @@
 									"pm.test(\"Response should have a delete count\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(2);",
+									"    pm.expect(count).to.eql(1);",
 									"});",
 									"",
 									"pm.test(\"Response message should confirm delete successfull\", function () {",
@@ -967,7 +933,7 @@
 									"pm.test(\"Response should have a delete count\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(2);",
+									"    pm.expect(count).to.eql(1);",
 									"});",
 									"",
 									"pm.test(\"Response message should confirm delete successfull\", function () {",
@@ -1102,12 +1068,6 @@
 									"    var listId = jsonData['listId'];",
 									"    pm.expect(listId.length).to.eql(36);",
 									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.eql('List was created.');",
-									"});",
 									""
 								],
 								"type": "text/javascript"
@@ -1188,7 +1148,7 @@
 									"pm.test(\"The returned object should contain the correct number of updated items\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var keys = Object.keys(jsonData)",
-									"    pm.expect(keys.length).to.eql(2);",
+									"    pm.expect(keys.length).to.eql(1);",
 									"});",
 									"",
 									"pm.test(\"Check that returned attributes contain the values we expect\", function () {",
@@ -1199,11 +1159,6 @@
 									"    pm.expect(jsonData[0]['updates']['title']).to.eql(\"My Updated Title\");",
 									"    pm.expect(jsonData[0]['updates']['eventDate']).to.eql(\"20 December 2020\");",
 									"    pm.expect(jsonData[0]['updates']['imageUrl']).to.eql(\"/images/celebration-default.jpg\");",
-									"    pm.expect(jsonData[1]['updates']['occasion']).to.eql(\"Birthday\");",
-									"    pm.expect(jsonData[1]['updates']['description']).to.eql(\"A gift wish list for my birthday.\");",
-									"    pm.expect(jsonData[1]['updates']['title']).to.eql(\"My Updated Title\");",
-									"    pm.expect(jsonData[1]['updates']['eventDate']).to.eql(\"20 December 2020\");",
-									"    pm.expect(jsonData[1]['updates']['imageUrl']).to.eql(\"/images/celebration-default.jpg\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1307,7 +1262,7 @@
 									"pm.test(\"The returned object should contain the correct number of updated items\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var keys = Object.keys(jsonData)",
-									"    pm.expect(keys.length).to.eql(2);",
+									"    pm.expect(keys.length).to.eql(1);",
 									"});",
 									"",
 									"pm.test(\"Check that returned attributes contain the values we expect\", function () {",
@@ -1318,10 +1273,6 @@
 									"    pm.expect(jsonData[0]['updates']['title']).to.eql(\"My Updated Title2\");",
 									"    pm.expect(jsonData[0]['updates']['eventDate']).to.eql(\"31 October 2019\");",
 									"    pm.expect(jsonData[0]['updates']['imageUrl']).to.eql(\"/images/christmas-default.jpg\");",
-									"    pm.expect(jsonData[1]['updates']['occasion']).to.eql(\"Christmas\");",
-									"    pm.expect(jsonData[1]['updates']['description']).to.eql(\"Updated description for the list.\");",
-									"    pm.expect(jsonData[1]['updates']['eventDate']).to.eql(\"31 October 2019\");",
-									"    pm.expect(jsonData[1]['updates']['imageUrl']).to.eql(\"/images/christmas-default.jpg\");",
 									"});",
 									""
 								],
@@ -1426,7 +1377,7 @@
 									"pm.test(\"The returned object should contain the correct number of updated items\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var keys = Object.keys(jsonData)",
-									"    pm.expect(keys.length).to.eql(2);",
+									"    pm.expect(keys.length).to.eql(1);",
 									"});",
 									"",
 									"pm.test(\"Check that returned attributes contain the values we expect\", function () {",
@@ -1437,10 +1388,6 @@
 									"    pm.expect(jsonData[0]['updates']['title']).to.eql(\"My Updated Title2\");",
 									"    pm.expect(jsonData[0]['updates']['eventDate']).to.eql(\"None\");",
 									"    pm.expect(jsonData[0]['updates']['imageUrl']).to.eql(\"/images/christmas-default.jpg\");",
-									"    pm.expect(jsonData[1]['updates']['occasion']).to.eql(\"Christmas\");",
-									"    pm.expect(jsonData[1]['updates']['description']).to.eql(\"Updated description for the list.\");",
-									"    pm.expect(jsonData[1]['updates']['eventDate']).to.eql(\"None\");",
-									"    pm.expect(jsonData[1]['updates']['imageUrl']).to.eql(\"/images/christmas-default.jpg\");",
 									"});",
 									""
 								],
@@ -1551,7 +1498,7 @@
 									"pm.test(\"Response should have a delete count\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(2);",
+									"    pm.expect(count).to.eql(1);",
 									"});",
 									"",
 									"pm.test(\"Response message should confirm delete successfull\", function () {",
@@ -1686,11 +1633,6 @@
 									"    pm.expect(listId.length).to.eql(36);",
 									"});",
 									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.eql('List was created.');",
-									"});",
 									""
 								],
 								"type": "text/javascript"
@@ -1983,12 +1925,6 @@
 									"    var list_obj = pm.response.json();",
 									"    pm.expect(list_obj.reserved.length).to.eql(0);",
 									"});",
-									"",
-									"pm.test(\"Expected shared users objects was not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    var shared_keys = Object.keys(list_obj.shared)",
-									"    pm.expect(shared_keys.length).to.eql(0);",
-									"});",
 									""
 								],
 								"type": "text/javascript"
@@ -2193,12 +2129,6 @@
 									"pm.test(\"Expected list of reserved products were not correct\", function () {",
 									"    var list_obj = pm.response.json();",
 									"    pm.expect(list_obj.reserved.length).to.eql(0);",
-									"});",
-									"",
-									"pm.test(\"Expected shared users objects was not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    var shared_keys = Object.keys(list_obj.shared)",
-									"    pm.expect(shared_keys.length).to.eql(0);",
 									"});",
 									""
 								],
@@ -2483,7 +2413,7 @@
 									"pm.test(\"Response should have a delete count\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(2);",
+									"    pm.expect(count).to.eql(1);",
 									"});",
 									"",
 									"pm.test(\"Response message should confirm delete successfull\", function () {",
@@ -2678,1377 +2608,6 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Share list with existing user (not used)",
-			"item": [
-				{
-					"name": "create list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"Add variable for new List ID\", function() {",
-									"    var jsonData = pm.response.json();",
-									"    listId = jsonData[\"listId\"];",
-									"    pm.environment.set(\"list_id\", listId);",
-									"});",
-									"",
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"A list Id should be returned\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var listId = jsonData['listId'];",
-									"    pm.expect(listId.length).to.eql(36);",
-									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.eql('List was created.');",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"eventDate\": \"20 December 2020\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"
-						},
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "share list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"Add variable for new Ewe user sub\", function() {",
-									"    var jsonData = pm.response.json();",
-									"    pm.environment.set(\"user2_id\", jsonData['user'].userId);",
-									"});",
-									"",
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var user = jsonData['user'];",
-									"    pm.expect(user['email']).to.eql(\"eweuser8+test2@gmail.com\");",
-									"    pm.expect(user['name']).to.eql(\"Ewe Api2\");",
-									"    pm.expect(user['userId']).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
-									"    pm.expect(user['type']).to.eql(\"SHARED\");",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
-								"exec": [
-									"pm.environment.get(\"list_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/share/eweuser8%2Btest2%40gmail.com",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}",
-								"share",
-								"eweuser8%2Btest2%40gmail.com"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "get list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "fb81bbcd-559a-430f-9b5a-0ef955261e1c",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Expected list details were not correct.\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    pm.expect(list_obj.list.listId.length).to.eql(36);",
-									"    pm.expect(list_obj.list.title).to.eql(\"My Birthday List\");",
-									"    pm.expect(list_obj.list.description).to.eql(\"A gift wish list for my birthday.\");",
-									"    pm.expect(list_obj.list.eventDate).to.eql(\"20 December 2020\");",
-									"    pm.expect(list_obj.list.occasion).to.eql(\"Birthday\");",
-									"    pm.expect(list_obj.list.imageUrl).to.eql(\"/images/celebration-default.jpg\");",
-									"});",
-									"",
-									"pm.test(\"Expected producted details were not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    var product_keys = Object.keys(list_obj.products)",
-									"    pm.expect(product_keys.length).to.eql(0);",
-									"});",
-									"",
-									"pm.test(\"Expected list of reserved products were not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    pm.expect(list_obj.reserved.length).to.eql(0);",
-									"});",
-									"",
-									"pm.test(\"Expected shared users objects was not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    var shared_keys = Object.keys(list_obj.shared)",
-									"    pm.expect(shared_keys.length).to.eql(1);",
-									"    ",
-									"    var user = list_obj.shared[shared_keys[0]]",
-									"    pm.expect(user.type).to.eql(\"SHARED\");",
-									"    pm.expect(user.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
-									"    pm.expect(user.name).to.eql(\"Ewe Api2\");",
-									"    pm.expect(user.email).to.eql(\"eweuser8+test2@gmail.com\");",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "c6b1463f-8426-42ea-aeee-c6583fa1ad97",
-								"exec": [
-									"pm.environment.get(\"list_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "get shared list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"The returned object should contain the correct list details\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    pm.expect(list_obj.list.listId.length).to.eql(36);",
-									"    pm.expect(list_obj.list.title).to.eql(\"My Birthday List\");",
-									"    pm.expect(list_obj.list.description).to.eql(\"A gift wish list for my birthday.\");",
-									"    pm.expect(list_obj.list.eventDate).to.eql(\"20 December 2020\");",
-									"    pm.expect(list_obj.list.occasion).to.eql(\"Birthday\");",
-									"    pm.expect(list_obj.list.imageUrl).to.eql(\"/images/celebration-default.jpg\");",
-									"});",
-									"",
-									"pm.test(\"Expected producted details were not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    var product_keys = Object.keys(list_obj.products)",
-									"    pm.expect(product_keys.length).to.eql(0);",
-									"});",
-									"",
-									"pm.test(\"Expected reserved products details were not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    var reserved_keys = Object.keys(list_obj.reserved)",
-									"    pm.expect(reserved_keys.length).to.eql(0);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
-								"exec": [
-									"pm.environment.get(\"list_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey2}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey2}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/shared",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}",
-								"shared"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "share list already shared",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(500);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Response message should exist\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['error'];",
-									"    pm.expect(message).to.eql('User already exists in list.');",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
-								"exec": [
-									"pm.environment.get(\"list_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/share/eweuser8%2Btest2%40gmail.com",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}",
-								"share",
-								"eweuser8%2Btest2%40gmail.com"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "unshare list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var result = jsonData['unshared'];",
-									"    pm.expect(result).to.eql(true);",
-									"});",
-									"",
-									"pm.test(\"Clear environment variable\", function() {",
-									"    pm.environment.unset(\"user2_id\")",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
-								"exec": [
-									"pm.environment.get(\"list_id\")",
-									"pm.environment.get(\"eweuser8_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"share_type\": \"SHARED\"\n}"
-						},
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/share/{{user2_id}}",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}",
-								"share",
-								"{{user2_id}}"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "delete list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Response should confirm deleted\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var deletedBool = jsonData['deleted'];",
-									"    pm.expect(deletedBool).to.eql(true);",
-									"});",
-									"",
-									"pm.test(\"Response should have a delete count\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(2);",
-									"});",
-									"",
-									"pm.test(\"Response message should confirm delete successfull\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.include(\"Deleted all items\");",
-									"});",
-									"",
-									"pm.test(\"Clear environment variable\", function() {",
-									"    pm.environment.unset(\"list_id\")",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
-								"exec": [
-									"pm.environment.get(\"list_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				}
-			],
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "72004e96-87ea-483c-aad2-1faa8cac62fb",
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"id": "66ec9718-6d2a-493b-9d29-b9e1f40ba822",
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Share list with non-existing user (not used)",
-			"item": [
-				{
-					"name": "create list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"Add variable for new List ID\", function() {",
-									"    var jsonData = pm.response.json();",
-									"    listId = jsonData[\"listId\"];",
-									"    pm.environment.set(\"list_id\", listId);",
-									"});",
-									"",
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"A list Id should be returned\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var listId = jsonData['listId'];",
-									"    pm.expect(listId.length).to.eql(36);",
-									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.eql('List was created.');",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"eventDate\": \"20 December 2020\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"
-						},
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "share list with user that does not exist",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var user = jsonData['user'];",
-									"    pm.expect(user['email']).to.eql(\"success@simulator.amazonses.com\");",
-									"    pm.expect(user['type']).to.eql(\"PENDING\");",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
-								"exec": [
-									"pm.environment.get(\"list_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/share/success%40simulator.amazonses.com",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}",
-								"share",
-								"success%40simulator.amazonses.com"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "get list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "fb81bbcd-559a-430f-9b5a-0ef955261e1c",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Expected list details were not correct.\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    pm.expect(list_obj.list.listId.length).to.eql(36);",
-									"    pm.expect(list_obj.list.title).to.eql(\"My Birthday List\");",
-									"    pm.expect(list_obj.list.description).to.eql(\"A gift wish list for my birthday.\");",
-									"    pm.expect(list_obj.list.eventDate).to.eql(\"20 December 2020\");",
-									"    pm.expect(list_obj.list.occasion).to.eql(\"Birthday\");",
-									"    pm.expect(list_obj.list.imageUrl).to.eql(\"/images/celebration-default.jpg\");",
-									"});",
-									"",
-									"pm.test(\"Expected producted details were not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    var product_keys = Object.keys(list_obj.products)",
-									"    pm.expect(product_keys.length).to.eql(0);",
-									"});",
-									"",
-									"pm.test(\"Expected list of reserved products were not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    pm.expect(list_obj.reserved.length).to.eql(0);",
-									"});",
-									"",
-									"pm.test(\"Expected shared users objects was not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    var shared_keys = Object.keys(list_obj.shared)",
-									"    pm.expect(shared_keys.length).to.eql(1);",
-									"    ",
-									"    var user = list_obj.shared[shared_keys[0]]",
-									"    pm.expect(user.type).to.eql(\"PENDING\");",
-									"    pm.expect(user.email).to.eql(\"success@simulator.amazonses.com\");",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "c6b1463f-8426-42ea-aeee-c6583fa1ad97",
-								"exec": [
-									"pm.environment.get(\"list_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "share list already shared",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(500);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Response message should exist\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['error'];",
-									"    pm.expect(message).to.eql('User already exists in list.');",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
-								"exec": [
-									"pm.environment.get(\"list_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/share/success%40simulator.amazonses.com",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}",
-								"share",
-								"success%40simulator.amazonses.com"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "unshare list from pending user",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var result = jsonData['unshared'];",
-									"    pm.expect(result).to.eql(true);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
-								"exec": [
-									"pm.environment.get(\"list_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"share_type\": \"PENDING\"\n}"
-						},
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/share/success%40simulator.amazonses.com",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}",
-								"share",
-								"success%40simulator.amazonses.com"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
-					"name": "delete list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Response should confirm deleted\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var deletedBool = jsonData['deleted'];",
-									"    pm.expect(deletedBool).to.eql(true);",
-									"});",
-									"",
-									"pm.test(\"Response should have a delete count\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(2);",
-									"});",
-									"",
-									"pm.test(\"Response message should confirm delete successfull\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.include(\"Deleted all items\");",
-									"});",
-									"",
-									"pm.test(\"Clear environment variable\", function() {",
-									"    pm.environment.unset(\"list_id\")",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
-								"exec": [
-									"pm.environment.get(\"list_id\")"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"{{list_id}}"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				}
-			],
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "72004e96-87ea-483c-aad2-1faa8cac62fb",
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"id": "66ec9718-6d2a-493b-9d29-b9e1f40ba822",
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
 			"name": "Reserve, edit and unreserve products (auth)",
 			"item": [
 				{
@@ -4082,13 +2641,17 @@
 									"    var listId = jsonData['listId'];",
 									"    pm.expect(listId.length).to.eql(36);",
 									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.eql('List was created.');",
-									"});",
 									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "35637152-5ec2-43b7-ab66-eb64359d734f",
+								"exec": [
+									"pm.environment.set(\"list_title\", \"My Birthday List\");"
 								],
 								"type": "text/javascript"
 							}
@@ -4380,19 +2943,6 @@
 									"    var list_obj = pm.response.json();",
 									"    pm.expect(list_obj.reserved.length).to.eql(0);",
 									"});",
-									"",
-									"// No longer store who list is shared with.",
-									"// pm.test(\"Expected shared users objects was not correct\", function () {",
-									"//     var list_obj = pm.response.json();",
-									"//     var shared_keys = Object.keys(list_obj.shared)",
-									"//     pm.expect(shared_keys.length).to.eql(1);",
-									"    ",
-									"//     var user = list_obj.shared[shared_keys[0]]",
-									"//     pm.expect(user.type).to.eql(\"SHARED\");",
-									"//     pm.expect(user.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
-									"//     pm.expect(user.name).to.eql(\"Ewe Api2\");",
-									"//     pm.expect(user.email).to.eql(\"eweuser8+test2@gmail.com\");",
-									"// });",
 									""
 								],
 								"type": "text/javascript"
@@ -4591,8 +3141,9 @@
 									"",
 									"pm.test(\"Response message should be created\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    var reserved = jsonData['reserved'];",
-									"    pm.expect(reserved).to.eql(true);",
+									"    var reservation_id = jsonData['reservation_id'];",
+									"    pm.expect(reservation_id.length).to.eql(36);",
+									"    pm.environment.set(\"reservation_id\", reservation_id);",
 									"});",
 									""
 								],
@@ -4640,7 +3191,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 1\n}"
+							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{lists_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"Mamas and Papas\",\n        \"details\": \"Balloon Print Zip All-in-One\",\n        \"productUrl\": \"https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5\",\n        \"imageUrl\": \"https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$\"\n    }\n}"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}",
@@ -4658,6 +3209,124 @@
 								"{{list_id}}",
 								"reserve",
 								"{{p_product_id}}"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "get reservation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fb81bbcd-559a-430f-9b5a-0ef955261e1c",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Expected list details were not correct.\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    pm.expect(list_obj.list.listId.length).to.eql(36);",
+									"    pm.expect(list_obj.list.title).to.eql(\"My Birthday List\");",
+									"    pm.expect(list_obj.list.description).to.eql(\"A gift wish list for my birthday.\");",
+									"    pm.expect(list_obj.list.eventDate).to.eql(\"20 December 2020\");",
+									"    pm.expect(list_obj.list.occasion).to.eql(\"Birthday\");",
+									"    pm.expect(list_obj.list.imageUrl).to.eql(\"/images/celebration-default.jpg\");",
+									"});",
+									"",
+									"pm.test(\"Expected producted details were not correct\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    var product_keys = Object.keys(list_obj.products)",
+									"    pm.expect(product_keys.length).to.eql(1);",
+									"    ",
+									"    var product = list_obj.products[product_keys[0]]",
+									"    pm.expect(product.type).to.eql(\"products\");",
+									"    pm.expect(product.productId.length).to.eql(36);",
+									"    pm.expect(product.quantity).to.eql(2);",
+									"    pm.expect(product.reserved).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"Expected list of reserved products were not correct\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    pm.expect(list_obj.reserved.length).to.eql(1);",
+									"    ",
+									"    var reserved_product = list_obj.reserved[0]",
+									"    pm.expect(reserved_product.name).to.eql(\"Ewe Api2\");",
+									"    pm.expect(reserved_product.quantity).to.eql(1);",
+									"    pm.expect(reserved_product.productId.length).to.eql(36);",
+									"    pm.expect(reserved_product.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c6b1463f-8426-42ea-aeee-c6583fa1ad97",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/reservation/{{reservation_id}}",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"reservation",
+								"{{reservation_id}}"
 							]
 						},
 						"description": "Create list"
@@ -4717,19 +3386,6 @@
 									"    pm.expect(reserved_product.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
 									"});",
 									"",
-									"",
-									"// No longer store who list is shared with.",
-									"// pm.test(\"Expected shared users objects was not correct\", function () {",
-									"//     var list_obj = pm.response.json();",
-									"//     var shared_keys = Object.keys(list_obj.shared)",
-									"//     pm.expect(shared_keys.length).to.eql(1);",
-									"    ",
-									"//     var user = list_obj.shared[shared_keys[0]]",
-									"//     pm.expect(user.type).to.eql(\"SHARED\");",
-									"//     pm.expect(user.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
-									"//     pm.expect(user.name).to.eql(\"Ewe Api2\");",
-									"//     pm.expect(user.email).to.eql(\"eweuser8+test2@gmail.com\");",
-									"// });",
 									""
 								],
 								"type": "text/javascript"
@@ -5229,7 +3885,7 @@
 									"pm.test(\"Response should have a delete count\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(3);",
+									"    pm.expect(count).to.eql(2);",
 									"});",
 									"",
 									"pm.test(\"Response message should confirm delete successfull\", function () {",
@@ -5240,6 +3896,7 @@
 									"",
 									"pm.test(\"Clear environment variables\", function() {",
 									"    pm.environment.unset(\"list_id\")",
+									"    pm.environment.unset(\"list_title\")",
 									"    pm.environment.unset(\"user2_id\")",
 									"});"
 								],
@@ -5458,13 +4115,17 @@
 									"    var listId = jsonData['listId'];",
 									"    pm.expect(listId.length).to.eql(36);",
 									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.eql('List was created.');",
-									"});",
 									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "da5207f3-f4d6-45cf-b412-29ab4762000f",
+								"exec": [
+									"pm.environment.set(\"list_title\", \"My Birthday List\");"
 								],
 								"type": "text/javascript"
 							}
@@ -5757,17 +4418,6 @@
 									"    pm.expect(list_obj.reserved.length).to.eql(0);",
 									"});",
 									"",
-									"pm.test(\"Expected shared users objects was not correct\", function () {",
-									"    var list_obj = pm.response.json();",
-									"    var shared_keys = Object.keys(list_obj.shared)",
-									"    pm.expect(shared_keys.length).to.eql(1);",
-									"    ",
-									"    var user = list_obj.shared[shared_keys[0]]",
-									"    pm.expect(user.type).to.eql(\"SHARED\");",
-									"    pm.expect(user.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
-									"    pm.expect(user.name).to.eql(\"Ewe Api2\");",
-									"    pm.expect(user.email).to.eql(\"eweuser8+test2@gmail.com\");",
-									"});",
 									""
 								],
 								"type": "text/javascript"
@@ -6063,8 +4713,8 @@
 									"",
 									"pm.test(\"Response message should be created\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    var reserved = jsonData['reserved'];",
-									"    pm.expect(reserved).to.eql(true);",
+									"    var reservation_id = jsonData['reservation_id'];",
+									"    pm.expect(reservation_id.length).to.eql(36);",
 									"});",
 									""
 								],
@@ -6112,7 +4762,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 1,\n    \"name\": \"Success Simulator\"\n}"
+							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{lists_title}}\",\n    \"name\": \"Success Simulator\"\n}"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/success%40simulator.amazonses.com",
@@ -6332,12 +4982,12 @@
 							"awsv4": [
 								{
 									"key": "secretKey",
-									"value": "{{SecretKey2}}",
+									"value": "",
 									"type": "string"
 								},
 								{
 									"key": "accessKey",
-									"value": "{{AccessKey2}}",
+									"value": "",
 									"type": "string"
 								},
 								{
@@ -6614,12 +5264,12 @@
 							"awsv4": [
 								{
 									"key": "secretKey",
-									"value": "{{SecretKey2}}",
+									"value": "",
 									"type": "string"
 								},
 								{
 									"key": "accessKey",
-									"value": "{{AccessKey2}}",
+									"value": "",
 									"type": "string"
 								},
 								{
@@ -6638,10 +5288,10 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n    \"name\": \"Success Simulator\"\n}"
 						},
 						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}",
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/success%40simulator.amazonses.com",
 							"protocol": "https",
 							"host": [
 								"{{lists_url_id}}",
@@ -6655,7 +5305,9 @@
 								"lists",
 								"{{list_id}}",
 								"reserve",
-								"{{p_product_id}}"
+								"{{p_product_id}}",
+								"email",
+								"success%40simulator.amazonses.com"
 							]
 						},
 						"description": "Create list"
@@ -6691,7 +5343,7 @@
 									"pm.test(\"Response should have a delete count\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(4);",
+									"    pm.expect(count).to.eql(2);",
 									"});",
 									"",
 									"pm.test(\"Response message should confirm delete successfull\", function () {",
@@ -6702,6 +5354,7 @@
 									"",
 									"pm.test(\"Clear environment variables\", function() {",
 									"    pm.environment.unset(\"list_id\")",
+									"    pm.environment.unset(\"list_title\")",
 									"    pm.environment.unset(\"user2_id\")",
 									"});"
 								],
@@ -6994,7 +5647,6 @@
 									"pm.test(\"The correct number of list objects should be returned\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData['owned'].length).to.eql(0);",
-									"    pm.expect(jsonData['shared'].length).to.eql(0);",
 									"});",
 									"",
 									""
@@ -7256,12 +5908,6 @@
 									"    var listId = jsonData['listId'];",
 									"    pm.expect(listId.length).to.eql(36);",
 									"});",
-									"",
-									"pm.test(\"Response message should be created\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var message = jsonData['message'];",
-									"    pm.expect(message).to.eql('List was created.');",
-									"});",
 									""
 								],
 								"type": "text/javascript"
@@ -7427,7 +6073,7 @@
 									"pm.test(\"Response should have a delete count\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(2);",
+									"    pm.expect(count).to.eql(1);",
 									"});",
 									"",
 									"pm.test(\"Response message should confirm delete successfull\", function () {",
