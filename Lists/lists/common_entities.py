@@ -102,3 +102,36 @@ class Reserved:
             reserved['message'] = self.message
 
         return reserved
+
+
+class Reservation:
+    def __init__(self, item):
+        self.reservationId = item.get('reservationId').get('S')
+        self.userId = item.get('userId').get('S')
+        self.name = item.get('name').get('S')
+        self.email = item.get('email').get('S')
+        self.listId = item.get('listId').get('S')
+        self.title = item.get('title').get('S')
+        self.productId = item.get('productId').get('S')
+        self.productType = item.get('productType').get('S')
+        self.quantity = item.get('quantity').get('N')
+        self.state = item.get('state').get('S')
+
+    def __repr__(self):
+        return "Reservation<{}>".format(self.reservationId)
+
+    def get_details(self):
+        reserved = {
+            'reservationId': self.reservationId,
+            'userId': self.userId,
+            'name': self.name,
+            'email': self.email,
+            'listId': self.listId,
+            'title': self.title,
+            'productId': self.productId,
+            'productType': self.productType,
+            'quantity': int(self.quantity),
+            'state': self.state
+        }
+
+        return reserved

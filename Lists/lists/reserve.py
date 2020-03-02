@@ -92,7 +92,7 @@ def create_reservation(table_name, resv_id, list_id, list_title, product_id, pro
         'title': {'S': list_title},
         'productId': {'S': product_id},
         'productType': {'S': product_type},
-        'quantity': {'S': str(request_reserve_quantity)},
+        'quantity': {'N': str(request_reserve_quantity)},
         'state': {'S': 'reserved'}
     }
 

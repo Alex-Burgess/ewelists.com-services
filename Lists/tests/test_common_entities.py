@@ -1,4 +1,4 @@
-from lists.common_entities import User, List, Product, Reserved
+from lists.common_entities import User, List, Product, Reserved, Reservation
 from lists import logger
 
 log = logger.setup_logger()
@@ -77,3 +77,33 @@ class TestReserved:
         assert reserved['name'] == "Test User2", "Reserved name was not correct."
         assert not reserved.get('message'), "Reserved message was not correct."
         assert reserved['userId'] == '12345678-user-0002-1234-abcdefghijkl', "Reserved userId was not correct."
+
+
+class TestReservation:
+    def test_get_details(self):
+        item = {
+            'PK': {'S': 'RESERVATION#12345678-resv-0001-1234-abcdefghijkl'},
+            'SK': {'S': 'RESERVATION#12345678-resv-0001-1234-abcdefghijkl'},
+            'reservationId': {'S': '12345678-resv-0001-1234-abcdefghijkl'},
+            'userId': {'S': '12345678-user-0002-1234-abcdefghijkl'},
+            'name': {'S': 'Test User2'},
+            'email': {'S': 'test.user2@gmail.com'},
+            'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'},
+            'title': {'S': 'Child User1 1st Birthday'},
+            'productId': {'S': '12345678-prod-0001-1234-abcdefghijkl'},
+            'productType': {'S': 'products'},
+            'quantity': {'N': '1'},
+            'state': {'S': 'reserved'}
+        }
+        reservation = Reservation(item).get_details()
+
+        assert reservation['reservationId'] == '12345678-resv-0001-1234-abcdefghijkl', "Attribute was not correct."
+        assert reservation['userId'] == '12345678-user-0002-1234-abcdefghijkl', "Attribute was not correct."
+        assert reservation['name'] == 'Test User2', "Attribute was not correct."
+        assert reservation['email'] == 'test.user2@gmail.com', "Attribute was not correct."
+        assert reservation['listId'] == '12345678-list-0001-1234-abcdefghijkl', "Attribute was not correct."
+        assert reservation['title'] == 'Child User1 1st Birthday', "Attribute was not correct."
+        assert reservation['productId'] == '12345678-prod-0001-1234-abcdefghijkl', "Attribute was not correct."
+        assert reservation['productType'] == 'products', "Attribute was not correct."
+        assert reservation['quantity'] == 1, "Quanity was not correct."
+        assert reservation['state'] == 'reserved', "Attribute was not correct."
