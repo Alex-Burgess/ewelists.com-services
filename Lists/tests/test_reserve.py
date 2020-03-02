@@ -185,6 +185,72 @@ class TestCreateEmailData:
         assert data == expected_data, "Email data json object was not as expected."
 
 
+class TestCreateProductKey:
+    def test_create_product_key(self):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+
+        expected_object = {
+            'PK': {'S': "LIST#12345678-list-0001-1234-abcdefghijkl"},
+            'SK': {'S': "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}
+        }
+
+        key = reserve.create_product_key(list_id, product_id)
+        assert key == expected_object, "Product key was not as expected."
+
+
+class TestCreateReservedItem:
+    def test_create_product_key(self):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        user = {
+            'id': '12345678-user-0001-1234-abcdefghijkl',
+            'name': 'Test User1',
+            'email': 'test.user2@gmail.com'
+        }
+        request_reserve_quantity = 1
+        resv_id = '12345678-resv-0001-1234-abcdefghijkl'
+
+        object = reserve.create_reserved_item(list_id, product_id, resv_id, user, request_reserve_quantity)
+        assert object['PK']['S'] == "LIST#12345678-list-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['SK']['S'] == "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['name']['S'] == "Test User1", "Object was not as expected."
+        assert object['productId']['S'] == "12345678-prod-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['userId']['S'] == "12345678-user-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['quantity']['N'] == "1", "Object was not as expected."
+        # assert object['reservedAt']['N'] == "1", "Object was not as expected."
+        assert object['reservationId']['S'] == "12345678-resv-0001-1234-abcdefghijkl", "Object was not as expected."
+
+
+class TestCreateReservationItem:
+    def test_create_product_key(self):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        list_title = 'Test List Title'
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        product_type = 'products'
+        user = {
+            'id': '12345678-user-0001-1234-abcdefghijkl',
+            'name': 'Test User1',
+            'email': 'test.user1@gmail.com'
+        }
+        request_reserve_quantity = 1
+        resv_id = '12345678-resv-0001-1234-abcdefghijkl'
+
+        object = reserve.create_reservation_item(list_id, list_title, product_id, product_type, resv_id, user, request_reserve_quantity)
+        assert object['PK']['S'] == "RESERVATION#12345678-resv-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['SK']['S'] == "RESERVATION#12345678-resv-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['reservationId']['S'] == "12345678-resv-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['userId']['S'] == "12345678-user-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['name']['S'] == "Test User1", "Object was not as expected."
+        assert object['email']['S'] == "test.user1@gmail.com", "Object was not as expected."
+        assert object['listId']['S'] == "12345678-list-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['title']['S'] == "Test List Title", "Object was not as expected."
+        assert object['productId']['S'] == "12345678-prod-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['productType']['S'] == "products", "Object was not as expected."
+        assert object['quantity']['N'] == "1", "Object was not as expected."
+        assert object['state']['S'] == "reserved", "Object was not as expected."
+
+
 class TestReserveMain:
     @pytest.mark.skip(reason="transact_write_items is not implemented for moto. https://github.com/spulec/moto/issues/2424")
     def test_reserve_product_not_yet_reserved(self, env_vars, api_gateway_event_prod2, dynamodb_mock):
