@@ -371,6 +371,26 @@ Resources:
             Path: /lists/reservation/{id}
             Method: GET
 
+  DeleteReservationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ServiceName}-deletereservation-${Environment}'
+      Handler: lists/delete_reservation.handler
+      Runtime: python3.6
+      MemorySize: 512
+      Timeout: 3
+      Description: Deletes a reservation item.
+      Role: !GetAtt FunctionRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+      Events:
+        Reserve:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /lists/reservation/{id}
+            Method: DELETE
 
   FunctionRole:
     Type: AWS::IAM::Role
@@ -888,6 +908,18 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 type: "aws_proxy"
+            delete:
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteReservationFunction.Arn}/invocations'
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                type: "aws_proxy"
             options:
               consumes:
               - "application/json"
@@ -908,7 +940,7 @@ Resources:
                   default:
                     statusCode: "200"
                     responseParameters:
-                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Methods: "'GET,DELETE,OPTIONS'"
                       method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
                       method.response.header.Access-Control-Allow-Origin: !If [Prod, !Sub "'https://${DomainName}'",
                                                                             !If [Staging, !Sub "'https://${Environment}.${DomainName}'", "'*'"]
