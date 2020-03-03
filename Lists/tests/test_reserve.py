@@ -45,7 +45,7 @@ def api_gateway_event_prod1():
 def api_gateway_event_prod2():
     event = fixtures.api_gateway_base_event()
     event['resource'] = "/lists/{id}/reserve/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0002-1234-abcdefghijkl"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/reserve/12345678-prod-0002-1234-abcdefghijkl"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
     event['body'] = json.dumps({
@@ -67,7 +67,7 @@ def api_gateway_event_prod2():
 def api_gateway_event_existing_user():
     event = fixtures.api_gateway_no_auth_base_event()
     event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user1@gmail.com"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/reserve/12345678-prod-0001-1234-abcdefghijkl/email/test.user1@gmail.com"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
     event['body'] = json.dumps({
