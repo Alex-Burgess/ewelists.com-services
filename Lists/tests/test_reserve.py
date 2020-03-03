@@ -218,8 +218,9 @@ class TestCreateReservedItem:
         assert object['productId']['S'] == "12345678-prod-0001-1234-abcdefghijkl", "Object was not as expected."
         assert object['userId']['S'] == "12345678-user-0001-1234-abcdefghijkl", "Object was not as expected."
         assert object['quantity']['N'] == "1", "Object was not as expected."
-        # assert object['reservedAt']['N'] == "1", "Object was not as expected."
+        assert len(object['reservedAt']['N']) == 10, "Object was not as expected."
         assert object['reservationId']['S'] == "12345678-resv-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['state']['S'] == "reserved", "Object was not as expected."
 
 
 class TestCreateReservationItem:

@@ -84,6 +84,8 @@ class Reserved:
         self.quantity = item.get('quantity').get('N')
         self.name = item.get('name').get('S')
         self.userId = item.get('userId').get('S')
+        if item.get('state'):
+            self.state = item.get('state').get('S')
         if item.get('message'):
             self.message = item.get('message').get('S')
 
@@ -97,6 +99,9 @@ class Reserved:
             'name': self.name,
             'userId': self.userId
         }
+
+        if hasattr(self, 'state'):
+            reserved['state'] = self.state
 
         if hasattr(self, 'message'):
             reserved['message'] = self.message

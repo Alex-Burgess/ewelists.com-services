@@ -83,7 +83,8 @@ def create_reserved_item(list_id, product_id, resv_id, user, request_reserve_qua
         'userId': {'S': user['id']},
         'quantity': {'N': str(request_reserve_quantity)},
         'reservedAt': {'N': str(int(time.time()))},
-        'reservationId': {'S': resv_id}
+        'reservationId': {'S': resv_id},
+        'state': {'S': 'reserved'}
     }
 
 
