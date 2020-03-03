@@ -61,6 +61,7 @@ class Product:
         self.productId = item.get('SK').get('S').split("#")[1]
         self.quantity = item.get('quantity').get('N')
         self.reserved = item.get('reserved').get('N')
+        self.purchased = item.get('purchased').get('N')
         self.type = item.get('type').get('S')
 
     def __repr__(self):
@@ -71,6 +72,7 @@ class Product:
             'productId': self.productId,
             'quantity': int(self.quantity),
             'reserved': int(self.reserved),
+            'purchased': int(self.purchased),
             'type': self.type
         }
 
@@ -84,6 +86,7 @@ class Reserved:
         self.quantity = item.get('quantity').get('N')
         self.name = item.get('name').get('S')
         self.userId = item.get('userId').get('S')
+        self.reservationId = item.get('reservationId').get('S')
         if item.get('state'):
             self.state = item.get('state').get('S')
         if item.get('message'):
@@ -97,7 +100,8 @@ class Reserved:
             'productId': self.productId,
             'quantity': int(self.quantity),
             'name': self.name,
-            'userId': self.userId
+            'userId': self.userId,
+            'reservationId': self.reservationId
         }
 
         if hasattr(self, 'state'):

@@ -206,7 +206,7 @@ class TestCreateReservedItem:
         user = {
             'id': '12345678-user-0001-1234-abcdefghijkl',
             'name': 'Test User1',
-            'email': 'test.user2@gmail.com'
+            'email': 'test.user1@gmail.com'
         }
         request_reserve_quantity = 1
         resv_id = '12345678-resv-0001-1234-abcdefghijkl'

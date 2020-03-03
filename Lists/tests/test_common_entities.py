@@ -48,18 +48,19 @@ class TestList:
 
 class TestProduct:
     def test_get_details(self):
-        product_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "quantity": {"N": "2"}, "reserved": {"N": "1"}, "type": {"S": "products"}}
+        product_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "quantity": {"N": "2"}, "reserved": {"N": "1"}, "purchased": {"N": "0"}, "type": {"S": "products"}}
         product = Product(product_item).get_details()
 
         assert product['productId'] == '12345678-prod-0001-1234-abcdefghijkl', "Product ID was not correct."
         assert product['quantity'] == 2, "Product quanity was not correct."
         assert product['reserved'] == 1, "Product reserved quantity was not correct."
+        assert product['purchased'] == 0, "Product purchased quantity was not correct."
         assert product['type'] == 'products', "Product reserved type was not correct."
 
 
 class TestReserved:
     def test_get_details(self):
-        reserved_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl"}, "name": {"S": "Test User2"}, "productId": {"S": "12345678-prod-0001-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}}
+        reserved_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl"}, "name": {"S": "Test User2"}, "productId": {"S": "12345678-prod-0001-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}, "reservationId": {"S": "12345678-resv-0001-1234-abcdefghijkl"}}
         reserved = Reserved(reserved_item).get_details()
 
         assert reserved['productId'] == '12345678-prod-0001-1234-abcdefghijkl', "Product ID was not correct."
@@ -67,9 +68,10 @@ class TestReserved:
         assert reserved['name'] == "Test User2", "Reserved name was not correct."
         assert reserved['message'] == 'Happy Birthday', "Reserved message was not correct."
         assert reserved['userId'] == '12345678-user-0002-1234-abcdefghijkl', "Reserved userId was not correct."
+        assert reserved['reservationId'] == '12345678-resv-0001-1234-abcdefghijkl', "ReservationId was not correct."
 
     def test_get_item_if_no_message(self):
-        reserved_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl"}, "name": {"S": "Test User2"}, "productId": {"S": "12345678-prod-0001-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "reservedAt": {"N": "1573739584"}}
+        reserved_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl"}, "name": {"S": "Test User2"}, "productId": {"S": "12345678-prod-0001-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "reservedAt": {"N": "1573739584"}, "reservationId": {"S": "12345678-resv-0001-1234-abcdefghijkl"}}
         reserved = Reserved(reserved_item).get_details()
 
         assert reserved['productId'] == '12345678-prod-0001-1234-abcdefghijkl', "Product ID was not correct."
@@ -77,6 +79,7 @@ class TestReserved:
         assert reserved['name'] == "Test User2", "Reserved name was not correct."
         assert not reserved.get('message'), "Reserved message was not correct."
         assert reserved['userId'] == '12345678-user-0002-1234-abcdefghijkl', "Reserved userId was not correct."
+        assert reserved['reservationId'] == '12345678-resv-0001-1234-abcdefghijkl', "ReservationId was not correct."
 
 
 class TestReservation:

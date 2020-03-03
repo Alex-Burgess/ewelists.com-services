@@ -44,7 +44,8 @@ def create_product_item(table_name, list_id, product_id, type, quantity):
         'SK': {'S': "PRODUCT#{}".format(product_id)},
         'type': {'S': type},
         'quantity': {'N': str(quantity)},
-        'reserved': {'N': str(0)}
+        'reserved': {'N': str(0)},
+        'purchased': {'N': str(0)}
     }
 
     try:

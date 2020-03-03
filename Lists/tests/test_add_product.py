@@ -65,6 +65,7 @@ class TestCreateProductItem:
         assert test_response['Item']['type']['S'] == 'products', "Product type not as expected."
         assert test_response['Item']['quantity']['N'] == '1', "Quantity not as expected."
         assert test_response['Item']['reserved']['N'] == '0', "Quantity not as expected."
+        assert test_response['Item']['purchased']['N'] == '0', "Quantity not as expected."
 
     def test_with_quantity_2(self, dynamodb_mock):
         product_id = '12345678-prod-0011-1234-abcdefghijkl'
