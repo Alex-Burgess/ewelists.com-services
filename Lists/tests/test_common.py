@@ -294,52 +294,38 @@ class TestSendEmail:
 
 
 class TestGetUser:
-    def test_get_authed_user(self, dynamodb_mock, api_gateway_event):
-        user = common.get_user(api_gateway_event, os.environ, 'lists-unittest')
-        assert user['id'] == '12345678-user-0003-1234-abcdefghijkl'
-        assert user['email'] == 'test.user3@gmail.com'
-        assert user['name'] == 'Test User3'
-        assert user['exists']
-
-    def test_get_user_with_email(self, api_gateway_event_with_email):
-        user = common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest')
-        assert user['id'] == 'test.user99@gmail.com'
-        assert user['email'] == 'test.user99@gmail.com'
-        assert user['name'] == 'Test User99'
-        assert not user['exists']
-
-    def test_get_user_when_email_null(self, api_gateway_event_with_null_email):
-        with pytest.raises(Exception) as e:
-            common.get_user(api_gateway_event_with_null_email, os.environ, 'lists-unittest')
-        assert str(e.value) == "Path contained a null email parameter.", "Exception message not correct."
-
-    def test_get_user_when_body_empty(self, api_gateway_event_with_email):
-        api_gateway_event_with_email['body'] = None
-        with pytest.raises(Exception) as e:
-            common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest')
-        assert str(e.value) == "Body was missing required attributes.", "Exception message not correct."
-
-    def test_get_user_when_name_not_in_body(self, api_gateway_event_with_email):
-        api_gateway_event_with_email['body'] = "{\n    \"wrongname\": \"Test User99\"\n}"
-        with pytest.raises(Exception) as e:
-            common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest')
-        assert str(e.value) == "API Event did not contain a name body attribute.", "Exception message not correct."
-
-
-class TestGetUser2:
     def test_get_user_with_no_account(self, dynamodb_mock, api_gateway_event_with_email):
-        user = common.get_user2(api_gateway_event_with_email, os.environ, 'lists-unittest', 'email-index')
+        user = common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest', 'email-index')
         assert user['id'] == 'test.user99@gmail.com'
         assert user['email'] == 'test.user99@gmail.com'
         assert user['name'] == 'Test User99'
         assert not user['exists']
 
     def test_get_user_with_account(self, dynamodb_mock, api_gateway_event_with_email_and_account):
-        user = common.get_user2(api_gateway_event_with_email_and_account, os.environ, 'lists-unittest', 'email-index')
+        user = common.get_user(api_gateway_event_with_email_and_account, os.environ, 'lists-unittest', 'email-index')
         assert user['id'] == '12345678-user-0001-1234-abcdefghijkl'
         assert user['email'] == 'test.user1@gmail.com'
         assert user['name'] == 'Test User1'
         assert user['exists']
+
+    def test_get_user_when_body_empty(self, dynamodb_mock, api_gateway_event_with_email):
+        api_gateway_event_with_email['body'] = "null"
+        user = common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest', 'email-index')
+        assert user['id'] == 'test.user99@gmail.com'
+        assert user['email'] == 'test.user99@gmail.com'
+        assert 'name' not in user
+        assert not user['exists']
+
+    def test_get_user_when_email_null(self, dynamodb_mock, api_gateway_event_with_null_email):
+        with pytest.raises(Exception) as e:
+            common.get_user(api_gateway_event_with_null_email, os.environ, 'lists-unittest', 'email-index')
+        assert str(e.value) == "Path contained a null email parameter.", "Exception message not correct."
+
+    def test_get_user_when_name_not_in_body(self, dynamodb_mock, api_gateway_event_with_email):
+        api_gateway_event_with_email['body'] = "{\n    \"wrongname\": \"Test User99\"\n}"
+        with pytest.raises(Exception) as e:
+            common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest', 'email-index')
+        assert str(e.value) == "API Event did not contain a name body attribute.", "Exception message not correct."
 
 
 class TestGetProductType:

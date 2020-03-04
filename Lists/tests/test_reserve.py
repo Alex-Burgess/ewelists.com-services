@@ -20,12 +20,12 @@ def env_vars(monkeypatch):
 
 
 @pytest.fixture
-def api_gateway_event_prod1():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/reserve/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
+def api_gateway_base_reserve_event():
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user3@gmail.com"
     event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user3@gmail.com"}
     event['body'] = json.dumps({
         "quantity": 2,
         "title": "Child User1 1st Birthday",
@@ -43,11 +43,11 @@ def api_gateway_event_prod1():
 
 @pytest.fixture
 def api_gateway_event_prod2():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/reserve/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/reserve/12345678-prod-0002-1234-abcdefghijkl"
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/reserve/12345678-prod-0002-1234-abcdefghijkl/email/test.user2@gmail.com"
     event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
     event['body'] = json.dumps({
         "quantity": 1,
         "title": "Child User1 1st Birthday",
@@ -64,12 +64,12 @@ def api_gateway_event_prod2():
 
 
 @pytest.fixture
-def api_gateway_event_existing_user():
+def api_gateway_event_non_existing_user():
     event = fixtures.api_gateway_no_auth_base_event()
     event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/reserve/12345678-prod-0001-1234-abcdefghijkl/email/test.user1@gmail.com"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/reserve/12345678-prod-0001-1234-abcdefghijkl/email/test.user99@gmail.com"
     event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
     event['body'] = json.dumps({
         "quantity": 1,
         "title": "Child User1 1st Birthday",
@@ -173,8 +173,8 @@ class TestCreateEmailData:
             "list_title": "Test List Title",
             "list_url": "http://localhost:3000/lists/12345678-list-0001-1234-abcdefghijkl",
             "quantity": 2,
-            "confirm_url": "http://localhost:3000/purchased/12345678-resv-0001-1234-abcdefghijkl",
-            "edit_url": "http://localhost:3000/edit-reservation/12345678-resv-0001-1234-abcdefghijkl",
+            "confirm_url": "http://localhost:3000/reserve/12345678-resv-0001-1234-abcdefghijkl",
+            "edit_url": "http://localhost:3000/reserve/12345678-resv-0001-1234-abcdefghijkl",
             "brand": "Mamas and Papas",
             "details": "Balloon Print Zip All-in-One",
             "product_url": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
@@ -282,15 +282,15 @@ class TestReserveMain:
         assert reserved_details_response['Item']['quantity']['N'] == '1', "Quantity not as expected."
 
     @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-    def test_reserve_product_with_one_reserved(self, env_vars, api_gateway_event_prod1, dynamodb_mock):
-        response = reserve.reserve_main(api_gateway_event_prod1)
+    def test_reserve_product_with_one_reserved(self, env_vars, api_gateway_base_reserve_event, dynamodb_mock):
+        response = reserve.reserve_main(api_gateway_base_reserve_event)
         body = json.loads(response['body'])
         assert body['reserved'], "Reserve response was not true."
 
         # Check the table was updated with right reserved details
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
-        list_id = api_gateway_event_prod1['pathParameters']['id']
-        product_id = api_gateway_event_prod1['pathParameters']['productid']
+        list_id = api_gateway_base_reserve_event['pathParameters']['id']
+        product_id = api_gateway_base_reserve_event['pathParameters']['productid']
 
         test_response = dynamodb.get_item(
             TableName='lists-unittest',
@@ -309,8 +309,9 @@ class TestReserveMain:
         assert reserved_details_response['Item']['SK']['S'] == 'RESERVED#PRODUCT#12345678-prod-0001-1234-abcdefghijkl', "SK not as expected."
         assert reserved_details_response['Item']['quantity']['N'] == '2', "Quantity not as expected."
 
-    def test_over_reserve_product(self, env_vars, api_gateway_event_prod1, dynamodb_mock):
-        api_gateway_event_prod1['body'] = json.dumps({
+    def test_over_reserve_product(self, env_vars, api_gateway_base_reserve_event, dynamodb_mock):
+        api_gateway_base_reserve_event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
+        api_gateway_base_reserve_event['body'] = json.dumps({
             "quantity": 4,
             "title": "Child User1 1st Birthday",
             "product": {
@@ -322,33 +323,43 @@ class TestReserveMain:
             }
         })
 
-        response = reserve.reserve_main(api_gateway_event_prod1)
+        response = reserve.reserve_main(api_gateway_base_reserve_event)
         body = json.loads(response['body'])
         assert body['error'] == 'Reserved quantity for product (2) could not be updated by 4 as exceeds required quantity (3).', "Reserve error was not as expected."
 
-    def test_reserve_product_not_added_to_list(self, env_vars, api_gateway_event_prod1, dynamodb_mock):
-        api_gateway_event_prod1['pathParameters'] = {"productid": "12345678-prod-0100-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    def test_reserve_product_not_added_to_list(self, env_vars, api_gateway_base_reserve_event, dynamodb_mock):
+        api_gateway_base_reserve_event['pathParameters'] = {"productid": "12345678-prod-1000-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
 
-        response = reserve.reserve_main(api_gateway_event_prod1)
+        response = reserve.reserve_main(api_gateway_base_reserve_event)
         body = json.loads(response['body'])
         assert body['error'] == 'No product item exists with this ID.', "Reserve error was not as expected."
 
-    def test_reserve_product_already_reserved_by_user(self, env_vars, api_gateway_event_prod1, dynamodb_mock):
-        api_gateway_event_prod1['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0002-1234-abcdefghijkl"
-
-        response = reserve.reserve_main(api_gateway_event_prod1)
+    def test_reserve_product_already_reserved_by_user(self, env_vars, api_gateway_base_reserve_event, dynamodb_mock):
+        response = reserve.reserve_main(api_gateway_base_reserve_event)
         body = json.loads(response['body'])
         assert body['error'] == 'Product already reserved by user.', "Reserve error was not as expected."
 
-    def test_reserve_with_user_that_has_account(self, env_vars, api_gateway_event_existing_user, dynamodb_mock):
-        response = reserve.reserve_main(api_gateway_event_existing_user)
+    def test_reserve_no_name_for_non_user(self, env_vars, api_gateway_event_non_existing_user, dynamodb_mock):
+        api_gateway_event_non_existing_user['body'] = json.dumps({
+            "quantity": 1,
+            "title": "Child User1 1st Birthday",
+            "product": {
+                "type": "products",
+                "brand": "Mamas and Papas",
+                "details": "Balloon Print Zip All-in-One",
+                "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+                "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+            }
+        })
+
+        response = reserve.reserve_main(api_gateway_event_non_existing_user)
         body = json.loads(response['body'])
-        assert body['error'] == 'User has an account, login required before product can be reserved.', "Reserve error was not as expected."
+        assert body['error'] == 'API Event did not contain a name body attribute.', "Reserve error was not as expected."
 
 
 @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-def test_handler(api_gateway_event_prod1, env_vars, dynamodb_mock):
-    response = reserve.handler(api_gateway_event_prod1, None)
+def test_handler(api_gateway_base_reserve_event, env_vars, dynamodb_mock):
+    response = reserve.handler(api_gateway_base_reserve_event, None)
     body = json.loads(response['body'])
 
     assert response['statusCode'] == 200

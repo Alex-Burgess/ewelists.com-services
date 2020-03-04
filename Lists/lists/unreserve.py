@@ -15,11 +15,12 @@ def handler(event, context):
 def unreserve_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
+        index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
         list_id = common.get_path_parameter(event, 'id')
         product_id = common.get_path_parameter(event, 'productid')
 
         # Step 1 - get identity (which could be from sign in, or email in path, or encrypted parameter)
-        id = common.get_user(event, os.environ, table_name)['id']
+        id = common.get_user(event, os.environ, table_name, index_name)['id']
 
         # Step 2 - get reserved item and product item.
         reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, id)

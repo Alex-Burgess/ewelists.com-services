@@ -32,12 +32,8 @@ def reserve_main(event):
         request_reserve_quantity = common.get_body_attribute(event, 'quantity')
 
         # Step 1 - check if reserved item exists
-        user = common.get_user(event, os.environ, table_name)
+        user = common.get_user(event, os.environ, table_name, index_name)
         common_table_ops.check_product_not_reserved_by_user(table_name, list_id, product_id, user['id'])
-
-        if not user['exists']:
-            if common_table_ops.does_user_have_account(table_name, index_name, user['email']):
-                raise Exception("User has an account, login required before product can be reserved.")
 
         # Step 2 - get product item.
         product_item = common_table_ops.get_product_item(table_name, list_id, product_id)

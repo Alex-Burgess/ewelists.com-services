@@ -122,26 +122,7 @@ def send_email(email, name, template):
     return True
 
 
-def get_user(event, osenv, table_name):
-    user = {}
-
-    if 'email' in event['pathParameters']:
-        user['id'] = get_path_parameter(event, 'email')
-        user['email'] = get_path_parameter(event, 'email')
-        user['name'] = get_body_attribute(event, 'name')
-
-        user['exists'] = False
-    else:
-        user['id'] = get_identity(event, osenv)
-        attributes = common_table_ops.get_users_details(table_name, user['id'])
-        user['email'] = attributes['email']
-        user['name'] = attributes['name']
-        user['exists'] = True
-
-    return user
-
-
-def get_user2(event, osenv, table_name, index_name):
+def get_user(event, osenv, table_name, index_name):
     user = {}
 
     email = get_path_parameter(event, 'email')
@@ -149,15 +130,17 @@ def get_user2(event, osenv, table_name, index_name):
 
     if user_id:
         attributes = common_table_ops.get_users_details(table_name, user_id)
-        user['id'] = user_id
-        user['email'] = attributes['email']
-        user['name'] = attributes['name']
         user['exists'] = True
+        user['id'] = user_id
+        user['email'] = email
+        user['name'] = attributes['name']
     else:
-        user['id'] = get_path_parameter(event, 'email')
-        user['email'] = get_path_parameter(event, 'email')
-        user['name'] = get_body_attribute(event, 'name')
         user['exists'] = False
+        user['id'] = email
+        user['email'] = email
+
+        if event['body'] != "null":
+            user['name'] = get_body_attribute(event, 'name')
 
     return user
 

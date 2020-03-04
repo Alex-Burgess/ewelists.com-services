@@ -25,7 +25,7 @@ def purchase_main(event):
         product_id = common.get_path_parameter(event, 'productid')
 
         # Get user
-        user = common.get_user2(event, os.environ, table_name, index_name)
+        user = common.get_user(event, os.environ, table_name, index_name)
 
         # Get reservation to know how what the quantity reserved was. As well as the reservation id
         reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, user['id'])
