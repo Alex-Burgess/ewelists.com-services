@@ -141,6 +141,27 @@ def get_user(event, osenv, table_name):
     return user
 
 
+def get_user2(event, osenv, table_name, index_name):
+    user = {}
+
+    email = get_path_parameter(event, 'email')
+    user_id = common_table_ops.does_user_have_account(table_name, index_name, email)
+
+    if user_id:
+        attributes = common_table_ops.get_users_details(table_name, user_id)
+        user['id'] = user_id
+        user['email'] = attributes['email']
+        user['name'] = attributes['name']
+        user['exists'] = True
+    else:
+        user['id'] = get_path_parameter(event, 'email')
+        user['email'] = get_path_parameter(event, 'email')
+        user['name'] = get_body_attribute(event, 'name')
+        user['exists'] = False
+
+    return user
+
+
 def get_product_type(event):
     try:
         body_object = json.loads(event['body'])

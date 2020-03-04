@@ -19,15 +19,26 @@ def env_vars(monkeypatch):
     return monkeypatch
 
 
+# @pytest.fixture
+# def api_gateway_event():
+#     # User 2 will update its reserved quantity of product 1 from 1 to 2.
+#     event = fixtures.api_gateway_base_event()
+#     event['resource'] = "/lists/{id}/purchased/{productid}"
+#     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/purchase/12345678-prod-0001-1234-abcdefghijkl"
+#     event['httpMethod'] = "POST"
+#     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+#     event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0002-1234-abcdefghijkl"
+#
+#     return event
+
+
 @pytest.fixture
-def api_gateway_event():
-    # User 2 will update its reserved quantity of product 1 from 1 to 2.
-    event = fixtures.api_gateway_base_event()
+def api_gateway_event_new_user():
+    event = fixtures.api_gateway_no_auth_base_event()
     event['resource'] = "/lists/{id}/purchased/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/purchase/12345678-prod-0001-1234-abcdefghijkl"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/purchase/12345678-prod-0001-1234-abcdefghijkl/email/test.user99@gmail.com"
     event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0002-1234-abcdefghijkl"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
 
     return event
 

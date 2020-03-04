@@ -13,19 +13,19 @@ SENDER = "Ewelists <contact@ewelists.com>"
 
 
 def handler(event, context):
-    response = reserve_main(event)
+    response = purchase_main(event)
     return response
 
 
-def reserve_main(event):
+def purchase_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-        # index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
+        index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
         list_id = common.get_path_parameter(event, 'id')
         product_id = common.get_path_parameter(event, 'productid')
 
         # Get user
-        user = common.get_user(event, os.environ, table_name)
+        user = common.get_user2(event, os.environ, table_name, index_name)
 
         # Get reservation to know how what the quantity reserved was. As well as the reservation id
         reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, user['id'])

@@ -94,6 +94,18 @@ def api_gateway_event_with_email():
 
 
 @pytest.fixture
+def api_gateway_event_with_email_and_account():
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user1@gmail.com"
+    event['httpMethod'] = "DELETE"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
+    event['body'] = "{\n    \"name\": \"Test User1\"\n}"
+
+    return event
+
+
+@pytest.fixture
 def api_gateway_event_with_null_email():
     event = fixtures.api_gateway_no_auth_base_event()
     event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
@@ -138,8 +150,15 @@ def dynamodb_mock():
     table = dynamodb.create_table(
         TableName='lists-unittest',
         KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}, {'AttributeName': 'email', 'AttributeType': 'S'}],
+        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
+        GlobalSecondaryIndexes=[{
+            'IndexName': 'email-index',
+            'KeySchema': [{'AttributeName': 'email', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
+            'Projection': {
+                'ProjectionType': 'ALL'
+            }
+        }]
     )
 
     items = fixtures.load_test_data()
@@ -305,6 +324,22 @@ class TestGetUser:
         with pytest.raises(Exception) as e:
             common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest')
         assert str(e.value) == "API Event did not contain a name body attribute.", "Exception message not correct."
+
+
+class TestGetUser2:
+    def test_get_user_with_no_account(self, dynamodb_mock, api_gateway_event_with_email):
+        user = common.get_user2(api_gateway_event_with_email, os.environ, 'lists-unittest', 'email-index')
+        assert user['id'] == 'test.user99@gmail.com'
+        assert user['email'] == 'test.user99@gmail.com'
+        assert user['name'] == 'Test User99'
+        assert not user['exists']
+
+    def test_get_user_with_account(self, dynamodb_mock, api_gateway_event_with_email_and_account):
+        user = common.get_user2(api_gateway_event_with_email_and_account, os.environ, 'lists-unittest', 'email-index')
+        assert user['id'] == '12345678-user-0001-1234-abcdefghijkl'
+        assert user['email'] == 'test.user1@gmail.com'
+        assert user['name'] == 'Test User1'
+        assert user['exists']
 
 
 class TestGetProductType:

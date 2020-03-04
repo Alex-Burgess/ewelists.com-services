@@ -74,7 +74,7 @@ def does_user_have_account(table_name, index_name, email):
     for item in response['Items']:
         if item['PK']['S'].startswith("USER"):
             log.info("User with email {} was found.".format(email))
-            return True
+            return item['userId']['S']
 
     return False
 

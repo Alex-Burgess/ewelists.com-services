@@ -72,7 +72,8 @@ class TestDoesUserHaveAccount:
 
     def test_user_does_have_account(self, dynamodb_mock):
         email = 'test.user1@gmail.com'
-        assert common_table_ops.does_user_have_account('lists-unittest', 'email-index', email)
+        id = common_table_ops.does_user_have_account('lists-unittest', 'email-index', email)
+        assert id == "12345678-user-0001-1234-abcdefghijkl"
 
 
 class TestGetReservedDetailsItem:
