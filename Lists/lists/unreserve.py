@@ -29,7 +29,7 @@ def unreserve_main(event):
         new_product_reserved_quantity = common.calculate_new_reserved_quantity(product_item, -reserved_item['quantity'])
 
         # Step 4 - Delete reserved details item and update product reserved quantities
-        common_table_ops.unreserve_product(table_name, list_id, product_id, id, new_product_reserved_quantity)
+        common_table_ops.unreserve_product(table_name, list_id, product_id, reserved_item['reservationId'], id, new_product_reserved_quantity)
     except Exception as e:
         log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))

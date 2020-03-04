@@ -152,7 +152,7 @@ def check_product_not_reserved_by_user(table_name, list_id, product_id, user_id)
     return True
 
 
-def unreserve_product(table_name, list_id, product_id, user_id, new_product_reserved_quantity):
+def unreserve_product(table_name, list_id, product_id, resv_id, user_id, new_product_reserved_quantity):
     product_key = {
         'PK': {'S': "LIST#{}".format(list_id)},
         'SK': {'S': "PRODUCT#{}".format(product_id)}
@@ -166,6 +166,11 @@ def unreserve_product(table_name, list_id, product_id, user_id, new_product_rese
     condition = {
         ':PK': {'S': "LIST#{}".format(list_id)},
         ':SK': {'S': "RESERVED#{}#{}".format(product_id, user_id)}
+    }
+
+    reservation_key = {
+        'PK': {'S': "RESERVATION#{}".format(resv_id)},
+        'SK': {'S': "RESERVATION#{}".format(resv_id)},
     }
 
     try:
@@ -187,6 +192,19 @@ def unreserve_product(table_name, list_id, product_id, user_id, new_product_rese
                         'Key': reserved_key,
                         'ConditionExpression': "PK = :PK AND SK = :SK",
                         'ExpressionAttributeValues': condition
+                    }
+                },
+                {
+                    'Update': {
+                        'TableName': table_name,
+                        'Key': reservation_key,
+                        'UpdateExpression': "set #st = :s",
+                        'ExpressionAttributeValues': {
+                            ':s': {'S': 'cancelled'},
+                        },
+                        'ExpressionAttributeNames': {
+                            '#st': 'state'
+                        }
                     }
                 }
             ]
