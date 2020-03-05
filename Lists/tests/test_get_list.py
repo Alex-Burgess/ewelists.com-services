@@ -17,7 +17,7 @@ def api_gateway_get_list_event():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl",
     event['httpMethod'] = "GET"
     event['pathParameters'] = {"id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "null"
+    event['body'] = None
 
     return event
 

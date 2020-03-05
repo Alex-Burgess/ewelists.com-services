@@ -49,18 +49,18 @@ def api_gateway_postman_event():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl"
     event['httpMethod'] = "GET"
     event['pathParameters'] = {"id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "null"
+    event['body'] = None
 
     event['requestContext']['identity'] = {
-        "cognitoIdentityPoolId": "null",
+        "cognitoIdentityPoolId": None,
         "accountId": "123456789012",
-        "cognitoIdentityId": "null",
+        "cognitoIdentityId": None,
         "caller": "ABCDEFGPDMJL4EB35H6H",
         "sourceIp": "5.81.150.55",
         "principalOrgId": "o-d8jj6dyqv2",
         "accessKey": "ABCDEFGPDMJL4EB35H6H",
-        "cognitoAuthenticationType": "null",
-        "cognitoAuthenticationProvider": "null",
+        "cognitoAuthenticationType": None,
+        "cognitoAuthenticationProvider": None,
         "userArn": "arn:aws:iam::123456789012:user/ApiTestUser",
         "userAgent": "PostmanRuntime/7.15.2",
         "user": "ABCDEFGPDMJL4EB35H6H"

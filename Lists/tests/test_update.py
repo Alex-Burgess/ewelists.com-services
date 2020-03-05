@@ -63,11 +63,11 @@ class TestGetAttributeDetails:
         assert str(e.value) == "Event body did not contain the expected keys ['title', 'description', 'eventDate', 'occasion', 'imageUrl'].", "Exception not as expected."
 
     def test_get_attribute_details_with_empty_body(self, api_gateway_event):
-        api_gateway_event['body'] = "null"
+        api_gateway_event['body'] = None
 
         with pytest.raises(Exception) as e:
             update.get_attribute_details(api_gateway_event)
-        assert str(e.value) == "API Event Body was empty.", "Exception not as expected."
+        assert str(e.value) == "API Event did not contain a valid body.", "Exception not as expected."
 
     def test_get_attribute_details_with_body_not_json(self, api_gateway_event):
         api_gateway_event['body'] = "some text"
@@ -141,10 +141,10 @@ class TestUpdateListMain:
 
     def test_update_list_main_with_empty_body(self, monkeypatch, api_gateway_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['body'] = "null"
+        api_gateway_event['body'] = None
         response = update.update_list_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'API Event Body was empty.', "Update main response did not contain the correct error message."
+        assert body['error'] == 'API Event did not contain a valid body.', "Update main response did not contain the correct error message."
 
     def test_update_list_that_does_not_exist(self, monkeypatch, api_gateway_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

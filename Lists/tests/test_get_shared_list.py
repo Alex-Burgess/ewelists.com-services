@@ -17,17 +17,17 @@ def api_gateway_unauthed_event():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl",
     event['httpMethod'] = "GET"
     event['pathParameters'] = {"id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "null"
+    event['body'] = None
     event['requestContext']['identity'] = {
-        "cognitoIdentityPoolId": "null",
-        "accountId": "null",
-        "cognitoIdentityId": "null",
-        "caller": "null",
-        "accessKey": "null",
-        "cognitoAuthenticationType": "null",
-        "cognitoAuthenticationProvider": "null",
-        "userArn": "null",
-        "user": "null"
+        "cognitoIdentityPoolId": None,
+        "accountId": None,
+        "cognitoIdentityId": None,
+        "caller": None,
+        "accessKey": None,
+        "cognitoAuthenticationType": None,
+        "cognitoAuthenticationProvider": None,
+        "userArn": None,
+        "user": None
     }
 
     return event
@@ -40,7 +40,7 @@ def api_gateway_event():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl",
     event['httpMethod'] = "GET"
     event['pathParameters'] = {"id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "null"
+    event['body'] = None
 
     return event
 
