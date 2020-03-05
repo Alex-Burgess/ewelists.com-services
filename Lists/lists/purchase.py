@@ -1,7 +1,6 @@
 import json
 import os
 import boto3
-# from botocore.exceptions import ClientError
 from lists import common, common_table_ops, logger
 
 log = logger.setup_logger()
@@ -21,8 +20,13 @@ def purchase_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
+        template = common.get_env_variable(os.environ, 'TEMPLATE_NAME')
+        domain_name = common.get_env_variable(os.environ, 'DOMAIN_NAME')
         list_id = common.get_path_parameter(event, 'id')
+        list_title = common.get_body_attribute(event, 'title')
         product_id = common.get_path_parameter(event, 'productid')
+        product = common.get_body_attribute(event, 'product')
+        request_reserve_quantity = common.get_body_attribute(event, 'quantity')
 
         # Get user
         user = common.get_user(event, os.environ, table_name, index_name)
@@ -45,6 +49,10 @@ def purchase_main(event):
         reserved_key = create_reserved_key(list_id, product_id, user)
         reservation_key = create_reservation_key(reserved_item['reservationId'])
         update_product_reserved_and_reservation_items(table_name, product_key, product_reserved_q, product_purchased_q, reserved_key, reservation_key)
+
+        # Send confirmation
+        data = create_email_data(domain_name, user['name'], list_id, list_title, request_reserve_quantity, product)
+        common.send_email(user['email'], template, data)
 
     except Exception as e:
         log.error("Exception: {}".format(e))
@@ -142,3 +150,18 @@ def create_reservation_key(resv_id):
         'PK': {'S': "RESERVATION#{}".format(resv_id)},
         'SK': {'S': "RESERVATION#{}".format(resv_id)},
     }
+
+
+def create_email_data(domain_name, name, list_id, title, quantity, product):
+    template_data = {
+        "name": name,
+        "list_title": title,
+        "list_url": domain_name + "/lists/" + list_id,
+        "quantity": quantity,
+        "brand": product['brand'],
+        "details": product['details'],
+        "product_url": product['productUrl'],
+        "image_url": product['imageUrl']
+    }
+
+    return template_data

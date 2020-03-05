@@ -13,8 +13,8 @@ log = logger.setup_logger()
 def env_vars(monkeypatch):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
     monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
-    # monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
-    # monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://test.ewelists.com')
+    monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
+    monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://test.ewelists.com')
 
     return monkeypatch
 
@@ -26,6 +26,18 @@ def api_gateway_event_no_account_user():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/purchase/12345678-prod-0001-1234-abcdefghijkl/email/test.user99@gmail.com"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+    event['body'] = json.dumps({
+        "quantity": 2,
+        "title": "Child User1 1st Birthday",
+        "name": "Test User1",
+        "product": {
+            "type": "products",
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+    })
 
     return event
 
@@ -37,6 +49,17 @@ def api_gateway_event_existing_user():
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/purchase/12345678-prod-0001-1234-abcdefghijkl/email/test.user1@gmail.com"
     event['httpMethod'] = "POST"
     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
+    event['body'] = json.dumps({
+        "quantity": 2,
+        "title": "Child User1 1st Birthday",
+        "product": {
+            "type": "products",
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+    })
 
     return event
 
@@ -128,6 +151,38 @@ class TestNewPurchasedQuantity:
         assert purchase.new_purchased_quantity(2, 1) == 3, "New quantity not as expected."
 
 
+class TestCreateEmailData:
+    def test_create_email_data(self):
+        domain_name = 'http://localhost:3000'
+        name = 'Test User'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        list_title = 'Test List Title'
+        quantity = 2
+        product = {
+            "type": "products",
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+
+        data = purchase.create_email_data(domain_name, name, list_id, list_title, quantity, product)
+
+        expected_data = {
+            "name": "Test User",
+            "list_title": "Test List Title",
+            "list_url": "http://localhost:3000/lists/12345678-list-0001-1234-abcdefghijkl",
+            "quantity": 2,
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "product_url": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "image_url": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+
+        assert len(data) == 8, "Number of fields in email data was not as expected."
+        assert data == expected_data, "Email data json object was not as expected."
+
+
 class TestReserveMain:
     def test_no_list_id_path_parameter(self, env_vars, api_gateway_event_existing_user):
         api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "null", "email": "test.user99@gmail.com"}
@@ -164,6 +219,30 @@ class TestReserveMain:
         response = purchase.purchase_main(api_gateway_event_existing_user)
         body = json.loads(response['body'])
         assert body['error'] == 'Product is not reserved by user.', "Error for missing environment variable was not as expected."
+
+    def test_reserve_no_name_for_non_user(self, env_vars, api_gateway_event_no_account_user, dynamodb_mock):
+        api_gateway_event_no_account_user['body'] = json.dumps({
+            "quantity": 1,
+            "title": "Child User1 1st Birthday",
+            "product": {
+                "type": "products",
+                "brand": "Mamas and Papas",
+                "details": "Balloon Print Zip All-in-One",
+                "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+                "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+            }
+        })
+
+        response = purchase.purchase_main(api_gateway_event_no_account_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'API Event did not contain a name body attribute.', "Reserve error was not as expected."
+
+    def test_reserve_with_no_body(self, env_vars, api_gateway_event_no_account_user, dynamodb_mock):
+        api_gateway_event_no_account_user['body'] = None
+
+        response = purchase.purchase_main(api_gateway_event_no_account_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Body was missing required attributes.', "Reserve error was not as expected."
 
 
 @pytest.mark.skip(reason="transact_write_items is not implemented for moto")

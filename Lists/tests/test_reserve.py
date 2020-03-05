@@ -374,6 +374,13 @@ class TestReserveMain:
         body = json.loads(response['body'])
         assert body['error'] == 'API Event did not contain a name body attribute.', "Reserve error was not as expected."
 
+    def test_reserve_with_no_body(self, env_vars, api_gateway_event_non_existing_user, dynamodb_mock):
+        api_gateway_event_non_existing_user['body'] = None
+
+        response = reserve.reserve_main(api_gateway_event_non_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Body was missing required attributes.', "Reserve error was not as expected."
+
 
 @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
 def test_handler(api_gateway_base_reserve_event, env_vars, dynamodb_mock):

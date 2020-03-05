@@ -22,6 +22,7 @@ def handler(event, context):
     table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
     user_pool_id = common.get_env_variable(os.environ, 'USERPOOL_ID')
     template = common.get_env_variable(os.environ, 'TEMPLATE_NAME')
+    domain_name = common.get_env_variable(os.environ, 'DOMAIN_NAME')
     new_user = get_user_from_event(event)
     trigger = get_trigger_source_event(event)
     exists = get_user_from_userpool(user_pool_id, new_user['email'])
@@ -35,7 +36,8 @@ def handler(event, context):
         create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])
 
         # Send welcome email
-        common.send(new_user['email'], new_user['name'], template)
+        data = create_email_data(domain_name, new_user['name'])
+        common.send(new_user['email'], template, data)
     else:
         log.info("User does not have entry in userpool.")
 
@@ -57,10 +59,19 @@ def handler(event, context):
             create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])
 
             # Send welcome email
-            common.send(new_user['email'], new_user['name'], template)
+            data = create_email_data(domain_name, new_user['name'])
+            common.send(new_user['email'], template, data)
             log.info("Allowing signup process to complete for user.")
 
     return event
+
+
+def create_email_data(domain_name, name):
+    template_data = {
+        "name": name,
+    }
+
+    return template_data
 
 
 def set_random_password(user_pool_id, email):

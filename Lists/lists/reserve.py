@@ -3,7 +3,6 @@ import os
 import time
 import uuid
 import boto3
-from botocore.exceptions import ClientError
 from lists import common, common_table_ops, logger
 
 log = logger.setup_logger()
@@ -50,7 +49,7 @@ def reserve_main(event):
 
         # Step 5 - Send reserve confirmation email
         data = create_email_data(domain_name, user['name'], resv_id, list_id, list_title, request_reserve_quantity, product)
-        send_email(user['email'], template, data)
+        common.send_email(user['email'], template, data)
 
     except Exception as e:
         log.error("Exception: {}".format(e))
@@ -153,22 +152,3 @@ def create_email_data(domain_name, name, resv_id, list_id, title, quantity, prod
     }
 
     return template_data
-
-
-def send_email(email, template, template_data):
-    try:
-        response = ses.send_templated_email(
-            Source=SENDER,
-            Destination={
-                'ToAddresses': [email],
-            },
-            ReplyToAddresses=[SENDER],
-            Template=template,
-            TemplateData=json.dumps(template_data)
-        )
-    except ClientError as e:
-        raise Exception("Could not send reserve email: " + e.response['Error']['Message'])
-    else:
-        log.info("Email sent! Message ID: " + response['MessageId'])
-
-    return True

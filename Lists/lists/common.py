@@ -103,7 +103,7 @@ def create_response(code, body):
     return response
 
 
-def send_email(email, name, template):
+def send_email(email, template, template_data):
     try:
         response = ses.send_templated_email(
             Source=SENDER,
@@ -112,10 +112,10 @@ def send_email(email, name, template):
             },
             ReplyToAddresses=[SENDER],
             Template=template,
-            TemplateData='{ \"name\":\"' + name + '\" }'
+            TemplateData=json.dumps(template_data)
         )
     except ClientError as e:
-        raise Exception("Could not send welcome email: " + e.response['Error']['Message'])
+        raise Exception("Could not send reserve email: " + e.response['Error']['Message'])
     else:
         log.info("Email sent! Message ID: " + response['MessageId'])
 

@@ -273,5 +273,19 @@ class TestCreateNewCognitoUser:
         assert len(result['user_id']) == 19, "New user id was not expected lenghth."
 
 
+class TestCreateEmailData:
+    def test_create_email_data(self):
+        domain_name = 'http://localhost:3000'
+        name = 'Test User'
+
+        data = signup.create_email_data(domain_name, name)
+
+        expected_data = {
+            "name": "Test User"
+        }
+
+        assert data == expected_data, "Email data json object was not as expected."
+
+
 # As link account tests not implemented, not able to test whole logic.
 # class TestHandler:

@@ -2719,6 +2719,20 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ab7fc62b-1a40-4cb8-aa88-f7334a3d1688",
+								"exec": [
+									"pm.environment.set(\"product_retailer\", \"amazon\");",
+									"pm.environment.set(\"product_brand\", \"BABYBJÖRN\");",
+									"pm.environment.set(\"product_details\", \"Travel Cot Easy Go, Anthracite, with transport bag\");",
+									"pm.environment.set(\"product_productUrl\", \"https://www.amazon.co.uk/dp/B01H24LM58\");",
+									"pm.environment.set(\"product_imageUrl\", \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\");"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -2751,7 +2765,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
+							"raw": "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"{{product_brand}}\",\n    \"details\": \"{{product_details}}\",\n    \"productUrl\": \"{{product_productUrl}}\",\n    \"imageUrl\": \"{{product_imageUrl}}\"\n}"
 						},
 						"url": {
 							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products",
@@ -3125,7 +3139,8 @@
 							"script": {
 								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
 								"exec": [
-									"pm.environment.get(\"list_id\")"
+									"pm.environment.get(\"list_id\")",
+									"pm.environment.set(\"reserve_quantity\", 1);"
 								],
 								"type": "text/javascript"
 							}
@@ -3161,7 +3176,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"Mamas and Papas\",\n        \"details\": \"Balloon Print Zip All-in-One\",\n        \"productUrl\": \"https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5\",\n        \"imageUrl\": \"https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$\"\n    }\n}"
+							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
@@ -3596,7 +3611,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"Mamas and Papas\",\n        \"details\": \"Balloon Print Zip All-in-One\",\n        \"productUrl\": \"https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5\",\n        \"imageUrl\": \"https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$\"\n    }\n}"
+							"raw": "{\n    \"quantity\": {{reserve_quantity}},\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
@@ -3935,7 +3950,7 @@
 									"pm.test(\"Response message should exist\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var message = jsonData['error'];",
-									"    pm.expect(message).to.eql('No reserved item exists with this ID.');",
+									"    pm.expect(message).to.eql('Product is not reserved by user.');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -4009,6 +4024,103 @@
 					"response": []
 				},
 				{
+					"name": "purchase product after cancellation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('Product is not reserved by user.');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": \"{{reserve_quantity}}\",\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/purchase/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"purchase",
+								"{{p_product_id}}",
+								"email",
+								"eweuser8%2Btest2%40gmail.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
 					"name": "delete reservation item",
 					"event": [
 						{
@@ -4035,6 +4147,7 @@
 									"",
 									"pm.test(\"Clear environment variables\", function() {",
 									"    pm.environment.unset(\"reservation_id\")",
+									"    pm.environment.unset(\"reserve_quantity\")",
 									"});"
 								],
 								"type": "text/javascript"
@@ -4228,6 +4341,11 @@
 									"",
 									"pm.test(\"Clear environment variable\", function() {",
 									"    pm.environment.unset(\"p_product_id\")",
+									"    pm.environment.unset(\"product_retailer\");",
+									"    pm.environment.unset(\"product_brand\");",
+									"    pm.environment.unset(\"product_details\");",
+									"    pm.environment.unset(\"product_productUrl\");",
+									"    pm.environment.unset(\"product_imageUrl\");",
 									"});",
 									"",
 									"",
@@ -4461,6 +4579,20 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "18c25e73-44e6-4cf5-923b-fd8e0dd07c1a",
+								"exec": [
+									"pm.environment.set(\"product_retailer\", \"amazon\");",
+									"pm.environment.set(\"product_brand\", \"BABYBJÖRN\");",
+									"pm.environment.set(\"product_details\", \"Travel Cot Easy Go, Anthracite, with transport bag\");",
+									"pm.environment.set(\"product_productUrl\", \"https://www.amazon.co.uk/dp/B01H24LM58\");",
+									"pm.environment.set(\"product_imageUrl\", \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\");"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -4493,7 +4625,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
+							"raw": "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"{{product_brand}}\",\n    \"details\": \"{{product_details}}\",\n    \"productUrl\": \"{{product_productUrl}}\",\n    \"imageUrl\": \"{{product_imageUrl}}\"\n}"
 						},
 						"url": {
 							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products",
@@ -4904,7 +5036,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{list_title}}\",\n    \"name\": \"Success Simulator\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"Mamas and Papas\",\n        \"details\": \"Balloon Print Zip All-in-One\",\n        \"productUrl\": \"https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5\",\n        \"imageUrl\": \"https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$\"\n    }\n}"
+							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{list_title}}\",\n    \"name\": \"Success Simulator\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/success%40simulator.amazonses.com",
@@ -5336,7 +5468,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{lists_title}}\",\n    \"name\": \"Success Simulator\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"Mamas and Papas\",\n        \"details\": \"Balloon Print Zip All-in-One\",\n        \"productUrl\": \"https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5\",\n        \"imageUrl\": \"https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$\"\n    }\n}"
+							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{lists_title}}\",\n    \"name\": \"Success Simulator\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/success%40simulator.amazonses.com",
@@ -5675,7 +5807,7 @@
 									"pm.test(\"Response message should exist\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var message = jsonData['error'];",
-									"    pm.expect(message).to.eql('No reserved item exists with this ID.');",
+									"    pm.expect(message).to.eql('Product is not reserved by user.');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -5749,6 +5881,103 @@
 					"response": []
 				},
 				{
+					"name": "purchase product after cancelled",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('Product is not reserved by user.');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": \"{{reserve_quantity}}\",\n    \"title\": \"{{list_title}}\",\n    \"name\": \"Success Simulator\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/purchase/{{p_product_id}}/email/success%40simulator.amazonses.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"purchase",
+								"{{p_product_id}}",
+								"email",
+								"success%40simulator.amazonses.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
 					"name": "delete reservation item",
 					"event": [
 						{
@@ -5775,6 +6004,7 @@
 									"",
 									"pm.test(\"Clear environment variables\", function() {",
 									"    pm.environment.unset(\"reservation_id\")",
+									"    pm.environment.unset(\"reserve_quantity\")",
 									"});"
 								],
 								"type": "text/javascript"
@@ -5968,6 +6198,11 @@
 									"",
 									"pm.test(\"Clear environment variable\", function() {",
 									"    pm.environment.unset(\"p_product_id\")",
+									"    pm.environment.unset(\"product_retailer\");",
+									"    pm.environment.unset(\"product_brand\");",
+									"    pm.environment.unset(\"product_details\");",
+									"    pm.environment.unset(\"product_productUrl\");",
+									"    pm.environment.unset(\"product_imageUrl\");",
 									"});",
 									"",
 									"",
@@ -6201,6 +6436,20 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a4955de3-98ba-413c-ac70-c5fc71faac30",
+								"exec": [
+									"pm.environment.set(\"product_retailer\", \"amazon\");",
+									"pm.environment.set(\"product_brand\", \"BABYBJÖRN\");",
+									"pm.environment.set(\"product_details\", \"Travel Cot Easy Go, Anthracite, with transport bag\");",
+									"pm.environment.set(\"product_productUrl\", \"https://www.amazon.co.uk/dp/B01H24LM58\");",
+									"pm.environment.set(\"product_imageUrl\", \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\");"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -6233,7 +6482,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
+							"raw": "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"{{product_brand}}\",\n    \"details\": \"{{product_details}}\",\n    \"productUrl\": \"{{product_productUrl}}\",\n    \"imageUrl\": \"{{product_imageUrl}}\"\n}"
 						},
 						"url": {
 							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products",
@@ -6385,7 +6634,8 @@
 							"script": {
 								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
 								"exec": [
-									"pm.environment.get(\"list_id\")"
+									"pm.environment.get(\"list_id\")",
+									"pm.environment.set(\"reserve_quantity\", 1);"
 								],
 								"type": "text/javascript"
 							}
@@ -6421,7 +6671,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"Mamas and Papas\",\n        \"details\": \"Balloon Print Zip All-in-One\",\n        \"productUrl\": \"https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5\",\n        \"imageUrl\": \"https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$\"\n    }\n}"
+							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
@@ -6855,7 +7105,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n    \"quantity\": {{reserve_quantity}},\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/purchase/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
@@ -7292,7 +7542,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n    \"quantity\": {{reserve_quantity}},\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/purchase/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
@@ -7309,6 +7559,102 @@
 								"lists",
 								"{{list_id}}",
 								"purchase",
+								"{{p_product_id}}",
+								"email",
+								"eweuser8%2Btest2%40gmail.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "unreserve product already confirmed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('Product was already purchased.');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"reserve",
 								"{{p_product_id}}",
 								"email",
 								"eweuser8%2Btest2%40gmail.com"
@@ -7345,6 +7691,7 @@
 									"",
 									"pm.test(\"Clear environment variables\", function() {",
 									"    pm.environment.unset(\"reservation_id\")",
+									"    pm.environment.unset(\"reserve_quantity\")",
 									"});"
 								],
 								"type": "text/javascript"
@@ -7538,6 +7885,11 @@
 									"",
 									"pm.test(\"Clear environment variable\", function() {",
 									"    pm.environment.unset(\"p_product_id\")",
+									"    pm.environment.unset(\"product_retailer\");",
+									"    pm.environment.unset(\"product_brand\");",
+									"    pm.environment.unset(\"product_details\");",
+									"    pm.environment.unset(\"product_productUrl\");",
+									"    pm.environment.unset(\"product_imageUrl\");",
 									"});",
 									"",
 									"",
@@ -7771,6 +8123,20 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0ce7b1f6-7c2d-4524-bbd8-5870f596564f",
+								"exec": [
+									"pm.environment.set(\"product_retailer\", \"amazon\");",
+									"pm.environment.set(\"product_brand\", \"BABYBJÖRN\");",
+									"pm.environment.set(\"product_details\", \"Travel Cot Easy Go, Anthracite, with transport bag\");",
+									"pm.environment.set(\"product_productUrl\", \"https://www.amazon.co.uk/dp/B01H24LM58\");",
+									"pm.environment.set(\"product_imageUrl\", \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\");"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -7803,7 +8169,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
+							"raw": "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"{{product_brand}}\",\n    \"details\": \"{{product_details}}\",\n    \"productUrl\": \"{{product_productUrl}}\",\n    \"imageUrl\": \"{{product_imageUrl}}\"\n}"
 						},
 						"url": {
 							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products",
@@ -7955,7 +8321,8 @@
 							"script": {
 								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
 								"exec": [
-									"pm.environment.get(\"list_id\")"
+									"pm.environment.get(\"list_id\")",
+									"pm.environment.set(\"reserve_quantity\", 1);"
 								],
 								"type": "text/javascript"
 							}
@@ -7991,7 +8358,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{list_title}}\",\n    \"name\": \"Success Simulator\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"Mamas and Papas\",\n        \"details\": \"Balloon Print Zip All-in-One\",\n        \"productUrl\": \"https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5\",\n        \"imageUrl\": \"https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$\"\n    }\n}"
+							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{list_title}}\",\n    \"name\": \"Success Simulator\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/success%40simulator.amazonses.com",
@@ -8422,7 +8789,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n    \"quantity\": {{reserve_quantity}},\n    \"title\": \"{{list_title}}\",\n    \"name\": \"Success Simulator\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}\n"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/purchase/{{p_product_id}}/email/success%40simulator.amazonses.com",
@@ -8857,7 +9224,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n    \"quantity\": {{reserve_quantity}},\n    \"title\": \"{{list_title}}\",\n    \"name\": \"Success Simulator\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}\n"
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/purchase/{{p_product_id}}/email/success%40simulator.amazonses.com",
@@ -8874,6 +9241,102 @@
 								"lists",
 								"{{list_id}}",
 								"purchase",
+								"{{p_product_id}}",
+								"email",
+								"success%40simulator.amazonses.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "unreserve product already confirmed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('Product was already purchased.');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Success Simulator\"\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/success%40simulator.amazonses.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"reserve",
 								"{{p_product_id}}",
 								"email",
 								"success%40simulator.amazonses.com"
@@ -8910,6 +9373,7 @@
 									"",
 									"pm.test(\"Clear environment variables\", function() {",
 									"    pm.environment.unset(\"reservation_id\")",
+									"    pm.environment.unset(\"reserve_quantity\")",
 									"});"
 								],
 								"type": "text/javascript"
@@ -9103,6 +9567,11 @@
 									"",
 									"pm.test(\"Clear environment variable\", function() {",
 									"    pm.environment.unset(\"p_product_id\")",
+									"    pm.environment.unset(\"product_retailer\");",
+									"    pm.environment.unset(\"product_brand\");",
+									"    pm.environment.unset(\"product_details\");",
+									"    pm.environment.unset(\"product_productUrl\");",
+									"    pm.environment.unset(\"product_imageUrl\");",
 									"});",
 									"",
 									"",
