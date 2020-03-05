@@ -3913,6 +3913,102 @@
 					"response": []
 				},
 				{
+					"name": "unreserve product already cancelled",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('No reserved item exists with this ID.');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"reserve",
+								"{{p_product_id}}",
+								"email",
+								"eweuser8%2Btest2%40gmail.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
 					"name": "delete reservation item",
 					"event": [
 						{
@@ -5452,6 +5548,292 @@
 								"{{p_product_id}}",
 								"email",
 								"success%40simulator.amazonses.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "get reservation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fb81bbcd-559a-430f-9b5a-0ef955261e1c",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Expected reservation details were not correct.\", function () {",
+									"    var obj = pm.response.json();",
+									"    pm.expect(obj.reservationId.length).to.eql(36);",
+									"    pm.expect(obj.userId).to.eql(\"success@simulator.amazonses.com\");",
+									"    pm.expect(obj.name).to.eql(\"Success Simulator\");",
+									"    pm.expect(obj.email).to.eql(\"success@simulator.amazonses.com\");",
+									"    pm.expect(obj.listId.length).to.eql(36);",
+									"    pm.expect(obj.title).to.eql(\"My Birthday List\");",
+									"    pm.expect(obj.productId.length).to.eql(36);",
+									"    pm.expect(obj.productType).to.eql(\"products\");",
+									"    pm.expect(obj.quantity).to.eql(1);",
+									"    pm.expect(obj.state).to.eql(\"cancelled\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c6b1463f-8426-42ea-aeee-c6583fa1ad97",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/reservation/{{reservation_id}}",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"reservation",
+								"{{reservation_id}}"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "unreserve product already cancelled",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('No reserved item exists with this ID.');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Success Simulator\"\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/success%40simulator.amazonses.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"reserve",
+								"{{p_product_id}}",
+								"email",
+								"success%40simulator.amazonses.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "delete reservation item",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response should confirm deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData['deleted']).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Clear environment variables\", function() {",
+									"    pm.environment.unset(\"reservation_id\")",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/reservation/{{reservation_id}}",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"reservation",
+								"{{reservation_id}}"
 							]
 						},
 						"description": "Create list"
