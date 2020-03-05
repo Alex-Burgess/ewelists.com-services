@@ -91,7 +91,7 @@ class TestGetItemsAssociatedWithList:
     def test_get_items_associated_with_list(self, dynamodb_mock):
         list_id = '12345678-list-0001-1234-abcdefghijkl'
         items = delete.get_items_associated_with_list('lists-unittest', list_id)
-        assert len(items) == 9, "Number of items deleted was not as expected."
+        assert len(items) == 13, "Number of items deleted was not as expected."
 
 
 class TestDeleteMain:
@@ -135,4 +135,4 @@ def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
     assert re.match('{"deleted": .*}', response['body']), "Response body was not as expected."
 
     body = json.loads(response['body'])
-    assert body['count'] == 9, "Number of items deleted was not as expected."
+    assert body['count'] == 13, "Number of items deleted was not as expected."

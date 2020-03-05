@@ -19,21 +19,8 @@ def env_vars(monkeypatch):
     return monkeypatch
 
 
-# @pytest.fixture
-# def api_gateway_event():
-#     # User 2 will update its reserved quantity of product 1 from 1 to 2.
-#     event = fixtures.api_gateway_base_event()
-#     event['resource'] = "/lists/{id}/purchased/{productid}"
-#     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/purchase/12345678-prod-0001-1234-abcdefghijkl"
-#     event['httpMethod'] = "POST"
-#     event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-#     event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0002-1234-abcdefghijkl"
-#
-#     return event
-
-
 @pytest.fixture
-def api_gateway_event_new_user():
+def api_gateway_event_no_account_user():
     event = fixtures.api_gateway_no_auth_base_event()
     event['resource'] = "/lists/{id}/purchased/{productid}"
     event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/purchase/12345678-prod-0001-1234-abcdefghijkl/email/test.user99@gmail.com"
@@ -169,12 +156,85 @@ class TestIsNotPurchased:
         assert str(e.value) == "Product was already purchased.", "Exception message not correct."
 
 
+class TestReserveMain:
+    def test_no_table_name_env_variable(self, monkeypatch, api_gateway_event_existing_user):
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+        response = purchase.purchase_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'TABLE_NAME environment variable not set correctly.', "Error for missing environment variable was not as expected."
+
+    def test_no_index_name_env_variable(self, monkeypatch, api_gateway_event_existing_user):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        response = purchase.purchase_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'INDEX_NAME environment variable not set correctly.', "Error for missing environment variable was not as expected."
+
+    def test_bad_table_name_env_variable(self, monkeypatch, api_gateway_event_existing_user):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'notable')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+        response = purchase.purchase_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Unexpected error when getting user from table.', "Error for missing environment variable was not as expected."
+
+    def test_bad_index_name_env_variable(self, monkeypatch, api_gateway_event_existing_user):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'noindex')
+        response = purchase.purchase_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Unexpected error when getting user from table.', "Error for missing environment variable was not as expected."
+
+    def test_no_list_id_path_parameter(self, env_vars, api_gateway_event_existing_user):
+        api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "null", "email": "test.user99@gmail.com"}
+        response = purchase.purchase_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Path contained a null id parameter.', "Error for missing environment variable was not as expected."
+
+    def test_no_product_id_path_parameter(self, env_vars, api_gateway_event_existing_user):
+        api_gateway_event_existing_user['pathParameters'] = {"productid": "null", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+        response = purchase.purchase_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Path contained a null productid parameter.', "Error for missing environment variable was not as expected."
+
+    def test_no_email_path_parameter(self, env_vars, api_gateway_event_existing_user):
+        api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "null"}
+        response = purchase.purchase_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Path contained a null email parameter.', "Error for missing environment variable was not as expected."
+
+    def test_list_with_product_added(self, env_vars, api_gateway_event_existing_user, dynamodb_mock):
+        api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-1000-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
+        response = purchase.purchase_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'No reserved item exists with this ID.', "Error for missing environment variable was not as expected."
+
+    def test_confirm_product_already_confirmed_by_user_with_account(self, env_vars, api_gateway_event_existing_user, dynamodb_mock):
+        api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-0004-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
+        response = purchase.purchase_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Product was already purchased.', "Error for missing environment variable was not as expected."
+
+    def test_confirm_product_already_confirmed_by_user_with_no_account(self, env_vars, api_gateway_event_no_account_user, dynamodb_mock):
+        api_gateway_event_no_account_user['pathParameters'] = {"productid": "12345678-prod-0005-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+        response = purchase.purchase_main(api_gateway_event_no_account_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Product was already purchased.', "Error for missing environment variable was not as expected."
+
+
 @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-def test_handler(api_gateway_event, env_vars, dynamodb_mock):
-    response = purchase.handler(api_gateway_event, None)
+def test_handler_with_existing_user(api_gateway_event_existing_user, env_vars, dynamodb_mock):
+    response = purchase.handler(api_gateway_event_existing_user, None)
     body = json.loads(response['body'])
 
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
+    assert body['purchased'], "purchase was not confirmed."
 
-    assert body['purchased']
+
+@pytest.mark.skip(reason="transact_write_items is not implemented for moto")
+def test_handler_with_no_account_user(api_gateway_event_no_account_user, env_vars, dynamodb_mock):
+    response = purchase.handler(api_gateway_event_no_account_user, None)
+    body = json.loads(response['body'])
+
+    assert response['statusCode'] == 200
+    assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
+    assert body['purchased'], "purchase was not confirmed."

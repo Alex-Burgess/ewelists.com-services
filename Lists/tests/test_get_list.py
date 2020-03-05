@@ -64,7 +64,7 @@ class TestGetListQuery:
         user_id = "12345678-user-0001-1234-abcdefghijkl"
         list_id = "12345678-list-0001-1234-abcdefghijkl"
         items = get_list.get_list_query('lists-unittest', user_id, list_id)
-        assert len(items) == 9, "Number of items returned was not as expected."
+        assert len(items) == 13, "Number of items returned was not as expected."
 
     def test_get_list_query_wrong_table(self, dynamodb_mock):
         user_id = "12345678-user-0001-1234-abcdefghijkl"
@@ -115,17 +115,21 @@ class TestGetListMain:
         assert body['list']['occasion'] == "Birthday", "Occasion was not correct."
         assert body['list']['imageUrl'] == "/images/celebration-default.jpg", "Image url was not correct."
 
-        assert len(body['products']) == 4, "Get list response did not contain correct number of products."
+        assert len(body['products']) == 6, "Get list response did not contain correct number of products."
         assert body['products']["12345678-prod-0001-1234-abcdefghijkl"] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "quantity": 3, "reserved": 2, "purchased": 0, "type": "products"}, "Product object not correct."
         assert body['products']["12345678-prod-0002-1234-abcdefghijkl"] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 0, "type": "products"}, "Product object not correct."
         assert body['products']["12345678-prod-0003-1234-abcdefghijkl"] == {"productId": "12345678-prod-0003-1234-abcdefghijkl", "quantity": 1, "reserved": 1, "purchased": 0, "type": "products"}, "Product object not correct."
+        assert body['products']["12345678-prod-0004-1234-abcdefghijkl"] == {"productId": "12345678-prod-0004-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 1, "type": "products"}, "Product object not correct."
+        assert body['products']["12345678-prod-0005-1234-abcdefghijkl"] == {"productId": "12345678-prod-0005-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 1, "type": "products"}, "Product object not correct."
         assert body['products']["12345678-notf-0010-1234-abcdefghijkl"] == {"productId": "12345678-notf-0010-1234-abcdefghijkl", "quantity": 2, "reserved": 1, "purchased": 0, "type": "notfound"}, "Product object not correct."
 
-        assert len(body['reserved']) == 4, "Get list response did not contain correct number of reservations."
-        assert body['reserved'][0] == {"productId": "12345678-notf-0010-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday", "state": "reserved", "reservationId": '12345678-resv-0004-1234-abcdefghijkl'}, "Reserved object not correct."
-        assert body['reserved'][1] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday", "state": "reserved", "reservationId": '12345678-resv-0001-1234-abcdefghijkl'}, "Reserved object not correct."
-        assert body['reserved'][2] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User3", "userId": "12345678-user-0003-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday", "state": "reserved", "reservationId": '12345678-resv-0002-1234-abcdefghijkl'}, "Reserved object not correct."
+        assert len(body['reserved']) == 6, "Get list response did not contain correct number of reservations."
+        assert body['reserved'][0] == {"productId": "12345678-notf-0010-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0004-1234-abcdefghijkl'}, "Reserved object not correct."
+        assert body['reserved'][1] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0001-1234-abcdefghijkl'}, "Reserved object not correct."
+        assert body['reserved'][2] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User3", "userId": "12345678-user-0003-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0002-1234-abcdefghijkl'}, "Reserved object not correct."
         assert body['reserved'][3] == {"productId": "12345678-prod-0003-1234-abcdefghijkl", "name": "Test User99", "userId": "test.user99@gmail.com", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0003-1234-abcdefghijkl'}, "Reserved object not correct."
+        assert body['reserved'][4] == {"productId": "12345678-prod-0004-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday", "state": "purchased", "reservationId": '12345678-resv-0006-1234-abcdefghijkl'}, "Reserved object not correct."
+        assert body['reserved'][5] == {"productId": "12345678-prod-0005-1234-abcdefghijkl", "name": "Test User99", "userId": "test.user99@gmail.com", "quantity": 1, "message": "Happy Birthday to you", "state": "purchased", "reservationId": '12345678-resv-0007-1234-abcdefghijkl'}, "Reserved object not correct."
 
     def test_get_list_with_no_date(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

@@ -83,7 +83,7 @@ class TestGetReservedDetailsItem:
         user_id = '12345678-user-0002-1234-abcdefghijkl'
         reserved_item = common_table_ops.get_reserved_details_item('lists-unittest', list_id, product_id, user_id)
 
-        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 1, 'name': 'Test User2', 'userId': '12345678-user-0002-1234-abcdefghijkl', 'message': 'Happy Birthday', 'state': 'reserved', 'reservationId': '12345678-resv-0001-1234-abcdefghijkl'}
+        expected_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 1, 'name': 'Test User2', 'userId': '12345678-user-0002-1234-abcdefghijkl', 'state': 'reserved', 'reservationId': '12345678-resv-0001-1234-abcdefghijkl'}
 
         assert reserved_item == expected_item, "Reserved item was not correct."
 
