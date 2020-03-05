@@ -157,32 +157,6 @@ class TestIsNotPurchased:
 
 
 class TestReserveMain:
-    def test_no_table_name_env_variable(self, monkeypatch, api_gateway_event_existing_user):
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
-        response = purchase.purchase_main(api_gateway_event_existing_user)
-        body = json.loads(response['body'])
-        assert body['error'] == 'TABLE_NAME environment variable not set correctly.', "Error for missing environment variable was not as expected."
-
-    def test_no_index_name_env_variable(self, monkeypatch, api_gateway_event_existing_user):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        response = purchase.purchase_main(api_gateway_event_existing_user)
-        body = json.loads(response['body'])
-        assert body['error'] == 'INDEX_NAME environment variable not set correctly.', "Error for missing environment variable was not as expected."
-
-    def test_bad_table_name_env_variable(self, monkeypatch, api_gateway_event_existing_user):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'notable')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
-        response = purchase.purchase_main(api_gateway_event_existing_user)
-        body = json.loads(response['body'])
-        assert body['error'] == 'Unexpected error when getting user from table.', "Error for missing environment variable was not as expected."
-
-    def test_bad_index_name_env_variable(self, monkeypatch, api_gateway_event_existing_user):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'noindex')
-        response = purchase.purchase_main(api_gateway_event_existing_user)
-        body = json.loads(response['body'])
-        assert body['error'] == 'Unexpected error when getting user from table.', "Error for missing environment variable was not as expected."
-
     def test_no_list_id_path_parameter(self, env_vars, api_gateway_event_existing_user):
         api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "null", "email": "test.user99@gmail.com"}
         response = purchase.purchase_main(api_gateway_event_existing_user)

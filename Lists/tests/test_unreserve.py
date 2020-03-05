@@ -70,6 +70,24 @@ def dynamodb_mock():
 
 
 class TestUnreserveMain:
+    def test_no_list_id_path_parameter(self, env_vars, api_gateway_event_with_account):
+        api_gateway_event_with_account['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "null", "email": "test.user99@gmail.com"}
+        response = unreserve.unreserve_main(api_gateway_event_with_account)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Path contained a null id parameter.', "Error for missing environment variable was not as expected."
+
+    def test_no_product_id_path_parameter(self, env_vars, api_gateway_event_with_account):
+        api_gateway_event_with_account['pathParameters'] = {"productid": "null", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+        response = unreserve.unreserve_main(api_gateway_event_with_account)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Path contained a null productid parameter.', "Error for missing environment variable was not as expected."
+
+    def test_no_email_path_parameter(self, env_vars, api_gateway_event_with_account):
+        api_gateway_event_with_account['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "null"}
+        response = unreserve.unreserve_main(api_gateway_event_with_account)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Path contained a null email parameter.', "Error for missing environment variable was not as expected."
+
     @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
     def test_unreserve_product_for_user(self, env_vars, dynamodb_mock, api_gateway_event_with_account):
         response = unreserve.unreserve_main(api_gateway_event_with_account)
