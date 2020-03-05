@@ -126,6 +126,7 @@ def get_user(event, osenv, table_name, index_name):
     user = {}
 
     email = get_path_parameter(event, 'email')
+    log.info("Checking if user exists in table with email: " + email)
     user_id = common_table_ops.does_user_have_account(table_name, index_name, email)
 
     if user_id:
@@ -139,7 +140,7 @@ def get_user(event, osenv, table_name, index_name):
         user['id'] = email
         user['email'] = email
 
-        if event['body'] != "null":
+        if event['body']:
             user['name'] = get_body_attribute(event, 'name')
 
     return user

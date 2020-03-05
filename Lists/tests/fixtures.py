@@ -43,10 +43,10 @@ def api_gateway_base_event():
             "X-Forwarded-Port": "443",
             "X-Forwarded-Proto": "https"
         },
-        "queryStringParameters": "null",
-        "multiValueQueryStringParameters": "null",
-        "pathParameters": "null",
-        "stageVariables": "null",
+        "queryStringParameters": None,
+        "multiValueQueryStringParameters": None,
+        "pathParameters": None,
+        "stageVariables": None,
         "requestContext": {
             "resourceId": "sgzmgr",
             "resourcePath": "/lists",
@@ -77,7 +77,7 @@ def api_gateway_base_event():
             "domainName": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
             "apiId": "4sdcvv0n2e"
         },
-        "body": "null",
+        "body": None,
         "isBase64Encoded": "false"
     }
 
@@ -112,10 +112,10 @@ def api_gateway_no_auth_base_event():
             "X-Forwarded-Port": "443",
             "X-Forwarded-Proto": "https"
         },
-        "queryStringParameters": "null",
-        "multiValueQueryStringParameters": "null",
-        "pathParameters": "null",
-        "stageVariables": "null",
+        "queryStringParameters": None,
+        "multiValueQueryStringParameters": None,
+        "pathParameters": None,
+        "stageVariables": None,
         "requestContext": {
             "resourceId": "sgzmgr",
             "resourcePath": "/lists",
@@ -130,23 +130,23 @@ def api_gateway_no_auth_base_event():
             "requestTimeEpoch": 1570551760227,
             "requestId": "a3d965cd-a79b-4249-867a-a03eb858a839",
             "identity": {
-                "cognitoIdentityPoolId": "null",
-                "accountId": "null",
-                "cognitoIdentityId": "null",
+                "cognitoIdentityPoolId": None,
+                "accountId": None,
+                "cognitoIdentityId": None,
                 "caller": "AROAZUFPDMJL6KJM4LLZI:CognitoIdentityCredentials",
                 "sourceIp": "31.49.230.217",
                 "principalOrgId": "o-d8jj6dyqv2",
-                "accessKey": "null",
-                "cognitoAuthenticationType": "null",
-                "cognitoAuthenticationProvider": "null",
-                "userArn": "null",
+                "accessKey": None,
+                "cognitoAuthenticationType": None,
+                "cognitoAuthenticationProvider": None,
+                "userArn": None,
                 "userAgent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36",
-                "user": "null"
+                "user": None
             },
             "domainName": "4sdcvv0n2e.execute-api.eu-west-1.amazonaws.com",
             "apiId": "4sdcvv0n2e"
         },
-        "body": "null",
+        "body": None,
         "isBase64Encoded": "false"
     }
 
@@ -169,7 +169,7 @@ def signup_event():
                 "name": "Test User",
                 "email": "test.user@gmail.com"
             },
-            "validationData": "null"
+            "validationData": None
         },
         "response": {
             "autoConfirmUser": "false",

@@ -309,7 +309,7 @@ class TestGetUser:
         assert user['exists']
 
     def test_get_user_when_body_empty(self, dynamodb_mock, api_gateway_event_with_email):
-        api_gateway_event_with_email['body'] = "null"
+        api_gateway_event_with_email['body'] = None
         user = common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest', 'email-index')
         assert user['id'] == 'test.user99@gmail.com'
         assert user['email'] == 'test.user99@gmail.com'
