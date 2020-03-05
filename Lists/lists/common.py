@@ -188,3 +188,12 @@ def get_identity(event, osenv):
         log.info('cognitoIdentityId was retrieved from event.')
 
     return identity
+
+
+def gift_is_reserved(item):
+    # State of reserved item can only be reserved or purchased.
+    if 'state' in item:
+        if item['state'] == 'purchased':
+            raise Exception("Product was already purchased.")
+
+    return True

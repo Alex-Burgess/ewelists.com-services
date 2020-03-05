@@ -31,7 +31,7 @@ def purchase_main(event):
         reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, user['id'])
 
         # Check that not already purchased
-        is_not_purchased(reserved_item)
+        common.gift_is_reserved(reserved_item)
 
         # Get product to ensure we know the latest quantities.
         product_item = common_table_ops.get_product_item(table_name, list_id, product_id)
@@ -119,14 +119,6 @@ def update_product_reserved_and_reservation_items(table_name, product_key, produ
     except Exception as e:
         log.info("Transaction write exception: " + str(e))
         raise Exception("Unexpected error when confirming purchase of product.")
-
-    return True
-
-
-def is_not_purchased(item):
-    if 'state' in item:
-        if item['state'] == 'purchased':
-            raise Exception("Product was already purchased.")
 
     return True
 

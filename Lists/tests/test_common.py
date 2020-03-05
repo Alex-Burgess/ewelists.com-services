@@ -377,3 +377,31 @@ class TestGetIdentity:
         with pytest.raises(Exception) as e:
             common.get_identity(api_gateway_postman_event, os.environ)
         assert str(e.value) == "POSTMAN_USERPOOL_SUB environment variable not set correctly.", "Exception not as expected."
+
+
+class TestGiftIsReserved:
+    def test_gift_is_reserved(self):
+        reserved_item = {
+            'reservationId': '12345678-resv-0001-1234-abcdefghijkl',
+            'name': 'Test User2',
+            'productId': '12345678-prod-0001-1234-abcdefghijkl',
+            'userId': '12345678-user-0002-1234-abcdefghijkl',
+            'quantity': 1,
+            'state': 'reserved'
+        }
+
+        assert common.gift_is_reserved(reserved_item), "Reservation was already purchased"
+
+    def test_gift_is_purchased_raises_exceptions(self):
+        reserved_item = {
+            'reservationId': '12345678-resv-0001-1234-abcdefghijkl',
+            'name': 'Test User2',
+            'productId': '12345678-prod-0001-1234-abcdefghijkl',
+            'userId': '12345678-user-0002-1234-abcdefghijkl',
+            'quantity': 1,
+            'state': 'purchased'
+        }
+
+        with pytest.raises(Exception) as e:
+            common.gift_is_reserved(reserved_item)
+        assert str(e.value) == "Product was already purchased.", "Exception message not correct."

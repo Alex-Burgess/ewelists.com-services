@@ -94,7 +94,7 @@ class TestGetReservedDetailsItem:
 
         with pytest.raises(Exception) as e:
             common_table_ops.get_reserved_details_item('lists-unittest', list_id, product_id, user_id)
-        assert str(e.value) == "No reserved item exists with this ID.", "Exception not as expected."
+        assert str(e.value) == "Product is not reserved by user.", "Exception not as expected."
 
 
 class TestGetProductItem:

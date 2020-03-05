@@ -122,7 +122,7 @@ def get_reserved_details_item(table_name, list_id, product_id, user_id):
 
     if 'Item' not in response:
         log.info("No reserved details were found for list {} and product id {} was found.".format(list_id, product_id))
-        raise Exception("No reserved item exists with this ID.")
+        raise Exception("Product is not reserved by user.")
 
     item = response['Item']
     log.info("Reserved Item: {}".format(item))

@@ -22,9 +22,10 @@ def unreserve_main(event):
         # Step 1 - get identity (which could be from sign in, or email in path, or encrypted parameter)
         id = common.get_user(event, os.environ, table_name, index_name)['id']
 
-        # Step 2 - get reserved item and product item.
+        # Step 2 - get reserved item and product item.  Check reserved item is in reserved state, i.e. not purchased or cancelled.
         reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, id)
         product_item = common_table_ops.get_product_item(table_name, list_id, product_id)
+        common.gift_is_reserved(reserved_item)
 
         # Step 3 - Calculate new reserved quantity of product.
         new_product_reserved_quantity = common.calculate_new_reserved_quantity(product_item, -reserved_item['quantity'])

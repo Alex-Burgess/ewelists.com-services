@@ -94,23 +94,17 @@ class TestUnreserveMain:
         body = json.loads(response['body'])
         assert body['unreserved'], "Unreserve main response did not contain the correct status."
 
-    def test_unreserve_product_not_reserved(self, env_vars, dynamodb_mock, api_gateway_event_with_account):
-        api_gateway_event_with_account['pathParameters'] = {"productid": "12345678-prod-0011-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user3@gmail.com"}
-        response = unreserve.unreserve_main(api_gateway_event_with_account)
-        body = json.loads(response['body'])
-        assert body['error'] == "No reserved item exists with this ID.", "Error was not as expected"
-
-    def test_unreserve_product_not_added_to_list(self, env_vars, dynamodb_mock, api_gateway_event_with_account):
-        api_gateway_event_with_account['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0011-1234-abcdefghijkl", "email": "test.user3@gmail.com"}
-        response = unreserve.unreserve_main(api_gateway_event_with_account)
-        body = json.loads(response['body'])
-        assert body['error'] == "No reserved item exists with this ID.", "Error was not as expected"
-
     def test_unreserve_product_not_reserved_by_requestor(self, env_vars, dynamodb_mock, api_gateway_event_with_account):
         api_gateway_event_with_account['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0011-1234-abcdefghijkl", "email": "test.user30@gmail.com"}
         response = unreserve.unreserve_main(api_gateway_event_with_account)
         body = json.loads(response['body'])
-        assert body['error'] == "No reserved item exists with this ID.", "Error was not as expected"
+        assert body['error'] == "Product is not reserved by user.", "Error was not as expected"
+
+    def test_unreserve_product_already_confirmed(self, env_vars, dynamodb_mock, api_gateway_event_with_account):
+        api_gateway_event_with_account['pathParameters'] = {"productid": "12345678-prod-0005-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+        response = unreserve.unreserve_main(api_gateway_event_with_account)
+        body = json.loads(response['body'])
+        assert body['error'] == "Product was already purchased.", "Error was not as expected"
 
     def test_unreserve_product_with_wrong_quantities(self, env_vars, dynamodb_mock, api_gateway_event_with_account):
         # Update table to break concurrency of product reserved quantity, with that of the reserved items.

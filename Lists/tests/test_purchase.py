@@ -128,34 +128,6 @@ class TestNewPurchasedQuantity:
         assert purchase.new_purchased_quantity(2, 1) == 3, "New quantity not as expected."
 
 
-class TestIsNotPurchased:
-    def test_is_not_purchased(self):
-        reserved_item = {
-            'reservationId': '12345678-resv-0001-1234-abcdefghijkl',
-            'name': 'Test User2',
-            'productId': '12345678-prod-0001-1234-abcdefghijkl',
-            'userId': '12345678-user-0002-1234-abcdefghijkl',
-            'quantity': 1,
-            'state': 'reserved'
-        }
-
-        assert purchase.is_not_purchased(reserved_item), "Reservation was already purchased"
-
-    def test_is_purchased_raises_exceptions(self):
-        reserved_item = {
-            'reservationId': '12345678-resv-0001-1234-abcdefghijkl',
-            'name': 'Test User2',
-            'productId': '12345678-prod-0001-1234-abcdefghijkl',
-            'userId': '12345678-user-0002-1234-abcdefghijkl',
-            'quantity': 1,
-            'state': 'purchased'
-        }
-
-        with pytest.raises(Exception) as e:
-            purchase.is_not_purchased(reserved_item)
-        assert str(e.value) == "Product was already purchased.", "Exception message not correct."
-
-
 class TestReserveMain:
     def test_no_list_id_path_parameter(self, env_vars, api_gateway_event_existing_user):
         api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "null", "email": "test.user99@gmail.com"}
@@ -175,12 +147,6 @@ class TestReserveMain:
         body = json.loads(response['body'])
         assert body['error'] == 'Path contained a null email parameter.', "Error for missing environment variable was not as expected."
 
-    def test_list_with_product_added(self, env_vars, api_gateway_event_existing_user, dynamodb_mock):
-        api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-1000-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
-        response = purchase.purchase_main(api_gateway_event_existing_user)
-        body = json.loads(response['body'])
-        assert body['error'] == 'No reserved item exists with this ID.', "Error for missing environment variable was not as expected."
-
     def test_confirm_product_already_confirmed_by_user_with_account(self, env_vars, api_gateway_event_existing_user, dynamodb_mock):
         api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-0004-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
         response = purchase.purchase_main(api_gateway_event_existing_user)
@@ -192,6 +158,12 @@ class TestReserveMain:
         response = purchase.purchase_main(api_gateway_event_no_account_user)
         body = json.loads(response['body'])
         assert body['error'] == 'Product was already purchased.', "Error for missing environment variable was not as expected."
+
+    def test_confirm_product_that_was_unreserved(self, env_vars, api_gateway_event_existing_user, dynamodb_mock):
+        api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-1000-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
+        response = purchase.purchase_main(api_gateway_event_existing_user)
+        body = json.loads(response['body'])
+        assert body['error'] == 'Product is not reserved by user.', "Error for missing environment variable was not as expected."
 
 
 @pytest.mark.skip(reason="transact_write_items is not implemented for moto")

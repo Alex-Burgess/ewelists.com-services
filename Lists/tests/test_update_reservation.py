@@ -93,14 +93,14 @@ class TestUpdateReserveMain:
         api_gateway_event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
         response = update_reservation.update_reserve_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == "No reserved item exists with this ID.", "Error was not as expected"
+        assert body['error'] == "Product is not reserved by user.", "Error was not as expected"
 
     def test_update_product_not_reserved_by_requestor(self, monkeypatch, dynamodb_mock, api_gateway_event):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         api_gateway_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl"
         response = update_reservation.update_reserve_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == "No reserved item exists with this ID.", "Error was not as expected"
+        assert body['error'] == "Product is not reserved by user.", "Error was not as expected"
 
     def test_update_product_with_wrong_quantities(self, monkeypatch, dynamodb_mock, api_gateway_event):
         api_gateway_event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0002-1234-abcdefghijkl"}
