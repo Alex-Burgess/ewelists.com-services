@@ -332,6 +332,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          INDEX_NAME: "email-index"
           POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
           POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
       Events:
@@ -339,7 +340,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref Api
-            Path: /lists/{id}/reserve/{productId}
+            Path: /lists/{id}/reserve/{productId}/email/{email}
             Method: PUT
 
   ReservationFunction:
@@ -772,80 +773,6 @@ Resources:
                   application/json: "{\n  \"statusCode\" : 200\n}\n"
                 passthroughBehavior: "when_no_match"
                 type: "mock"
-          "/lists/{id}/reserve/{productid}":
-            post:
-              responses:
-                "200":
-                  description: "200 response"
-                  headers:
-                    Access-Control-Allow-Origin:
-                      type: "string"
-              security:
-              - sigv4: []
-              x-amazon-apigateway-integration:
-                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ReserveProductFunction.Arn}/invocations'
-                passthroughBehavior: "when_no_match"
-                httpMethod: "POST"
-                type: "aws_proxy"
-            put:
-              responses:
-                "200":
-                  description: "200 response"
-                  headers:
-                    Access-Control-Allow-Origin:
-                      type: "string"
-              security:
-              - sigv4: []
-              x-amazon-apigateway-integration:
-                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateProductReservationFunction.Arn}/invocations'
-                passthroughBehavior: "when_no_match"
-                httpMethod: "POST"
-                type: "aws_proxy"
-            delete:
-              responses:
-                "200":
-                  description: "200 response"
-                  headers:
-                    Access-Control-Allow-Origin:
-                      type: "string"
-              security:
-              - sigv4: []
-              x-amazon-apigateway-integration:
-                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UnreserveProductFunction.Arn}/invocations'
-                passthroughBehavior: "when_no_match"
-                httpMethod: "POST"
-                type: "aws_proxy"
-            options:
-              consumes:
-              - "application/json"
-              produces:
-              - "application/json"
-              responses:
-                "200":
-                  description: "200 response"
-                  headers:
-                    Access-Control-Allow-Origin:
-                      type: "string"
-                    Access-Control-Allow-Methods:
-                      type: "string"
-                    Access-Control-Allow-Headers:
-                      type: "string"
-              x-amazon-apigateway-integration:
-                responses:
-                  default:
-                    statusCode: "200"
-                    responseParameters:
-                      method.response.header.Access-Control-Allow-Methods: "'POST,PUT,DELETE,OPTIONS'"
-                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-                      method.response.header.Access-Control-Allow-Origin: !If [Prod, !Sub "'https://${DomainName}'",
-                                                                            !If [Staging, !Sub "'https://${Environment}.${DomainName}'", "'*'"]
-                                                                          ]
-                    responseTemplates:
-                      application/json: "{}\n"
-                requestTemplates:
-                  application/json: "{\n  \"statusCode\" : 200\n}\n"
-                passthroughBehavior: "when_no_match"
-                type: "mock"
           "/lists/{id}/reserve/{productid}/email/{email}":
             post:
               responses:
@@ -859,20 +786,18 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 type: "aws_proxy"
-            # put:
-            #   responses:
-            #     "200":
-            #       description: "200 response"
-            #       headers:
-            #         Access-Control-Allow-Origin:
-            #           type: "string"
-            #   security:
-            #   - sigv4: []
-            #   x-amazon-apigateway-integration:
-            #     uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateProductReservationFunction.Arn}/invocations'
-            #     passthroughBehavior: "when_no_match"
-            #     httpMethod: "POST"
-            #     type: "aws_proxy"
+            put:
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateProductReservationFunction.Arn}/invocations'
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                type: "aws_proxy"
             delete:
               responses:
                 "200":

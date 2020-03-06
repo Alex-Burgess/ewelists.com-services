@@ -93,52 +93,6 @@ def dynamodb_mock():
     mock.stop()
 
 
-class TestCreateProductKey:
-    def test_create_product_key(self):
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        product_id = '12345678-prod-0001-1234-abcdefghijkl'
-
-        expected_object = {
-            'PK': {'S': "LIST#12345678-list-0001-1234-abcdefghijkl"},
-            'SK': {'S': "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}
-        }
-
-        key = purchase.create_product_key(list_id, product_id)
-        assert key == expected_object, "Product key was not as expected."
-
-
-class TestCreateReservedKey:
-    def test_create_product_key(self):
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        product_id = '12345678-prod-0001-1234-abcdefghijkl'
-        user = {
-            'id': '12345678-user-0001-1234-abcdefghijkl',
-            'name': 'Test User1',
-            'email': 'test.user1x@gmail.com'
-        }
-
-        expected_object = {
-            'PK': {'S': "LIST#12345678-list-0001-1234-abcdefghijkl"},
-            'SK': {'S': "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0001-1234-abcdefghijkl"}
-        }
-
-        key = purchase.create_reserved_key(list_id, product_id, user)
-        assert key == expected_object, "Key was not as expected."
-
-
-class TestCreateReservationKey:
-    def test_create_product_key(self):
-        id = '12345678-resv-0001-1234-abcdefghijkl'
-
-        expected_object = {
-            'PK': {'S': "RESERVATION#12345678-resv-0001-1234-abcdefghijkl"},
-            'SK': {'S': "RESERVATION#12345678-resv-0001-1234-abcdefghijkl"}
-        }
-
-        key = purchase.create_reservation_key(id)
-        assert key == expected_object, "Key was not as expected."
-
-
 class TestNewReservedQuantity:
     def test_new_reserved_quantity(self):
         assert purchase.new_reserved_quantity(1, 1) == 0, "New quantity not as expected."

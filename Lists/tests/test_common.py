@@ -257,31 +257,37 @@ class TestConfirmOwner:
 
 class TestCalculateNewReservedQuantity:
     def test_subtract_1(self):
-        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
+        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'purchased': 0, 'type': 'products'}
         new_quantity = common.calculate_new_reserved_quantity(product_item, -1)
         assert new_quantity == 0
 
     def test_no_update(self):
-        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
+        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'purchased': 0, 'type': 'products'}
         new_quantity = common.calculate_new_reserved_quantity(product_item, 0)
         assert new_quantity == 1
 
     def test_add_2(self):
-        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
+        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'purchased': 0, 'type': 'products'}
         new_quantity = common.calculate_new_reserved_quantity(product_item, 2)
         assert new_quantity == 3
 
     def test_over_subtract(self):
-        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
+        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1,  'purchased': 0, 'type': 'products'}
         with pytest.raises(Exception) as e:
             common.calculate_new_reserved_quantity(product_item, -2)
         assert str(e.value) == "Reserved quantity for product (1) could not be updated by -2.", "Exception message not correct."
 
     def test_over_add(self):
-        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'type': 'products'}
+        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'purchased': 0, 'type': 'products'}
         with pytest.raises(Exception) as e:
             common.calculate_new_reserved_quantity(product_item, 3)
         assert str(e.value) == "Reserved quantity for product (1) could not be updated by 3 as exceeds required quantity (3).", "Exception message not correct."
+
+    def test_over_add_with_purchased(self):
+        product_item = {'productId': '12345678-prod-0001-1234-abcdefghijkl', 'quantity': 3, 'reserved': 1, 'purchased': 1, 'type': 'products'}
+        with pytest.raises(Exception) as e:
+            common.calculate_new_reserved_quantity(product_item, 2)
+        assert str(e.value) == "Reserved quantity for product (1) could not be updated by 2 as exceeds required quantity (3).", "Exception message not correct."
 
 
 @pytest.mark.skip(reason="Not sure how to mock ses.")
@@ -405,3 +411,49 @@ class TestGiftIsReserved:
         with pytest.raises(Exception) as e:
             common.gift_is_reserved(reserved_item)
         assert str(e.value) == "Product was already purchased.", "Exception message not correct."
+
+
+class TestCreateProductKey:
+    def test_create_product_key(self):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+
+        expected_object = {
+            'PK': {'S': "LIST#12345678-list-0001-1234-abcdefghijkl"},
+            'SK': {'S': "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}
+        }
+
+        key = common.create_product_key(list_id, product_id)
+        assert key == expected_object, "Product key was not as expected."
+
+
+class TestCreateReservedKey:
+    def test_create_product_key(self):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        user = {
+            'id': '12345678-user-0001-1234-abcdefghijkl',
+            'name': 'Test User1',
+            'email': 'test.user1x@gmail.com'
+        }
+
+        expected_object = {
+            'PK': {'S': "LIST#12345678-list-0001-1234-abcdefghijkl"},
+            'SK': {'S': "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0001-1234-abcdefghijkl"}
+        }
+
+        key = common.create_reserved_key(list_id, product_id, user)
+        assert key == expected_object, "Key was not as expected."
+
+
+class TestCreateReservationKey:
+    def test_create_product_key(self):
+        id = '12345678-resv-0001-1234-abcdefghijkl'
+
+        expected_object = {
+            'PK': {'S': "RESERVATION#12345678-resv-0001-1234-abcdefghijkl"},
+            'SK': {'S': "RESERVATION#12345678-resv-0001-1234-abcdefghijkl"}
+        }
+
+        key = common.create_reservation_key(id)
+        assert key == expected_object, "Key was not as expected."

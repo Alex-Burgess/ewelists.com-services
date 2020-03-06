@@ -17,13 +17,15 @@ def handler(event, context):
 def update_reserve_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-        identity = common.get_identity(event, os.environ)
+        index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
         list_id = common.get_path_parameter(event, 'id')
         product_id = common.get_path_parameter(event, 'productid')
         request_reserve_quantity = common.get_body_attribute(event, 'quantity')
 
+        user = common.get_user(event, os.environ, table_name, index_name)
+
         # Step 1 - get reserved item and product item.
-        reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, identity)
+        reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, user['id'])
         product_item = common_table_ops.get_product_item(table_name, list_id, product_id)
 
         # Step 2 - Determine change to users reserved product quantity
@@ -34,7 +36,10 @@ def update_reserve_main(event):
         new_product_reserved_quantity = common.calculate_new_reserved_quantity(product_item, quantity_change)
 
         # Step 4 - Update reserved details item and update product reserved quantities
-        update_product_and_update_reserved_item(table_name, list_id, product_id, identity, new_product_reserved_quantity, request_reserve_quantity)
+        product_key = common.create_product_key(list_id, product_id)
+        reserved_key = common.create_reserved_key(list_id, product_id, user)
+        reservation_key = common.create_reservation_key(reserved_item['reservationId'])
+        update_product_and_update_reserved_item(table_name, product_key, reserved_key, reservation_key, new_product_reserved_quantity, request_reserve_quantity)
 
     except Exception as e:
         log.error("Exception: {}".format(e))
@@ -51,7 +56,7 @@ def calculate_difference_to_reserved_item_quantity(reserved_item, new_quantity):
     difference = new_quantity - reserved_item['quantity']
 
     if new_quantity <= 0:
-        message = "Reserved quantity ({}) for product ({}) for user ({}) cannot be reduced to 0.".format(reserved_item['quantity'], reserved_item['productId'], reserved_item['userId'])
+        message = "Reserved quantity cannot be reduced to 0.".format(reserved_item['quantity'], reserved_item['productId'], reserved_item['userId'])
         log.info(message)
         raise Exception(message)
 
@@ -63,17 +68,7 @@ def calculate_difference_to_reserved_item_quantity(reserved_item, new_quantity):
     return difference
 
 
-def update_product_and_update_reserved_item(table_name, list_id, product_id, user_id, new_product_reserved_quantity, request_reserve_quantity):
-    product_key = {
-        'PK': {'S': "LIST#{}".format(list_id)},
-        'SK': {'S': "PRODUCT#{}".format(product_id)}
-    }
-
-    reserved_key = {
-        'PK': {'S': "LIST#{}".format(list_id)},
-        'SK': {'S': "RESERVED#{}#{}".format(product_id, user_id)},
-    }
-
+def update_product_and_update_reserved_item(table_name, product_key, reserved_key, reservation_key, new_product_reserved_quantity, request_reserve_quantity):
     try:
         response = dynamodb.transact_write_items(
             TransactItems=[
@@ -91,6 +86,16 @@ def update_product_and_update_reserved_item(table_name, list_id, product_id, use
                     'Update': {
                         'TableName': table_name,
                         'Key': reserved_key,
+                        'UpdateExpression': "set quantity = :q",
+                        'ExpressionAttributeValues': {
+                            ':q': {'N': str(request_reserve_quantity)},
+                        }
+                    }
+                },
+                {
+                    'Update': {
+                        'TableName': table_name,
+                        'Key': reservation_key,
                         'UpdateExpression': "set quantity = :q",
                         'ExpressionAttributeValues': {
                             ':q': {'N': str(request_reserve_quantity)},

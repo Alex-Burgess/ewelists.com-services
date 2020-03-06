@@ -3638,7 +3638,7 @@
 					"response": []
 				},
 				{
-					"name": "update reserved quantity (todo)",
+					"name": "update reserved quantity",
 					"event": [
 						{
 							"listen": "test",
@@ -3711,7 +3711,7 @@
 							"raw": "{\n    \"quantity\": 2\n}"
 						},
 						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}",
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
 							"protocol": "https",
 							"host": [
 								"{{lists_url_id}}",
@@ -3725,7 +3725,201 @@
 								"lists",
 								"{{list_id}}",
 								"reserve",
-								"{{p_product_id}}"
+								"{{p_product_id}}",
+								"email",
+								"eweuser8%2Btest2%40gmail.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "update quantity with same number",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('There was no difference in update request to reserved item.');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"reserve",
+								"{{p_product_id}}",
+								"email",
+								"eweuser8%2Btest2%40gmail.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "update quantity with too many",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('Reserved quantity for product (2) could not be updated by 2 as exceeds required quantity (2).');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 4\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"reserve",
+								"{{p_product_id}}",
+								"email",
+								"eweuser8%2Btest2%40gmail.com"
 							]
 						},
 						"description": "Create list"
@@ -3859,7 +4053,7 @@
 									"    pm.expect(obj.title).to.eql(\"My Birthday List\");",
 									"    pm.expect(obj.productId.length).to.eql(36);",
 									"    pm.expect(obj.productType).to.eql(\"products\");",
-									"    pm.expect(obj.quantity).to.eql(1);",
+									"    pm.expect(obj.quantity).to.eql(2);",
 									"    pm.expect(obj.state).to.eql(\"cancelled\");",
 									"});",
 									""
@@ -5495,7 +5689,7 @@
 					"response": []
 				},
 				{
-					"name": "update reserved quantity (todo)",
+					"name": "update reserved quantity",
 					"event": [
 						{
 							"listen": "test",
@@ -5565,10 +5759,10 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 2\n}"
+							"raw": "{\n    \"quantity\": 2,\n    \"name\": \"Success Simulator\"\n}"
 						},
 						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}",
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/success%40simulator.amazonses.com",
 							"protocol": "https",
 							"host": [
 								"{{lists_url_id}}",
@@ -5582,7 +5776,201 @@
 								"lists",
 								"{{list_id}}",
 								"reserve",
-								"{{p_product_id}}"
+								"{{p_product_id}}",
+								"email",
+								"success%40simulator.amazonses.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "update quantity with same number",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('There was no difference in update request to reserved item.');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 2,\n    \"name\": \"Success Simulator\"\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/success%40simulator.amazonses.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"reserve",
+								"{{p_product_id}}",
+								"email",
+								"success%40simulator.amazonses.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "update quantity with too many",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.error; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should exist\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['error'];",
+									"    pm.expect(message).to.eql('Reserved quantity for product (2) could not be updated by 2 as exceeds required quantity (2).');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 4,\n    \"name\": \"Success Simulator\"\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/success%40simulator.amazonses.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"reserve",
+								"{{p_product_id}}",
+								"email",
+								"success%40simulator.amazonses.com"
 							]
 						},
 						"description": "Create list"
@@ -5716,7 +6104,7 @@
 									"    pm.expect(obj.title).to.eql(\"My Birthday List\");",
 									"    pm.expect(obj.productId.length).to.eql(36);",
 									"    pm.expect(obj.productType).to.eql(\"products\");",
-									"    pm.expect(obj.quantity).to.eql(1);",
+									"    pm.expect(obj.quantity).to.eql(2);",
 									"    pm.expect(obj.state).to.eql(\"cancelled\");",
 									"});",
 									""

@@ -69,6 +69,21 @@ def dynamodb_mock():
     mock.stop()
 
 
+class TestCreateReservationKey:
+    def test_create_product_key(self):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_id = '12345678-prod-0001-1234-abcdefghijkl'
+        user_id = '12345678-user-0001-1234-abcdefghijkl'
+
+        expected_object = {
+            ':PK': {'S': "LIST#12345678-list-0001-1234-abcdefghijkl"},
+            ':SK': {'S': "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0001-1234-abcdefghijkl"}
+        }
+
+        key = unreserve.create_condition(list_id, product_id, user_id)
+        assert key == expected_object, "Key was not as expected."
+
+
 class TestUnreserveMain:
     def test_no_list_id_path_parameter(self, env_vars, api_gateway_event_with_account):
         api_gateway_event_with_account['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "null", "email": "test.user99@gmail.com"}

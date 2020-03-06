@@ -45,9 +45,9 @@ def purchase_main(event):
         product_purchased_q = new_purchased_quantity(product_item['purchased'], reserved_item['quantity'])
 
         # update table with transaction
-        product_key = create_product_key(list_id, product_id)
-        reserved_key = create_reserved_key(list_id, product_id, user)
-        reservation_key = create_reservation_key(reserved_item['reservationId'])
+        product_key = common.create_product_key(list_id, product_id)
+        reserved_key = common.create_reserved_key(list_id, product_id, user)
+        reservation_key = common.create_reservation_key(reserved_item['reservationId'])
         update_product_reserved_and_reservation_items(table_name, product_key, product_reserved_q, product_purchased_q, reserved_key, reservation_key)
 
         # Send confirmation
@@ -129,27 +129,6 @@ def update_product_reserved_and_reservation_items(table_name, product_key, produ
         raise Exception("Unexpected error when confirming purchase of product.")
 
     return True
-
-
-def create_product_key(list_id, product_id):
-    return {
-        'PK': {'S': "LIST#{}".format(list_id)},
-        'SK': {'S': "PRODUCT#{}".format(product_id)}
-    }
-
-
-def create_reserved_key(list_id, product_id, user):
-    return {
-        'PK': {'S': "LIST#{}".format(list_id)},
-        'SK': {'S': "RESERVED#{}#{}".format(product_id, user['id'])}
-    }
-
-
-def create_reservation_key(resv_id):
-    return {
-        'PK': {'S': "RESERVATION#{}".format(resv_id)},
-        'SK': {'S': "RESERVATION#{}".format(resv_id)},
-    }
 
 
 def create_email_data(domain_name, name, list_id, title, quantity, product):

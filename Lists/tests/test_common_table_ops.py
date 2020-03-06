@@ -133,24 +133,3 @@ class TestCheckProductNotReservedByUser:
         with pytest.raises(Exception) as e:
             common_table_ops.check_product_not_reserved_by_user('lists-unittest', list_id, product_id, user_id)
         assert str(e.value) == "Product already reserved by user.", "Exception not as expected."
-
-
-@pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-class TestUnreserveProduct:
-    def test_unreserve(self, dynamodb_mock):
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        product_id = '12345678-prod-0001-1234-abcdefghijkl'
-        resv_id = '12345678-resv-0001-1234-abcdefghijkl'
-        user_id = '12345678-user-0002-1234-abcdefghijkl'
-        new_product_reserved_quantity = 1
-
-        assert common_table_ops.unreserve_product('lists-unittest', list_id, product_id, resv_id, user_id, new_product_reserved_quantity)
-
-    def test_unreserve_with_email(self, dynamodb_mock):
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        product_id = '12345678-prod-0003-1234-abcdefghijkl'
-        resv_id = '12345678-resv-0001-1234-abcdefghijkl'
-        user_id = 'test.user99@gmail.com'
-        new_product_reserved_quantity = 0
-
-        assert common_table_ops.unreserve_product('lists-unittest', list_id, product_id, resv_id, user_id, new_product_reserved_quantity)

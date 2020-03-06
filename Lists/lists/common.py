@@ -70,7 +70,8 @@ def calculate_new_reserved_quantity(product_item, update_amount):
         log.info("Reserved quantity for product ({}) could not be updated by {}.".format(product_item['reserved'], update_amount))
         raise Exception("Reserved quantity for product ({}) could not be updated by {}.".format(product_item['reserved'], update_amount))
 
-    if new_quantity > product_item['quantity']:
+    # Think this needs to be new quantity + purchased amount
+    if new_quantity + product_item['purchased'] > product_item['quantity']:
         raise Exception("Reserved quantity for product ({}) could not be updated by {} as exceeds required quantity ({}).".format(product_item['reserved'], update_amount, product_item['quantity']))
 
     return new_quantity
@@ -197,3 +198,24 @@ def gift_is_reserved(item):
             raise Exception("Product was already purchased.")
 
     return True
+
+
+def create_product_key(list_id, product_id):
+    return {
+        'PK': {'S': "LIST#{}".format(list_id)},
+        'SK': {'S': "PRODUCT#{}".format(product_id)}
+    }
+
+
+def create_reserved_key(list_id, product_id, user):
+    return {
+        'PK': {'S': "LIST#{}".format(list_id)},
+        'SK': {'S': "RESERVED#{}#{}".format(product_id, user['id'])}
+    }
+
+
+def create_reservation_key(resv_id):
+    return {
+        'PK': {'S': "RESERVATION#{}".format(resv_id)},
+        'SK': {'S': "RESERVATION#{}".format(resv_id)},
+    }

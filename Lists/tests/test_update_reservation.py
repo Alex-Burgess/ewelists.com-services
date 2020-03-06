@@ -10,15 +10,23 @@ log = logger.setup_logger()
 
 
 @pytest.fixture
+def env_vars(monkeypatch):
+    monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+
+    return monkeypatch
+
+
+@pytest.fixture
 def api_gateway_event():
-    # User 2 will update its reserved quantity of product 1 from 1 to 2.
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/reserve/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
+    event = fixtures.api_gateway_no_auth_base_event()
+    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user2@gmail.com"
     event['httpMethod'] = "PUT"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 2\n}"
-    event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0002-1234-abcdefghijkl"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
+    event['body'] = json.dumps({
+        "quantity": 2
+    })
 
     return event
 
@@ -32,8 +40,15 @@ def dynamodb_mock():
     table = dynamodb.create_table(
         TableName='lists-unittest',
         KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
+        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}, {'AttributeName': 'email', 'AttributeType': 'S'}],
+        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
+        GlobalSecondaryIndexes=[{
+            'IndexName': 'email-index',
+            'KeySchema': [{'AttributeName': 'email', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
+            'Projection': {
+                'ProjectionType': 'ALL'
+            }
+        }]
     )
 
     items = fixtures.load_test_data()
@@ -70,7 +85,7 @@ class TestCalculateDifferenceToReservedItemQuantity:
         reserved_item = {"productId": "12345678-notf-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": current_quantity, "message": "Happy Birthday"}
         with pytest.raises(Exception) as e:
             update_reservation.calculate_difference_to_reserved_item_quantity(reserved_item, 0)
-        assert str(e.value) == "Reserved quantity (1) for product (12345678-notf-0001-1234-abcdefghijkl) for user (12345678-user-0002-1234-abcdefghijkl) cannot be reduced to 0.", "Exception message not correct."
+        assert str(e.value) == "Reserved quantity cannot be reduced to 0.", "Exception message not correct."
 
     def test_keep_at_1(self):
         current_quantity = 1
@@ -82,48 +97,35 @@ class TestCalculateDifferenceToReservedItemQuantity:
 
 class TestUpdateReserveMain:
     @pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-    def test_update_reserve_main(self, monkeypatch, dynamodb_mock, api_gateway_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+    def test_update_reserve_main(self, env_vars, dynamodb_mock, api_gateway_event):
         response = update_reservation.update_reserve_main(api_gateway_event)
         body = json.loads(response['body'])
         assert body['updated'], "Update reserve main response did not contain the correct status."
 
-    def test_update_product_not_reserved(self, monkeypatch, dynamodb_mock, api_gateway_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    def test_update_product_not_reserved(self, env_vars, dynamodb_mock, api_gateway_event):
+        api_gateway_event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
         response = update_reservation.update_reserve_main(api_gateway_event)
         body = json.loads(response['body'])
         assert body['error'] == "Product is not reserved by user.", "Error was not as expected"
 
-    def test_update_product_not_reserved_by_requestor(self, monkeypatch, dynamodb_mock, api_gateway_event):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0001-1234-abcdefghijkl"
+    def test_update_product_not_reserved_by_requestor(self, env_vars, dynamodb_mock, api_gateway_event):
+        api_gateway_event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
         response = update_reservation.update_reserve_main(api_gateway_event)
         body = json.loads(response['body'])
         assert body['error'] == "Product is not reserved by user.", "Error was not as expected"
 
-    def test_update_product_with_wrong_quantities(self, monkeypatch, dynamodb_mock, api_gateway_event):
-        api_gateway_event['pathParameters'] = {"productid": "12345678-prod-0002-1234-abcdefghijkl", "id": "12345678-list-0002-1234-abcdefghijkl"}
-        api_gateway_event['body'] = "{\n    \"quantity\": 1\n}"
-        api_gateway_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
+    def test_update_reserved_quantity_to_zero(self, env_vars, dynamodb_mock, api_gateway_event):
+        api_gateway_event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
+        api_gateway_event['body'] = "{\n    \"quantity\": -2\n}"
 
-        # Update table to break concurrency of product reserved quantity, with that of the reserved items.
-        dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
-        key = {
-            'PK': {'S': "LIST#{}".format(api_gateway_event['pathParameters']['id'])},
-            'SK': {'S': "PRODUCT#{}".format(api_gateway_event['pathParameters']['productid'])}
-        }
-
-        response = dynamodb.update_item(
-            TableName='lists-unittest',
-            Key=key,
-            UpdateExpression="set reserved = :r",
-            ExpressionAttributeValues={
-                ':r': {'N': str(0)},
-            }
-        )
-
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
         response = update_reservation.update_reserve_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == "Reserved quantity for product (0) could not be updated by -1.", "Error was not as expected"
+        assert body['error'] == "Reserved quantity cannot be reduced to 0.", "Error was not as expected"
+
+    def test_update_reserved_quantity_by_too_many(self, env_vars, dynamodb_mock, api_gateway_event):
+        api_gateway_event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
+        api_gateway_event['body'] = "{\n    \"quantity\": 10\n}"
+
+        response = update_reservation.update_reserve_main(api_gateway_event)
+        body = json.loads(response['body'])
+        assert body['error'] == "Reserved quantity for product (2) could not be updated by 9 as exceeds required quantity (3).", "Error was not as expected"

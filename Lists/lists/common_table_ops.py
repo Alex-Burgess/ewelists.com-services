@@ -1,5 +1,4 @@
 import boto3
-import json
 from lists import logger
 from lists.common_entities import Product, Reserved
 from botocore.exceptions import ClientError
@@ -148,71 +147,5 @@ def check_product_not_reserved_by_user(table_name, list_id, product_id, user_id)
     if 'Item' in response:
         log.info("Reserved product was found for list {}, product id {} and user {}.".format(list_id, product_id, user_id))
         raise Exception("Product already reserved by user.")
-
-    return True
-
-
-def unreserve_product(table_name, list_id, product_id, resv_id, user_id, new_product_reserved_quantity):
-    product_key = {
-        'PK': {'S': "LIST#{}".format(list_id)},
-        'SK': {'S': "PRODUCT#{}".format(product_id)}
-    }
-
-    reserved_key = {
-        'PK': {'S': "LIST#{}".format(list_id)},
-        'SK': {'S': "RESERVED#{}#{}".format(product_id, user_id)}
-    }
-
-    condition = {
-        ':PK': {'S': "LIST#{}".format(list_id)},
-        ':SK': {'S': "RESERVED#{}#{}".format(product_id, user_id)}
-    }
-
-    reservation_key = {
-        'PK': {'S': "RESERVATION#{}".format(resv_id)},
-        'SK': {'S': "RESERVATION#{}".format(resv_id)},
-    }
-
-    try:
-        response = dynamodb.transact_write_items(
-            TransactItems=[
-                {
-                    'Update': {
-                        'TableName': table_name,
-                        'Key': product_key,
-                        'UpdateExpression': "set reserved = :r",
-                        'ExpressionAttributeValues': {
-                            ':r': {'N': str(new_product_reserved_quantity)},
-                        }
-                    }
-                },
-                {
-                    'Delete': {
-                        'TableName': table_name,
-                        'Key': reserved_key,
-                        'ConditionExpression': "PK = :PK AND SK = :SK",
-                        'ExpressionAttributeValues': condition
-                    }
-                },
-                {
-                    'Update': {
-                        'TableName': table_name,
-                        'Key': reservation_key,
-                        'UpdateExpression': "set #st = :s",
-                        'ExpressionAttributeValues': {
-                            ':s': {'S': 'cancelled'},
-                        },
-                        'ExpressionAttributeNames': {
-                            '#st': 'state'
-                        }
-                    }
-                }
-            ]
-        )
-
-        log.info("Attributes updated: " + json.dumps(response))
-    except Exception as e:
-        log.info("Transaction write exception: " + str(e))
-        raise Exception("Unexpected error when unreserving product.")
 
     return True
