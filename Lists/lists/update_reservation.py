@@ -9,7 +9,8 @@ dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):
-    log.info("Update product event: " + json.dumps(event))
+    log.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
+    log.info("Body attributes: {}".format(json.dumps(event['body'])))
     response = update_reserve_main(event)
     return response
 

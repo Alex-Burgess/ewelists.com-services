@@ -12,6 +12,7 @@ dynamodb = boto3.client('dynamodb')
 
 def handler(event, context):
     log.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
+    log.info("Body attributes: {}".format(json.dumps(event['body'])))
     response = reservation_main(event)
     return response
 

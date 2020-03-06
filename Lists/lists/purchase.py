@@ -12,6 +12,8 @@ SENDER = "Ewelists <contact@ewelists.com>"
 
 
 def handler(event, context):
+    log.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
+    log.info("Body attributes: {}".format(json.dumps(event['body'])))
     response = purchase_main(event)
     return response
 
