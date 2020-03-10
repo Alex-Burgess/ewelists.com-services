@@ -210,8 +210,8 @@ Resources:
                   headers:
                     Access-Control-Allow-Origin:
                       type: "string"
-              security:
-              - sigv4: []
+              # security:
+              # - sigv4: []
               x-amazon-apigateway-integration:
                 uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetProductFunction.Arn}/invocations'
                 passthroughBehavior: "when_no_match"
