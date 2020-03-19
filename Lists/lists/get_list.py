@@ -20,8 +20,9 @@ def get_list_main(event):
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         identity = common.get_identity(event, os.environ)
         list_id = common.get_path_parameter(event, 'id')
+        common.confirm_owner(table_name, identity, list_id)
+
         response_items = get_list_query(table_name, identity, list_id)
-        common.confirm_owner(identity, list_id, response_items)
         list_object = generate_list_object(response_items)
     except Exception as e:
         log.error("Exception: {}".format(e))

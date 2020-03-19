@@ -22,6 +22,7 @@ def get_env_variable(osenv, name):
 
 
 def get_path_parameter(event, type):
+    log.info("Getting path parameter ({}).".format(type))
     if type not in event['pathParameters']:
         raise Exception("Path did not contain a " + type + " parameter.")
 
@@ -77,16 +78,12 @@ def calculate_new_reserved_quantity(product_item, update_amount):
     return new_quantity
 
 
-def confirm_owner(user_id, list_id, response_items):
+def confirm_owner(table_name, user_id, list_id):
     """Confirms that the user owns a specified list, from the response items relating to a query for the same list."""
-    list_owner_id = None
-    for item in response_items:
-        if item['PK']['S'].startswith("LIST") and item['SK']['S'].startswith("USER"):
-            log.info("List Owner Item: {}".format(item))
-            log.info("List Owner: {}".format(item['listOwner']['S']))
-            list_owner_id = item['listOwner']['S']
+    item = common_table_ops.get_list_owner_item(table_name, list_id)
+    log.info("List Owner: {}".format(item['listOwner']))
 
-    if list_owner_id != user_id:
+    if item['listOwner'] != user_id:
         log.info("Owner of List ID {} did not match user id of requestor: {}.".format(list_id, user_id))
         raise Exception("Owner of List ID {} did not match user id of requestor: {}.".format(list_id, user_id))
 
@@ -147,23 +144,8 @@ def get_user(event, osenv, table_name, index_name):
     return user
 
 
-def get_product_type(event):
-    try:
-        body_object = json.loads(event['body'])
-        product_type = body_object['productType']
-        log.info("Product type: " + str(product_type))
-    except Exception:
-        log.error("API Event did not contain the product type in the body.")
-        raise Exception('API Event did not contain the product type in the body.')
-
-    if (product_type != 'notfound') and (product_type != 'products'):
-        log.error("API Event did not contain a product type of products or notfound.")
-        raise Exception('API Event did not contain a product type of products or notfound.')
-
-    return product_type
-
-
 def get_identity(event, osenv):
+    log.info('Getting identity.')
     try:
         userArn = event['requestContext']['identity']['userArn']
         user_id = event['requestContext']['identity']['cognitoIdentityId']
@@ -189,6 +171,22 @@ def get_identity(event, osenv):
         log.info('cognitoIdentityId was retrieved from event.')
 
     return identity
+
+
+def get_product_type(event):
+    try:
+        body_object = json.loads(event['body'])
+        product_type = body_object['productType']
+        log.info("Product type: " + str(product_type))
+    except Exception:
+        log.error("API Event did not contain the product type in the body.")
+        raise Exception('API Event did not contain the product type in the body.')
+
+    if (product_type != 'notfound') and (product_type != 'products'):
+        log.error("API Event did not contain a product type of products or notfound.")
+        raise Exception('API Event did not contain a product type of products or notfound.')
+
+    return product_type
 
 
 def gift_is_reserved(item):

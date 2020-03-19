@@ -19,8 +19,9 @@ def update_list_main(event):
         identity = common.get_identity(event, os.environ)
         list_id = common.get_path_parameter(event, 'id')
         attribute_details = get_attribute_details(event)
+        common.confirm_owner(table_name, identity, list_id)
+
         items = get_items_to_update(table_name, list_id)
-        common.confirm_owner(identity, list_id, items)
         updated_attributes = update_list(table_name, items, attribute_details)
     except Exception as e:
         log.error("Exception: {}".format(e))

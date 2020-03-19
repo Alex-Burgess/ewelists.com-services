@@ -118,7 +118,7 @@ class TestCreateProductMain:
         api_gateway_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
         response = add_product.add_product_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == "No list exists with this ID.", "Error not as expected."
+        assert body['error'] == "Owner of List ID 12345678-list-0001-1234-abcdefghijkl did not match user id of requestor: 12345678-user-0003-1234-abcdefghijkl.", "Error not as expected."
 
     def test_add_product_with_no_list_id(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

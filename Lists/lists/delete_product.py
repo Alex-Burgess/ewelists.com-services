@@ -1,7 +1,7 @@
 import json
 import os
 import boto3
-from lists import common, common_table_ops, logger
+from lists import common, logger
 
 log = logger.setup_logger()
 
@@ -19,9 +19,7 @@ def delete_product_main(event):
         identity = common.get_identity(event, os.environ)
         list_id = common.get_path_parameter(event, 'id')
         product_id = common.get_path_parameter(event, 'productid')
-
-        list_item = common_table_ops.get_list(table_name, identity, list_id)
-        common.confirm_owner(identity, list_id, [list_item])
+        common.confirm_owner(table_name, identity, list_id)
 
         message = delete_product_item(table_name, list_id, product_id)
     except Exception as e:

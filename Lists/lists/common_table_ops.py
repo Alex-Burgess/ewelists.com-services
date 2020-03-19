@@ -1,6 +1,6 @@
 import boto3
 from lists import logger
-from lists.common_entities import Product, Reserved
+from lists.common_entities import List, Product, Reserved
 from botocore.exceptions import ClientError
 
 log = logger.setup_logger()
@@ -29,6 +29,29 @@ def get_list(table_name, cognito_user_id, list_id):
         raise Exception("No list exists with this ID.")
 
     return response['Item']
+
+
+def get_list_owner_item(table_name, list_id):
+    log.info("Querying table {} to find all items associated with list id {}".format(table_name, list_id))
+
+    try:
+        response = dynamodb.query(
+            TableName=table_name,
+            KeyConditionExpression="PK = :PK",
+            ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
+        )
+        log.info("All items in query response. ({})".format(response['Items']))
+    except Exception as e:
+        log.info("Exception: " + str(e))
+        raise Exception("Unexpected error when getting list items from table.")
+
+    if len(response['Items']) == 0:
+        log.info("No items for the list {} were found.".format(list_id))
+        raise Exception("No list exists with this ID.")
+
+    for item in response['Items']:
+        if item['SK']['S'].startswith("USER"):
+            return List(item).get_details()
 
 
 def get_users_details(table_name, user_id):

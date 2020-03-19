@@ -109,7 +109,7 @@ class TestDeleteMain:
 
         response = delete.delete_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'Unexpected error when getting lists from table.', "Create main response did not contain the correct error message."
+        assert body['error'] == 'Unexpected error when getting list items from table.', "Create main response did not contain the correct error message."
 
     def test_delete_main_with_bad_user(self, api_gateway_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

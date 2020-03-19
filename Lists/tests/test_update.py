@@ -160,7 +160,7 @@ class TestUpdateListMain:
 
         response = update.update_list_main(api_gateway_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'Unexpected error when getting lists from table.', "Update main response did not contain the correct error message."
+        assert body['error'] == 'Unexpected error when getting list items from table.', "Update main response did not contain the correct error message."
 
     def test_update_list_with_requestor_not_owner(self, monkeypatch, api_gateway_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

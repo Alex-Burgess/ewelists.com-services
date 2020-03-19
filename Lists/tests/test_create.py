@@ -113,6 +113,7 @@ class TestPutItemInTable:
         assert len(test_response['Items'][0]['createdAt']['N']) == 10, "Attribute was not as expected."
         assert test_response['Items'][0]['description']['S'] == "Test description for the list.", "Attribute was not as expected."
         assert test_response['Items'][0]['imageUrl']['S'] == '/images/celebration-default.jpg', "imageurl of item was not as expected."
+        assert test_response['Items'][0]['state']['S'] == 'open', "Status of item was not as expected."
 
     def test_put_item_in_table_with_bad_name(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'

@@ -46,6 +46,7 @@ def put_item_in_table(table_name, cognito_user_id, listId, attributes, users_nam
         'description': {'S': attributes['description']},
         'createdAt': {'N': str(int(time.time()))},
         'imageUrl': {'S': attributes['imageUrl']},
+        'state': {'S': 'open'},
     }
 
     if 'eventDate' in attributes:

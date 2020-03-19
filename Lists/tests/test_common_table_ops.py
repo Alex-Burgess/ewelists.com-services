@@ -51,6 +51,30 @@ class TestGetList:
         assert str(e.value) == "No list exists with this ID.", "Exception not as expected."
 
 
+class TestGetListOwnerItem:
+    def test_get_list_owner_item(self, dynamodb_mock):
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        expect_item = {
+            "title": "Child User1 1st Birthday",
+            "occasion": "Birthday",
+            "listId": "12345678-list-0001-1234-abcdefghijkl",
+            "listOwner": "12345678-user-0001-1234-abcdefghijkl",
+            "description": "A gift list for Child User1 birthday.",
+            "eventDate": "31 October 2018",
+            "imageUrl": "/images/celebration-default.jpg",
+            "state": "open"
+        }
+
+        item = common_table_ops.get_list_owner_item('lists-unittest', list_id)
+        assert item == expect_item, "Item was not as expected."
+
+    def test_get_missing_list(self, dynamodb_mock):
+        list_id = '12345678-list-0009-1234-abcdefghijkl'
+        with pytest.raises(Exception) as e:
+            common_table_ops.get_list_owner_item('lists-unittest', list_id)
+        assert str(e.value) == "No list exists with this ID.", "Exception not as expected."
+
+
 class TestGetUsersDetails:
     def test_get_users_details(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'

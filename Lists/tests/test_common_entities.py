@@ -24,7 +24,7 @@ class TestUser:
 
 class TestList:
     def test_get_details(self):
-        list_item = {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}}
+        list_item = {'PK': {'S': 'LIST#12345678-list-0001-1234-abcdefghijkl'}, 'SK': {'S': 'USER#12345678-user-0001-1234-abcdefghijkl'}, 'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'title': {'S': "Child User1 1st Birthday"}, 'occasion': {'S': 'Birthday'}, 'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'}, 'listOwner': {'S': '12345678-user-0001-1234-abcdefghijkl'}, 'createdAt': {'S': '2018-09-01T10:00:00'}, 'description': {'S': 'A gift list for Child User1 birthday.'}, 'eventDate': {'S': '31 October 2018'}, 'imageUrl': {'S': '/images/celebration-default.jpg'}, 'state': {'S': 'open'}}
 
         list = List(list_item).get_details()
         assert list['listId'] == '12345678-list-0001-1234-abcdefghijkl', "List ID was not 12345678-list-0001-1234-abcdefghijkl."
@@ -34,9 +34,10 @@ class TestList:
         assert list['occasion'] == 'Birthday', "List occasion was not Birthday."
         assert list['imageUrl'] == '/images/celebration-default.jpg', "List imageUrl was not as expected."
         assert list['listOwner'] == '12345678-user-0001-1234-abcdefghijkl', "List occasion was not correct."
+        assert list['state'] == 'open', "List state was not correct."
 
     def test_get_details_with_no_date(self):
-        list_item = {"PK": {'S': "LIST#12345678-list-0002-1234-abcdefghijkl"}, "SK": {'S': "USER#12345678-user-0001-1234-abcdefghijkl"}, "userId": {'S': "12345678-user-0001-1234-abcdefghijkl"}, "title": {'S': "Child User1 Christmas List"}, "occasion": {'S': "Christmas"}, "listId": {'S': "12345678-list-0002-1234-abcdefghijkl"}, "listOwner": {'S': "12345678-user-0001-1234-abcdefghijkl"}, "createdAt": {'S': "2018-11-01T10:00:00"}, "description": {'S': "A gift list for Child User1 Christmas."}, "imageUrl": {'S': "/images/christmas-default.jpg"}}
+        list_item = {"PK": {'S': "LIST#12345678-list-0002-1234-abcdefghijkl"}, "SK": {'S': "USER#12345678-user-0001-1234-abcdefghijkl"}, "userId": {'S': "12345678-user-0001-1234-abcdefghijkl"}, "title": {'S': "Child User1 Christmas List"}, "occasion": {'S': "Christmas"}, "listId": {'S': "12345678-list-0002-1234-abcdefghijkl"}, "listOwner": {'S': "12345678-user-0001-1234-abcdefghijkl"}, "createdAt": {'S': "2018-11-01T10:00:00"}, "description": {'S': "A gift list for Child User1 Christmas."}, "imageUrl": {'S': "/images/christmas-default.jpg"}, 'state': {'S': 'open'}}
         list = List(list_item).get_details()
 
         assert list['listId'] == '12345678-list-0002-1234-abcdefghijkl', "List ID was not 12345678-list-0002-1234-abcdefghijkl."
@@ -44,6 +45,7 @@ class TestList:
         assert list['description'] == "A gift list for Child User1 Christmas.", "List description was not as expected."
         assert list['occasion'] == 'Christmas', "List occasion was not correct."
         assert list['listOwner'] == '12345678-user-0001-1234-abcdefghijkl', "List occasion was not correct."
+        assert list['state'] == 'open', "List state was not correct."
 
 
 class TestProduct:
