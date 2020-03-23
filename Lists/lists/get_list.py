@@ -70,6 +70,6 @@ def get_list_query(table_name, cognito_user_id, list_id):
 
     if len(response['Items']) == 0:
         log.info("No query results for List ID {} and user: {}.".format(list_id, cognito_user_id))
-        raise Exception("No query results for List ID {} and user: {}.".format(list_id, cognito_user_id))
+        raise Exception("No results for List ID {}.".format(list_id))
 
     return response['Items']

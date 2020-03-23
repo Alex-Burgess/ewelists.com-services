@@ -5,8 +5,6 @@ phases:
     commands:
       - pip install --upgrade pip
       - sam --version
-      # - pip install --user aws-sam-cli
-      # - /root/.local/bin/sam --version
   build:
     commands:
       - echo "Starting build `date` in `pwd`"

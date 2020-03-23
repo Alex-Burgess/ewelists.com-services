@@ -80,7 +80,7 @@ class TestGetListQuery:
 
         with pytest.raises(Exception) as e:
             get_list.get_list_query('lists-unittest', user_id, list_id)
-        assert str(e.value) == "No query results for List ID 12345678-list-0009-1234-abcdefghijkl and user: 12345678-user-0001-1234-abcdefghijkl.", "Exception not as expected."
+        assert str(e.value) == "No results for List ID 12345678-list-0009-1234-abcdefghijkl.", "Exception not as expected."
 
 
 class TestGenerateListObject:

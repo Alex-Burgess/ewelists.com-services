@@ -74,6 +74,6 @@ def get_list_query(table_name, list_id):
         raise Exception("Unexpected error when getting list item from table.")
 
     if len(response['Items']) == 0:
-        raise Exception("No query results for List ID {}.".format(list_id))
+        raise Exception("No results for List ID {}.".format(list_id))
 
     return response['Items']
