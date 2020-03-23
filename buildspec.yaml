@@ -4,15 +4,16 @@ phases:
   pre_build:
     commands:
       - pip install --upgrade pip
-      - pip install --user aws-sam-cli
-      - /root/.local/bin/sam --version
+      - sam --version
+      # - pip install --user aws-sam-cli
+      # - /root/.local/bin/sam --version
   build:
     commands:
       - echo "Starting build `date` in `pwd`"
-      - /root/.local/bin/sam package --template-file Lists/template.yaml --s3-bucket $LISTS_BUILD_OUTPUT_BUCKET --output-template-file lists-packaged.yaml
-      - /root/.local/bin/sam package --template-file NotFound/template.yaml --s3-bucket $NOTFOUND_BUILD_OUTPUT_BUCKET --output-template-file notfound-packaged.yaml
-      - /root/.local/bin/sam package --template-file Products/template.yaml --s3-bucket $PRODUCTS_BUILD_OUTPUT_BUCKET --output-template-file products-packaged.yaml
-      - /root/.local/bin/sam package --template-file Contact/template.yaml --s3-bucket $CONTACT_BUILD_OUTPUT_BUCKET --output-template-file contact-packaged.yaml
+      - sam package --template-file Lists/template.yaml --s3-bucket $LISTS_BUILD_OUTPUT_BUCKET --output-template-file lists-packaged.yaml
+      - sam package --template-file NotFound/template.yaml --s3-bucket $NOTFOUND_BUILD_OUTPUT_BUCKET --output-template-file notfound-packaged.yaml
+      - sam package --template-file Products/template.yaml --s3-bucket $PRODUCTS_BUILD_OUTPUT_BUCKET --output-template-file products-packaged.yaml
+      - sam package --template-file Contact/template.yaml --s3-bucket $CONTACT_BUILD_OUTPUT_BUCKET --output-template-file contact-packaged.yaml
   post_build:
     commands:
       - echo "build completed on `date`"
