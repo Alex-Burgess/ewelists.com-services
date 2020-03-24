@@ -31,7 +31,7 @@ class List:
         self.description = item.get('description').get('S')
         self.occasion = item.get('occasion').get('S')
         self.imageUrl = item.get('imageUrl').get('S')
-        self.listOwner = item.get('listOwner').get('S')
+        self.listOwner = item.get('SK').get('S').split("#")[1]
         self.state = item.get('state').get('S')
         if item.get('eventDate'):
             self.eventDate = item.get('eventDate').get('S')
@@ -81,40 +81,6 @@ class Product:
         return product
 
 
-class Reserved:
-    def __init__(self, item):
-        self.listId = item.get('PK').get('S')
-        self.productId = item.get('productId').get('S')
-        self.quantity = item.get('quantity').get('N')
-        self.name = item.get('name').get('S')
-        self.userId = item.get('userId').get('S')
-        self.reservationId = item.get('reservationId').get('S')
-        if item.get('state'):
-            self.state = item.get('state').get('S')
-        if item.get('message'):
-            self.message = item.get('message').get('S')
-
-    def __repr__(self):
-        return "Reserved<{} -- {} -- {} -- {} -- {} -- {}>".format(self.productId, self.listId, self.quantity, self.name, self.userId, self.message)
-
-    def get_details(self):
-        reserved = {
-            'productId': self.productId,
-            'quantity': int(self.quantity),
-            'name': self.name,
-            'userId': self.userId,
-            'reservationId': self.reservationId
-        }
-
-        if hasattr(self, 'state'):
-            reserved['state'] = self.state
-
-        if hasattr(self, 'message'):
-            reserved['message'] = self.message
-
-        return reserved
-
-
 class Reservation:
     def __init__(self, item):
         self.reservationId = item.get('reservationId').get('S')
@@ -122,7 +88,7 @@ class Reservation:
         self.name = item.get('name').get('S')
         self.email = item.get('email').get('S')
         self.listId = item.get('listId').get('S')
-        self.title = item.get('title').get('S')
+        self.listTitle = item.get('listTitle').get('S')
         self.productId = item.get('productId').get('S')
         self.productType = item.get('productType').get('S')
         self.quantity = item.get('quantity').get('N')
@@ -134,15 +100,15 @@ class Reservation:
     def get_details(self):
         reserved = {
             'reservationId': self.reservationId,
+            'productId': self.productId,
             'userId': self.userId,
+            'listId': self.listId,
             'name': self.name,
             'email': self.email,
-            'listId': self.listId,
-            'title': self.title,
-            'productId': self.productId,
-            'productType': self.productType,
             'quantity': int(self.quantity),
-            'state': self.state
+            'state': self.state,
+            'listTitle': self.listTitle,
+            'productType': self.productType
         }
 
         return reserved

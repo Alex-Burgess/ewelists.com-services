@@ -1,7 +1,7 @@
 import json
 import os
 import boto3
-from lists import common, logger
+from lists import common, common_table_ops, logger
 
 log = logger.setup_logger()
 
@@ -17,9 +17,13 @@ def handler(event, context):
 def delete_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
+        resv_id_index = common.get_env_variable(os.environ, 'RESERVATIONID_INDEX')
         resv_id = common.get_path_parameter(event, 'id')
 
-        delete_reservation_item(table_name, resv_id)
+        item = common_table_ops.get_reservation(table_name, resv_id_index, resv_id)
+        key = common.create_reservation_key(item)
+
+        delete_reservation_item(table_name, key)
 
     except Exception as e:
         log.error("Exception: {}".format(e))
@@ -32,25 +36,13 @@ def delete_main(event):
     return response
 
 
-def delete_reservation_item(table_name, id):
+def delete_reservation_item(table_name, key):
     log.info("Deleting reservation id: {}".format(id))
-
-    key = {
-        'PK': {'S': "RESERVATION#" + id},
-        'SK': {'S': "RESERVATION#" + id}
-    }
-
-    condition = {
-        ':PK': {'S': "RESERVATION#{}".format(id)},
-        ':SK': {'S': "RESERVATION#{}".format(id)}
-    }
 
     try:
         dynamodb.delete_item(
             TableName=table_name,
-            Key=key,
-            ConditionExpression="PK = :PK AND SK = :SK",
-            ExpressionAttributeValues=condition
+            Key=key
         )
     except Exception as e:
         log.error("Reservation item could not be deleted: {}".format(e))

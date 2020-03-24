@@ -54,15 +54,14 @@ def get_lists(table_name, index_name, cognito_user_id):
                 log.info("Adding user item to response data. ({})".format(item))
                 user = User(item)
                 response_data['user'] = user.get_basic_details()
-            elif item['SK']['S'] == 'USER#' + cognito_user_id:
-                if item['listOwner']['S'] == cognito_user_id and item['state']['S'] != 'closed':
-                    log.info("Adding owner list item to response data. ({})".format(item))
-                    list_details = List(item).get_details()
-                    response_data['owned'].append(list_details)
-                elif item['listOwner']['S'] == cognito_user_id and item['state']['S'] == 'closed':
-                    log.info("Adding owner list item to response data. ({})".format(item))
-                    list_details = List(item).get_details()
-                    response_data['closed'].append(list_details)
+            elif item['SK']['S'] == 'USER#' + cognito_user_id and item['state']['S'] != 'closed':
+                log.info("Adding owner list item to response data. ({})".format(item))
+                list_details = List(item).get_details()
+                response_data['owned'].append(list_details)
+            elif item['SK']['S'] == 'USER#' + cognito_user_id and item['state']['S'] == 'closed':
+                log.info("Adding owner list item to response data. ({})".format(item))
+                list_details = List(item).get_details()
+                response_data['closed'].append(list_details)
 
     else:
         log.info("0 lists were returned.")

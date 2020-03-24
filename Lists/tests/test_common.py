@@ -1,158 +1,27 @@
 import pytest
 import os
-import boto3
-from moto import mock_dynamodb2
 from lists import common, logger
-from tests import fixtures
 
 log = logger.setup_logger()
 
 
-@pytest.fixture()
-def response_items():
-    items = fixtures.load_test_response()
-    return items
-
-
 @pytest.fixture
-def api_gateway_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/reserve/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
-    event['httpMethod'] = "DELETE"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_postman_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl"
-    event['httpMethod'] = "GET"
-    event['pathParameters'] = {"id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = None
-
-    event['requestContext']['identity'] = {
-        "cognitoIdentityPoolId": None,
-        "accountId": "123456789012",
-        "cognitoIdentityId": None,
-        "caller": "ABCDEFGPDMJL4EB35H6H",
-        "sourceIp": "5.81.150.55",
-        "principalOrgId": "o-d8jj6dyqv2",
-        "accessKey": "ABCDEFGPDMJL4EB35H6H",
-        "cognitoAuthenticationType": None,
-        "cognitoAuthenticationProvider": None,
-        "userArn": "arn:aws:iam::123456789012:user/ApiTestUser",
-        "userAgent": "PostmanRuntime/7.15.2",
-        "user": "ABCDEFGPDMJL4EB35H6H"
+def reservation_item():
+    return {
+        'PK': "LIST#12345678-list-any1-1234-abcdefghijkl",
+        'SK': "RESERVATION#12345678-prod-any1-1234-abcdefghijkl#12345678-user-0001-1234-abcdefghijkl#12345678-resv-0001-1234-abcdefghijkl",
+        'reservationId': '12345678-resv-0001-1234-abcdefghijkl',
+        'productId': '12345678-prod-any1-1234-abcdefghijkl',
+        'userId': '12345678-user-0001-1234-abcdefghijkl',
+        'listId': '12345678-list-any1-1234-abcdefghijkl',
+        'name': 'Test User',
+        'email': 'test.user@gmail.com',
+        'quantity': '1',
+        'state': 'reserved',
+        'reservedAt': '1111111',
+        'listTitle': 'List Title',
+        'productType': 'products'
     }
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_add_product_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/product/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl"
-    event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 1,\n    \"productType\": \"products\"\n}"
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_event_with_email():
-    event = fixtures.api_gateway_no_auth_base_event()
-    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user99@gmail.com"
-    event['httpMethod'] = "DELETE"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
-    event['body'] = "{\n    \"name\": \"Test User99\"\n}"
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_event_with_email_and_account():
-    event = fixtures.api_gateway_no_auth_base_event()
-    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/test.user1@gmail.com"
-    event['httpMethod'] = "DELETE"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
-    event['body'] = "{\n    \"name\": \"Test User1\"\n}"
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_event_with_null_email():
-    event = fixtures.api_gateway_no_auth_base_event()
-    event['resource'] = "/lists/{id}/reserve/{productid}/email/{email}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/null"
-    event['httpMethod'] = "DELETE"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "null"}
-    event['body'] = "{\n    \"name\": \"Test User99\"\n}"
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_unshare_shared_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/share/{user}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/share/12345678-user-0002-1234-abcdefghijkl"
-    event['httpMethod'] = "DELETE"
-    event['pathParameters'] = {"user": "12345678-user-0002-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"share_type\": \"SHARED\"\n}"
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_unshare_pending_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/share/{user}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/share/test.user4%40gmail.com"
-    event['httpMethod'] = "DELETE"
-    event['pathParameters'] = {"user": "test.user4%40gmail.com", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"share_type\": \"PENDING\"\n}"
-
-    return event
-
-
-@pytest.fixture
-def dynamodb_mock():
-    mock = mock_dynamodb2()
-    mock.start()
-    dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
-
-    table = dynamodb.create_table(
-        TableName='lists-unittest',
-        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}, {'AttributeName': 'email', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
-        GlobalSecondaryIndexes=[{
-            'IndexName': 'email-index',
-            'KeySchema': [{'AttributeName': 'email', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
-            'Projection': {
-                'ProjectionType': 'ALL'
-            }
-        }]
-    )
-
-    items = fixtures.load_test_data()
-
-    for item in items:
-        table.put_item(TableName='lists-unittest', Item=item)
-
-    yield
-    # teardown: stop moto server
-    mock.stop()
 
 
 def test_create_response():
@@ -180,41 +49,45 @@ class TestGetEnvironmentVariable:
 
 
 class TestGetPathParameter:
-    def test_get_email(self, api_gateway_event_with_email):
-        email = common.get_path_parameter(api_gateway_event_with_email, 'email')
+    def test_get_email(self, api_base_event):
+        api_base_event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+        email = common.get_path_parameter(api_base_event, 'email')
         assert email == 'test.user99@gmail.com', "Path parameter returned from API event was not as expected."
 
-    def test_get_product_id(self, api_gateway_event_with_email):
-        id = common.get_path_parameter(api_gateway_event_with_email, 'productid')
+    def test_get_product_id(self, api_base_event):
+        api_base_event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+        id = common.get_path_parameter(api_base_event, 'productid')
         assert id == '12345678-prod-0001-1234-abcdefghijkl', "Path parameter returned from API event was not as expected."
 
-    def test_get_parameter_not_present(self, api_gateway_event_with_email):
+    def test_get_parameter_not_present(self, api_base_event):
+        api_base_event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
         with pytest.raises(Exception) as e:
-            common.get_path_parameter(api_gateway_event_with_email, 'helloworld')
+            common.get_path_parameter(api_base_event, 'helloworld')
         assert str(e.value) == "Path did not contain a helloworld parameter.", "Exception not as expected."
 
-    def test_get_parameter_when_null(self, api_gateway_event_with_email):
-        api_gateway_event_with_email['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl/email/null"
-        api_gateway_event_with_email['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "null"}
+    def test_get_parameter_when_null(self, api_base_event):
+        api_base_event['pathParameters'] = {"email": "null"}
         with pytest.raises(Exception) as e:
-            common.get_path_parameter(api_gateway_event_with_email, 'email')
+            common.get_path_parameter(api_base_event, 'email')
         assert str(e.value) == "Path contained a null email parameter.", "Exception not as expected."
 
 
 class TestGetBodyAttribute:
-    def test_get_name(self, api_gateway_event_with_email):
-        name = common.get_body_attribute(api_gateway_event_with_email, 'name')
+    def test_get_name(self, api_base_event):
+        api_base_event['body'] = "{\n    \"name\": \"Test User99\"\n}"
+        name = common.get_body_attribute(api_base_event, 'name')
         assert name == 'Test User99', "Body attribute returned from API event was not as expected."
 
-    def test_get_body_attribute_not_present(self, api_gateway_event_with_email):
+    def test_get_body_attribute_not_present(self, api_base_event):
+        api_base_event['body'] = "{\n    \"name\": \"Test User99\"\n}"
         with pytest.raises(Exception) as e:
-            common.get_body_attribute(api_gateway_event_with_email, 'helloworld')
+            common.get_body_attribute(api_base_event, 'helloworld')
         assert str(e.value) == "API Event did not contain a helloworld body attribute.", "Exception not as expected."
 
-    def test_get_user_when_body_empty(self, api_gateway_event_with_email):
-        api_gateway_event_with_email['body'] = None
+    def test_get_user_when_body_empty(self, api_base_event):
+        api_base_event['body'] = None
         with pytest.raises(Exception) as e:
-            common.get_body_attribute(api_gateway_event_with_email, 'name')
+            common.get_body_attribute(api_base_event, 'name')
         assert str(e.value) == "Body was missing required attributes.", "Exception message not correct."
 
 
@@ -236,7 +109,25 @@ class TestConfirmOwner:
         list_id = '12345678-list-0001-1234-abcdefghijkl'
         with pytest.raises(Exception) as e:
             common.confirm_owner('lists-unittest', user_id, list_id)
-        assert str(e.value) == "Owner of List ID 12345678-list-0001-1234-abcdefghijkl did not match user id of requestor: 12345678-user-0002-1234-abcdefghijkl.", "Exception not thrown for list not being owned by user."
+        assert str(e.value) == "User 12345678-user-0002-1234-abcdefghijkl was not owner of List 12345678-list-0001-1234-abcdefghijkl.", "Exception not thrown for list not being owned by user."
+
+
+class TestConfirmReservationOwner:
+    def test_confirm_reservation_owner(self, reservation_item):
+        assert common.confirm_reservation_owner(reservation_item, '12345678-user-0001-1234-abcdefghijkl')
+
+    def test_confirm_reservation_owner_with_email(self, reservation_item):
+        assert common.confirm_reservation_owner(reservation_item, 'test.user@gmail.com')
+
+    def test_not_reservation_owner(self, reservation_item):
+        with pytest.raises(Exception) as e:
+            common.confirm_reservation_owner(reservation_item, '12345678-user-0002-1234-abcdefghijkl')
+        assert str(e.value) == "Requestor is not reservation owner.", "Exception not as expected."
+
+    def test_not_reservation_owner_with_email(self, reservation_item):
+        with pytest.raises(Exception) as e:
+            common.confirm_reservation_owner(reservation_item, 'test.user2@gmail.confirmed')
+        assert str(e.value) == "Requestor is not reservation owner.", "Exception not as expected."
 
 
 class TestCalculateNewReservedQuantity:
@@ -284,88 +175,96 @@ class TestSendEmail:
 
 
 class TestGetUser:
-    def test_get_user_with_no_account(self, dynamodb_mock, api_gateway_event_with_email):
-        user = common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest', 'email-index')
+    def test_get_user_with_no_account(self, dynamodb_mock, api_no_auth_base_event):
+        api_no_auth_base_event['pathParameters'] = {"email": "test.user99@gmail.com"}
+        api_no_auth_base_event['body'] = "{\n    \"name\": \"Test User99\"\n}"
+        user = common.get_user(api_no_auth_base_event, os.environ, 'lists-unittest', 'email-index')
+
         assert user['id'] == 'test.user99@gmail.com'
         assert user['email'] == 'test.user99@gmail.com'
         assert user['name'] == 'Test User99'
         assert not user['exists']
 
-    def test_get_user_with_account(self, dynamodb_mock, api_gateway_event_with_email_and_account):
-        user = common.get_user(api_gateway_event_with_email_and_account, os.environ, 'lists-unittest', 'email-index')
+    def test_get_user_with_account(self, dynamodb_mock, api_no_auth_base_event):
+        api_no_auth_base_event['pathParameters'] = {"email": "test.user1@gmail.com"}
+        api_no_auth_base_event['body'] = "{\n    \"name\": \"Test User1\"\n}"
+        user = common.get_user(api_no_auth_base_event, os.environ, 'lists-unittest', 'email-index')
         assert user['id'] == '12345678-user-0001-1234-abcdefghijkl'
         assert user['email'] == 'test.user1@gmail.com'
         assert user['name'] == 'Test User1'
         assert user['exists']
 
-    def test_get_user_when_body_empty(self, dynamodb_mock, api_gateway_event_with_email):
-        api_gateway_event_with_email['body'] = None
-        user = common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest', 'email-index')
+    def test_get_user_when_body_empty(self, dynamodb_mock, api_no_auth_base_event):
+        api_no_auth_base_event['pathParameters'] = {"email": "test.user99@gmail.com"}
+        api_no_auth_base_event['body'] = None
+        user = common.get_user(api_no_auth_base_event, os.environ, 'lists-unittest', 'email-index')
         assert user['id'] == 'test.user99@gmail.com'
         assert user['email'] == 'test.user99@gmail.com'
         assert 'name' not in user
         assert not user['exists']
 
-    def test_get_user_when_email_null(self, dynamodb_mock, api_gateway_event_with_null_email):
+    def test_get_user_when_email_null(self, dynamodb_mock, api_no_auth_base_event):
+        api_no_auth_base_event['pathParameters'] = {"email": "null"}
         with pytest.raises(Exception) as e:
-            common.get_user(api_gateway_event_with_null_email, os.environ, 'lists-unittest', 'email-index')
+            common.get_user(api_no_auth_base_event, os.environ, 'lists-unittest', 'email-index')
         assert str(e.value) == "Path contained a null email parameter.", "Exception message not correct."
 
-    def test_get_user_when_name_not_in_body(self, dynamodb_mock, api_gateway_event_with_email):
-        api_gateway_event_with_email['body'] = "{\n    \"wrongname\": \"Test User99\"\n}"
+    def test_get_user_when_name_not_in_body(self, dynamodb_mock, api_no_auth_base_event):
+        api_no_auth_base_event['pathParameters'] = {"email": "test.user99@gmail.com"}
+        api_no_auth_base_event['body'] = "{\n    \"wrongname\": \"Test User99\"\n}"
         with pytest.raises(Exception) as e:
-            common.get_user(api_gateway_event_with_email, os.environ, 'lists-unittest', 'email-index')
+            common.get_user(api_no_auth_base_event, os.environ, 'lists-unittest', 'email-index')
         assert str(e.value) == "API Event did not contain a name body attribute.", "Exception message not correct."
 
 
 class TestGetProductType:
-    def test_get_product_type(self, api_gateway_add_product_event):
-        product = common.get_product_type(api_gateway_add_product_event)
+    def test_get_product_type(self, api_base_event):
+        api_base_event['body'] = "{\n    \"quantity\": 1,\n    \"productType\": \"products\"\n}"
+        product = common.get_product_type(api_base_event)
         assert product == 'products', "Product type returned from API event was not as expected."
 
-    def test_get_product_type_of_notfound(self, api_gateway_add_product_event):
-        api_gateway_add_product_event['body'] = '{\n    \"quantity\": 1,\n    \"productType\": \"notfound\"\n}'
-        product = common.get_product_type(api_gateway_add_product_event)
+    def test_get_product_type_of_notfound(self, api_base_event):
+        api_base_event['body'] = '{\n    \"quantity\": 1,\n    \"productType\": \"notfound\"\n}'
+        product = common.get_product_type(api_base_event)
         assert product == 'notfound', "Product type returned from API event was not as expected."
 
-    def test_get_wrong_product_type(self, api_gateway_add_product_event):
-        api_gateway_add_product_event['body'] = '{\n    \"quantity\": 1,\n    \"productType\": \"wrong\"\n}'
+    def test_get_wrong_product_type(self, api_base_event):
+        api_base_event['body'] = '{\n    \"quantity\": 1,\n    \"productType\": \"wrong\"\n}'
         with pytest.raises(Exception) as e:
-            common.get_product_type(api_gateway_add_product_event)
+            common.get_product_type(api_base_event)
         assert str(e.value) == "API Event did not contain a product type of products or notfound.", "Exception not as expected."
 
-    def test_get_product_type_when_not_present(self, api_gateway_event):
+    def test_get_product_type_when_not_present(self, api_base_event):
         with pytest.raises(Exception) as e:
-            common.get_product_type(api_gateway_event)
+            common.get_product_type(api_base_event)
         assert str(e.value) == "API Event did not contain the product type in the body.", "Exception not as expected."
 
 
 class TestGetIdentity:
-    def test_get_identity(self, api_gateway_event):
-        identity = common.get_identity(api_gateway_event, os.environ)
-        assert identity == "12345678-user-0003-1234-abcdefghijkl", "userPoolSub not as expected."
+    def test_get_identity(self, api_base_event):
+        identity = common.get_identity(api_base_event, os.environ)
+        assert identity == "12345678-user-0001-1234-abcdefghijkl", "userPoolSub not as expected."
 
-    def test_get_identity_when_postman_request(self, monkeypatch, api_gateway_postman_event):
+    def test_get_identity_when_postman_request(self, monkeypatch, api_postman_event):
         monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB', '12345678-user-api1-1234-abcdefghijkl')
-        identity = common.get_identity(api_gateway_postman_event, os.environ)
+        identity = common.get_identity(api_postman_event, os.environ)
         assert identity == "12345678-user-api1-1234-abcdefghijkl", "userPoolSub not as expected."
 
-    def test_get_identity_when_postman2_request(self, monkeypatch, api_gateway_postman_event):
-        api_gateway_postman_event['requestContext']['identity']['userArn'] = "arn:aws:iam::123456789012:user/ApiTestUser2"
+    def test_get_identity_when_postman2_request(self, monkeypatch, api_postman_event):
+        api_postman_event['requestContext']['identity']['userArn'] = "arn:aws:iam::123456789012:user/ApiTestUser2"
         monkeypatch.setitem(os.environ, 'POSTMAN_USERPOOL_SUB2', '12345678-user-api2-1234-abcdefghijkl')
-        identity = common.get_identity(api_gateway_postman_event, os.environ)
+        identity = common.get_identity(api_postman_event, os.environ)
         assert identity == "12345678-user-api2-1234-abcdefghijkl", "userPoolSub not as expected."
 
-    def test_get_identity_when_noid(self, api_gateway_event):
-        api_gateway_event['requestContext']['identity'] = {}
-
+    @pytest.mark.usefixtures("api_no_auth_base_event")
+    def test_get_identity_when_noid(self, api_no_auth_base_event):
         with pytest.raises(Exception) as e:
-            common.get_identity(api_gateway_event, os.environ)
-        assert str(e.value) == "There was no identity context in API event.", "Exception not as expected."
+            common.get_identity(api_no_auth_base_event, os.environ)
+        assert str(e.value) == "There was no identity in the API event.", "Exception not as expected."
 
-    def test_get_identity_when_postman_request_and_with_no_osvars(self, api_gateway_postman_event):
+    def test_get_identity_when_postman_request_and_with_no_osvars(self, api_postman_event):
         with pytest.raises(Exception) as e:
-            common.get_identity(api_gateway_postman_event, os.environ)
+            common.get_identity(api_postman_event, os.environ)
         assert str(e.value) == "POSTMAN_USERPOOL_SUB environment variable not set correctly.", "Exception not as expected."
 
 
@@ -382,7 +281,7 @@ class TestGiftIsReserved:
 
         assert common.gift_is_reserved(reserved_item), "Reservation was already purchased"
 
-    def test_gift_is_purchased_raises_exceptions(self):
+    def test_gift_is_purchased_raises_exception(self):
         reserved_item = {
             'reservationId': '12345678-resv-0001-1234-abcdefghijkl',
             'name': 'Test User2',
@@ -394,7 +293,21 @@ class TestGiftIsReserved:
 
         with pytest.raises(Exception) as e:
             common.gift_is_reserved(reserved_item)
-        assert str(e.value) == "Product was already purchased.", "Exception message not correct."
+        assert str(e.value) == "Product was not reserved. State = purchased.", "Exception message not correct."
+
+    def test_gift_is_cancelled_raises_exception(self):
+        reserved_item = {
+            'reservationId': '12345678-resv-0001-1234-abcdefghijkl',
+            'name': 'Test User2',
+            'productId': '12345678-prod-0001-1234-abcdefghijkl',
+            'userId': '12345678-user-0002-1234-abcdefghijkl',
+            'quantity': 1,
+            'state': 'cancelled'
+        }
+
+        with pytest.raises(Exception) as e:
+            common.gift_is_reserved(reserved_item)
+        assert str(e.value) == "Product was not reserved. State = cancelled.", "Exception message not correct."
 
 
 class TestCreateProductKey:
@@ -411,33 +324,25 @@ class TestCreateProductKey:
         assert key == expected_object, "Product key was not as expected."
 
 
-class TestCreateReservedKey:
+class TestCreateReservationKey:
     def test_create_product_key(self):
-        list_id = '12345678-list-0001-1234-abcdefghijkl'
-        product_id = '12345678-prod-0001-1234-abcdefghijkl'
-        user = {
-            'id': '12345678-user-0001-1234-abcdefghijkl',
-            'name': 'Test User1',
-            'email': 'test.user1x@gmail.com'
+        item = {
+            'reservationId': '12345678-resv-0001-1234-abcdefghijkl',
+            'productId': '12345678-prod-0001-1234-abcdefghijkl',
+            'userId': '12345678-user-0002-1234-abcdefghijkl',
+            'listId': '12345678-list-0001-1234-abcdefghijkl',
+            'name': 'Test User2',
+            'email': 'test.user2@gmail.com',
+            'quantity': 1,
+            'state': 'reserved',
+            'listTitle': 'Birthday List',
+            'productType': 'products',
         }
 
         expected_object = {
             'PK': {'S': "LIST#12345678-list-0001-1234-abcdefghijkl"},
-            'SK': {'S': "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0001-1234-abcdefghijkl"}
+            'SK': {'S': "RESERVATION#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl#12345678-resv-0001-1234-abcdefghijkl"}
         }
 
-        key = common.create_reserved_key(list_id, product_id, user)
-        assert key == expected_object, "Key was not as expected."
-
-
-class TestCreateReservationKey:
-    def test_create_product_key(self):
-        id = '12345678-resv-0001-1234-abcdefghijkl'
-
-        expected_object = {
-            'PK': {'S': "RESERVATION#12345678-resv-0001-1234-abcdefghijkl"},
-            'SK': {'S': "RESERVATION#12345678-resv-0001-1234-abcdefghijkl"}
-        }
-
-        key = common.create_reservation_key(id)
+        key = common.create_reservation_key(item)
         assert key == expected_object, "Key was not as expected."

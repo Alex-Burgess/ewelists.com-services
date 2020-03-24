@@ -20,6 +20,7 @@ def create_main(event):
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         identity = common.get_identity(event, os.environ)
         users_name = common_table_ops.get_users_details(table_name, identity)['name']
+
         listId = generate_list_id()
         attributes = get_attribute_details(event)
         put_item_in_table(table_name, identity, listId, attributes, users_name)
@@ -39,7 +40,6 @@ def put_item_in_table(table_name, cognito_user_id, listId, attributes, users_nam
         'PK': {'S': "LIST#{}".format(listId)},
         'SK': {'S': "USER#{}".format(cognito_user_id)},
         'listId': {'S': listId},
-        "listOwner": {'S': cognito_user_id},
         'userId': {'S': cognito_user_id},
         'title': {'S': attributes['title']},
         'occasion': {'S': attributes['occasion']},

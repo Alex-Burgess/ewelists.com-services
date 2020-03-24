@@ -4,64 +4,22 @@ import re
 import json
 import copy
 import boto3
-from moto import mock_dynamodb2
 from lists import create, logger
-from tests import fixtures
 
 log = logger.setup_test_logger()
 
 
-@pytest.fixture
-def api_gateway_event():
-    event = fixtures.api_gateway_base_event()
-    event['httpMethod'] = "POST"
-    event['body'] = "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"eventDate\": \"25 December 2020\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_event2():
-    event = fixtures.api_gateway_base_event()
-    event['httpMethod'] = "POST"
-    event['body'] = "{\n    \"title\": \"My Birthday List\",\n    \"description\": \"A gift wish list for my birthday.\",\n    \"occasion\": \"Birthday\",\n    \"imageUrl\": \"/images/celebration-default.jpg\"\n}"
-
-    return event
-
-
-@pytest.fixture
-def dynamodb_mock():
-    mock = mock_dynamodb2()
-    mock.start()
-    dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
-
-    table = dynamodb.create_table(
-        TableName='lists-unittest',
-        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
-    )
-
-    items = fixtures.load_test_data()
-
-    for item in items:
-        table.put_item(TableName='lists-unittest', Item=item)
-
-    yield
-    mock.stop()
-
-
 class TestGetAttributeDetails:
-    def test_get_attribute_details(self, api_gateway_event):
-        attribute_details = create.get_attribute_details(api_gateway_event)
+    def test_get_attribute_details(self, api_create_event):
+        attribute_details = create.get_attribute_details(api_create_event)
         assert attribute_details['title'] == "My Birthday List", "Attribute title was not as expected."
         assert attribute_details['description'] == "A gift wish list for my birthday.", "Attribute description was not as expected."
         assert attribute_details['eventDate'] == "25 December 2020", "Attribute date was not as expected."
         assert attribute_details['occasion'] == "Birthday", "Attribute occasion was not as expected."
         assert attribute_details['imageUrl'] == "/images/celebration-default.jpg", "Attribute imageUrl was not as expected."
 
-    def test_get_attribute_details_with_empty_body(self, api_gateway_event):
-        event_no_body = copy.deepcopy(api_gateway_event)
+    def test_get_attribute_details_with_empty_body(self, api_create_event):
+        event_no_body = copy.deepcopy(api_create_event)
         event_no_body['body'] = None
 
         with pytest.raises(Exception) as e:
@@ -109,7 +67,6 @@ class TestPutItemInTable:
         assert test_response['Items'][0]['eventDate']['S'] == "25 December 2020", "Attribute was not as expected."
         assert test_response['Items'][0]['occasion']['S'] == "Birthday", "Attribute was not as expected."
         assert test_response['Items'][0]['listId']['S'] == "12345678-list-0012-1234-abcdefghijkl", "Attribute was not as expected."
-        assert test_response['Items'][0]['listOwner']['S'] == "12345678-user-0001-1234-abcdefghijkl", "Attribute was not as expected."
         assert len(test_response['Items'][0]['createdAt']['N']) == 10, "Attribute was not as expected."
         assert test_response['Items'][0]['description']['S'] == "Test description for the list.", "Attribute was not as expected."
         assert test_response['Items'][0]['imageUrl']['S'] == '/images/celebration-default.jpg', "imageurl of item was not as expected."
@@ -133,24 +90,16 @@ class TestPutItemInTable:
 
 
 class TestCreateMain:
-    def test_create_main(self, monkeypatch, api_gateway_event, dynamodb_mock):
+    def test_create_main(self, monkeypatch, api_create_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
-        response = create.create_main(api_gateway_event)
+        response = create.create_main(api_create_event)
         body = json.loads(response['body'])
 
         assert len(body['listId']) == 36, "Create main response did not contain a listId."
 
-    def test_create_main_no_date(self, monkeypatch, api_gateway_event2, dynamodb_mock):
-        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-
-        response = create.create_main(api_gateway_event2)
-        body = json.loads(response['body'])
-
-        assert len(body['listId']) == 36, "Create main response did not contain a listId."
-
-    def test_create_main_with_no_event_body(self, monkeypatch, api_gateway_event, dynamodb_mock):
-        event_no_body = copy.deepcopy(api_gateway_event)
+    def test_create_main_with_no_event_body(self, monkeypatch, api_create_event, dynamodb_mock):
+        event_no_body = copy.deepcopy(api_create_event)
         event_no_body['body'] = None
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
@@ -159,9 +108,9 @@ class TestCreateMain:
         assert body['error'] == 'API Event did not contain a valid body.', "Create main response did not contain the correct error message."
 
 
-def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
+def test_handler(api_create_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    response = create.handler(api_gateway_event, None)
+    response = create.handler(api_create_event, None)
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
     assert re.match('{"listId": .*}', response['body'])

@@ -1,10 +1,8 @@
 import pytest
 import os
+import mock
 import json
-import boto3
-from moto import mock_dynamodb2
 from lists import purchase, logger
-from tests import fixtures
 
 log = logger.setup_logger()
 
@@ -12,85 +10,11 @@ log = logger.setup_logger()
 @pytest.fixture
 def env_vars(monkeypatch):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    monkeypatch.setitem(os.environ, 'INDEX_NAME', 'email-index')
+    monkeypatch.setitem(os.environ, 'reservationid_INDEX', 'reservationid-index')
     monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
     monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://test.ewelists.com')
 
     return monkeypatch
-
-
-@pytest.fixture
-def api_gateway_event_no_account_user():
-    event = fixtures.api_gateway_no_auth_base_event()
-    event['resource'] = "/lists/{id}/purchased/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/purchase/12345678-prod-0001-1234-abcdefghijkl/email/test.user99@gmail.com"
-    event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
-    event['body'] = json.dumps({
-        "quantity": 2,
-        "title": "Child User1 1st Birthday",
-        "name": "Test User1",
-        "product": {
-            "type": "products",
-            "brand": "Mamas and Papas",
-            "details": "Balloon Print Zip All-in-One",
-            "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
-            "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
-        }
-    })
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_event_existing_user():
-    event = fixtures.api_gateway_no_auth_base_event()
-    event['resource'] = "/lists/{id}/purchased/{productid}/email/{email}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/purchase/12345678-prod-0001-1234-abcdefghijkl/email/test.user1@gmail.com"
-    event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
-    event['body'] = json.dumps({
-        "quantity": 2,
-        "title": "Child User1 1st Birthday",
-        "product": {
-            "type": "products",
-            "brand": "Mamas and Papas",
-            "details": "Balloon Print Zip All-in-One",
-            "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
-            "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
-        }
-    })
-
-    return event
-
-
-@pytest.fixture
-def dynamodb_mock():
-    mock = mock_dynamodb2()
-    mock.start()
-    dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
-
-    table = dynamodb.create_table(
-        TableName='lists-unittest',
-        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}, {'AttributeName': 'email', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
-        GlobalSecondaryIndexes=[{
-            'IndexName': 'email-index',
-            'KeySchema': [{'AttributeName': 'email', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
-            'Projection': {
-                'ProjectionType': 'ALL'
-            }
-        }]
-    )
-
-    items = fixtures.load_test_data()
-
-    for item in items:
-        table.put_item(TableName='lists-unittest', Item=item)
-
-    yield
-    mock.stop()
 
 
 class TestNewReservedQuantity:
@@ -137,71 +61,57 @@ class TestCreateEmailData:
         assert data == expected_data, "Email data json object was not as expected."
 
 
-class TestReserveMain:
-    def test_no_list_id_path_parameter(self, env_vars, api_gateway_event_existing_user):
-        api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "null", "email": "test.user99@gmail.com"}
-        response = purchase.purchase_main(api_gateway_event_existing_user)
+class TestPurchaseMain:
+    def test_no_reservation_id(self, env_vars, api_purchase_event):
+        api_purchase_event['pathParameters'] = {"reservationid": "null", "email": "test.user2@gmail.com"}
+        response = purchase.purchase_main(api_purchase_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'Path contained a null id parameter.', "Error for missing environment variable was not as expected."
+        assert body['error'] == 'Path contained a null reservationid parameter.', "Error for missing environment variable was not as expected."
 
-    def test_no_product_id_path_parameter(self, env_vars, api_gateway_event_existing_user):
-        api_gateway_event_existing_user['pathParameters'] = {"productid": "null", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
-        response = purchase.purchase_main(api_gateway_event_existing_user)
-        body = json.loads(response['body'])
-        assert body['error'] == 'Path contained a null productid parameter.', "Error for missing environment variable was not as expected."
-
-    def test_no_email_path_parameter(self, env_vars, api_gateway_event_existing_user):
-        api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "null"}
-        response = purchase.purchase_main(api_gateway_event_existing_user)
+    def test_no_email(self, env_vars, api_purchase_event):
+        api_purchase_event['pathParameters'] = {"reservationid": "12345678-resv-0002-1234-abcdefghijkl", "email": "null"}
+        response = purchase.purchase_main(api_purchase_event)
         body = json.loads(response['body'])
         assert body['error'] == 'Path contained a null email parameter.', "Error for missing environment variable was not as expected."
 
-    def test_confirm_product_already_confirmed_by_user_with_account(self, env_vars, api_gateway_event_existing_user, dynamodb_mock):
-        api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-0004-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
-        response = purchase.purchase_main(api_gateway_event_existing_user)
+    @mock.patch("lists.purchase.update_product_and_reservation", mock.MagicMock(return_value=[True]))
+    @mock.patch("lists.common.send_email", mock.MagicMock(return_value=[True]))
+    def test_confirm_purchase(self, env_vars, api_purchase_event, dynamodb_mock):
+        response = purchase.purchase_main(api_purchase_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'Product was already purchased.', "Error for missing environment variable was not as expected."
+        assert body['purchased'], "Error for missing environment variable was not as expected."
 
-    def test_confirm_product_already_confirmed_by_user_with_no_account(self, env_vars, api_gateway_event_no_account_user, dynamodb_mock):
-        api_gateway_event_no_account_user['pathParameters'] = {"productid": "12345678-prod-0005-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
-        response = purchase.purchase_main(api_gateway_event_no_account_user)
+    def test_confirm_reservation_already_confirmed_by_user_with_account(self, env_vars, api_purchase_event, dynamodb_mock):
+        api_purchase_event['pathParameters'] = {"reservationid": "12345678-resv-0006-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
+        response = purchase.purchase_main(api_purchase_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'Product was already purchased.', "Error for missing environment variable was not as expected."
+        assert body['error'] == 'Product was not reserved. State = purchased.', "Error for missing environment variable was not as expected."
 
-    def test_confirm_product_that_was_unreserved(self, env_vars, api_gateway_event_existing_user, dynamodb_mock):
-        api_gateway_event_existing_user['pathParameters'] = {"productid": "12345678-prod-1000-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl", "email": "test.user1@gmail.com"}
-        response = purchase.purchase_main(api_gateway_event_existing_user)
+    def test_confirm_reservation_already_confirmed_by_user_with_no_account(self, env_vars, api_purchase_event, dynamodb_mock):
+        api_purchase_event['pathParameters'] = {"reservationid": "12345678-resv-0007-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+        response = purchase.purchase_main(api_purchase_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'Product is not reserved by user.', "Error for missing environment variable was not as expected."
+        assert body['error'] == 'Product was not reserved. State = purchased.', "Error for missing environment variable was not as expected."
 
-    def test_reserve_no_name_for_non_user(self, env_vars, api_gateway_event_no_account_user, dynamodb_mock):
-        api_gateway_event_no_account_user['body'] = json.dumps({
-            "quantity": 1,
-            "title": "Child User1 1st Birthday",
-            "product": {
-                "type": "products",
-                "brand": "Mamas and Papas",
-                "details": "Balloon Print Zip All-in-One",
-                "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
-                "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
-            }
-        })
-
-        response = purchase.purchase_main(api_gateway_event_no_account_user)
+    def test_confirm_reservation_that_was_unreserved(self, env_vars, api_purchase_event, dynamodb_mock):
+        api_purchase_event['pathParameters'] = {"reservationid": "12345678-resv-0008-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
+        response = purchase.purchase_main(api_purchase_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'API Event did not contain a name body attribute.', "Reserve error was not as expected."
+        assert body['error'] == 'Product was not reserved. State = cancelled.', "Error for missing environment variable was not as expected."
 
-    def test_reserve_with_no_body(self, env_vars, api_gateway_event_no_account_user, dynamodb_mock):
-        api_gateway_event_no_account_user['body'] = None
+    def test_reserve_with_no_body(self, env_vars, api_purchase_event, dynamodb_mock):
+        api_purchase_event['pathParameters'] = {"reservationid": "12345678-resv-0003-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+        api_purchase_event['body'] = None
 
-        response = purchase.purchase_main(api_gateway_event_no_account_user)
+        response = purchase.purchase_main(api_purchase_event)
         body = json.loads(response['body'])
         assert body['error'] == 'Body was missing required attributes.', "Reserve error was not as expected."
 
 
-@pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-def test_handler_with_existing_user(api_gateway_event_existing_user, env_vars, dynamodb_mock):
-    response = purchase.handler(api_gateway_event_existing_user, None)
+@mock.patch("lists.purchase.update_product_and_reservation", mock.MagicMock(return_value=[True]))
+@mock.patch("lists.common.send_email", mock.MagicMock(return_value=[True]))
+def test_handler_with_existing_user(api_purchase_event, env_vars, dynamodb_mock):
+    response = purchase.handler(api_purchase_event, None)
     body = json.loads(response['body'])
 
     assert response['statusCode'] == 200
@@ -209,9 +119,11 @@ def test_handler_with_existing_user(api_gateway_event_existing_user, env_vars, d
     assert body['purchased'], "purchase was not confirmed."
 
 
-@pytest.mark.skip(reason="transact_write_items is not implemented for moto")
-def test_handler_with_no_account_user(api_gateway_event_no_account_user, env_vars, dynamodb_mock):
-    response = purchase.handler(api_gateway_event_no_account_user, None)
+@mock.patch("lists.purchase.update_product_and_reservation", mock.MagicMock(return_value=[True]))
+@mock.patch("lists.common.send_email", mock.MagicMock(return_value=[True]))
+def test_handler_with_no_account_user(api_purchase_event, env_vars, dynamodb_mock):
+    api_purchase_event['pathParameters'] = {"reservationid": "12345678-resv-0003-1234-abcdefghijkl", "email": "test.user99@gmail.com"}
+    response = purchase.handler(api_purchase_event, None)
     body = json.loads(response['body'])
 
     assert response['statusCode'] == 200

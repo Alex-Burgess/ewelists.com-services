@@ -21,40 +21,34 @@ def handler(event, context):
 def purchase_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-        index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
+        resv_id_index = common.get_env_variable(os.environ, 'RESERVATIONID_INDEX')
         template = common.get_env_variable(os.environ, 'TEMPLATE_NAME')
         domain_name = common.get_env_variable(os.environ, 'DOMAIN_NAME')
-        list_id = common.get_path_parameter(event, 'id')
-        list_title = common.get_body_attribute(event, 'title')
-        product_id = common.get_path_parameter(event, 'productid')
-        product = common.get_body_attribute(event, 'product')
-        request_reserve_quantity = common.get_body_attribute(event, 'quantity')
 
-        # Get user
-        user = common.get_user(event, os.environ, table_name, index_name)
+        resv_id = common.get_path_parameter(event, 'reservationid')
+        email = common.get_path_parameter(event, 'email')
+        product = common.get_body_attribute(event, 'product')
 
         # Get reservation to know how what the quantity reserved was. As well as the reservation id
-        reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, user['id'])
-
-        # Check that not already purchased
-        common.gift_is_reserved(reserved_item)
+        reservation = common_table_ops.get_reservation(table_name, resv_id_index, resv_id)
+        common.confirm_reservation_owner(reservation, email)
+        common.gift_is_reserved(reservation)
 
         # Get product to ensure we know the latest quantities.
-        product_item = common_table_ops.get_product_item(table_name, list_id, product_id)
+        product_item = common_table_ops.get_product_item(table_name, reservation['listId'], reservation['productId'])
 
         # Calculate reserved and purchased quantities
-        product_reserved_q = new_reserved_quantity(product_item['reserved'], reserved_item['quantity'])
-        product_purchased_q = new_purchased_quantity(product_item['purchased'], reserved_item['quantity'])
+        product_reserved_q = new_reserved_quantity(product_item['reserved'], reservation['quantity'])
+        product_purchased_q = new_purchased_quantity(product_item['purchased'], reservation['quantity'])
 
         # update table with transaction
-        product_key = common.create_product_key(list_id, product_id)
-        reserved_key = common.create_reserved_key(list_id, product_id, user)
-        reservation_key = common.create_reservation_key(reserved_item['reservationId'])
-        update_product_reserved_and_reservation_items(table_name, product_key, product_reserved_q, product_purchased_q, reserved_key, reservation_key)
+        product_key = common.create_product_key(reservation['listId'], reservation['productId'])
+        reservation_key = common.create_reservation_key(reservation)
+        update_product_and_reservation(table_name, product_key, product_reserved_q, product_purchased_q, reservation_key)
 
         # Send confirmation
-        data = create_email_data(domain_name, user['name'], list_id, list_title, request_reserve_quantity, product)
-        common.send_email(user['email'], template, data)
+        data = create_email_data(domain_name, reservation['name'], reservation['listId'], reservation['listTitle'], reservation['quantity'], product)
+        common.send_email(reservation['email'], template, data)
 
     except Exception as e:
         log.error("Exception: {}".format(e))
@@ -81,7 +75,7 @@ def new_purchased_quantity(product_purchased_quantity, user_reserved_quantity):
     return new_quantity
 
 
-def update_product_reserved_and_reservation_items(table_name, product_key, product_reserved_q, product_purchased_q, reserved_key, reservation_key):
+def update_product_and_reservation(table_name, product_key, product_reserved_q, product_purchased_q, reservation_key):
     try:
         response = dynamodb.transact_write_items(
             TransactItems=[
@@ -93,19 +87,6 @@ def update_product_reserved_and_reservation_items(table_name, product_key, produ
                         'ExpressionAttributeValues': {
                             ':r': {'N': str(product_reserved_q)},
                             ':p': {'N': str(product_purchased_q)}
-                        }
-                    }
-                },
-                {
-                    'Update': {
-                        'TableName': table_name,
-                        'Key': reserved_key,
-                        'UpdateExpression': "set #st = :s",
-                        'ExpressionAttributeValues': {
-                            ':s': {'S': 'purchased'},
-                        },
-                        'ExpressionAttributeNames': {
-                            '#st': 'state'
                         }
                     }
                 },

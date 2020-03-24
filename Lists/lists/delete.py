@@ -8,8 +8,6 @@ log = logger.setup_logger()
 
 dynamodb = boto3.client('dynamodb')
 
-# TODO - should use batch write to delete items more efficiently.
-
 
 def handler(event, context):
     response = delete_main(event)

@@ -18,27 +18,26 @@ def handler(event, context):
 def unreserve_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
-        index_name = common.get_env_variable(os.environ, 'INDEX_NAME')
-        list_id = common.get_path_parameter(event, 'id')
-        product_id = common.get_path_parameter(event, 'productid')
+        email_index = common.get_env_variable(os.environ, 'EMAIL_INDEX')
+        resv_id_index = common.get_env_variable(os.environ, 'RESERVATIONID_INDEX')
+        resv_id = common.get_path_parameter(event, 'id')
 
         # Step 1 - get identity (which could be from sign in, or email in path, or encrypted parameter)
-        user = common.get_user(event, os.environ, table_name, index_name)
+        user = common.get_user(event, os.environ, table_name, email_index)
 
-        # Step 2 - get reserved item and product item.  Check reserved item is in reserved state, i.e. not purchased or cancelled.
-        reserved_item = common_table_ops.get_reserved_details_item(table_name, list_id, product_id, user['id'])
-        product_item = common_table_ops.get_product_item(table_name, list_id, product_id)
-        common.gift_is_reserved(reserved_item)
+        # Step 2 - get reserved item. Check reserved item is in reserved state, i.e. not purchased or cancelled.
+        reservation = common_table_ops.get_reservation(table_name, resv_id_index, resv_id)
+        common.confirm_reservation_owner(reservation, user['id'])
+        common.gift_is_reserved(reservation)
 
-        # Step 3 - Calculate new reserved quantity of product.
-        new_product_reserved_quantity = common.calculate_new_reserved_quantity(product_item, -reserved_item['quantity'])
+        # Step 3 - Get product Item. Calculate new reserved quantity of product.
+        product_item = common_table_ops.get_product_item(table_name, reservation['listId'], reservation['productId'])
+        new_product_reserved_quantity = common.calculate_new_reserved_quantity(product_item, -reservation['quantity'])
 
         # Step 4 - Delete reserved details item and update product reserved quantities
-        product_key = common.create_product_key(list_id, product_id)
-        reserved_key = common.create_reserved_key(list_id, product_id, user)
-        reservation_key = common.create_reservation_key(reserved_item['reservationId'])
-        condition = create_condition(list_id, product_id, user['id'])
-        unreserve_product(table_name, product_key, reserved_key, reservation_key, condition, new_product_reserved_quantity)
+        product_key = common.create_product_key(reservation['listId'], reservation['productId'])
+        reservation_key = common.create_reservation_key(reservation)
+        unreserve_product(table_name, product_key, reservation_key, new_product_reserved_quantity)
     except Exception as e:
         log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -51,14 +50,7 @@ def unreserve_main(event):
     return response
 
 
-def create_condition(list_id, product_id, user_id):
-    return {
-        ':PK': {'S': "LIST#{}".format(list_id)},
-        ':SK': {'S': "RESERVED#{}#{}".format(product_id, user_id)}
-    }
-
-
-def unreserve_product(table_name, product_key, reserved_key, reservation_key, condition, new_product_reserved_quantity):
+def unreserve_product(table_name, product_key, reservation_key, new_product_reserved_quantity):
     try:
         response = dynamodb.transact_write_items(
             TransactItems=[
@@ -70,14 +62,6 @@ def unreserve_product(table_name, product_key, reserved_key, reservation_key, co
                         'ExpressionAttributeValues': {
                             ':r': {'N': str(new_product_reserved_quantity)},
                         }
-                    }
-                },
-                {
-                    'Delete': {
-                        'TableName': table_name,
-                        'Key': reserved_key,
-                        'ConditionExpression': "PK = :PK AND SK = :SK",
-                        'ExpressionAttributeValues': condition
                     }
                 },
                 {

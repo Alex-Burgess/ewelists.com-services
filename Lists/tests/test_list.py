@@ -2,10 +2,7 @@ import pytest
 import os
 import re
 import json
-import boto3
-from moto import mock_dynamodb2
 from lists import list, logger
-from tests import fixtures
 
 log = logger.setup_logger()
 
@@ -16,47 +13,6 @@ def env_vars(monkeypatch):
     monkeypatch.setitem(os.environ, 'INDEX_NAME', 'userId-index')
 
     return monkeypatch
-
-
-@pytest.fixture
-def api_gateway_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/"
-    event['path'] = "/lists",
-    event['httpMethod'] = "GET"
-
-    return event
-
-
-@pytest.fixture
-def dynamodb_mock():
-    mock = mock_dynamodb2()
-    mock.start()
-
-    dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
-
-    table = dynamodb.create_table(
-        TableName='lists-unittest',
-        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}, {'AttributeName': 'userId', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
-        GlobalSecondaryIndexes=[{
-            'IndexName': 'userId-index',
-            'KeySchema': [{'AttributeName': 'userId', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
-            'Projection': {
-                'ProjectionType': 'ALL'
-            }
-        }]
-    )
-
-    items = fixtures.load_test_data()
-
-    for item in items:
-        table.put_item(TableName='lists-unittest', Item=item)
-
-    yield
-    # teardown: stop moto server
-    mock.stop()
 
 
 class TestGetLists:
@@ -96,32 +52,32 @@ class TestGetLists:
 
 
 class TestListMain:
-    def test_list_main(self, api_gateway_event, env_vars, dynamodb_mock):
-        response = list.list_main(api_gateway_event)
+    def test_list_main(self, api_list_event, env_vars, dynamodb_mock):
+        response = list.list_main(api_list_event)
         body = json.loads(response['body'])
 
         assert len(body['owned']) == 2, "Number of lists returned was not as expected."
         assert len(body['closed']) == 1, "Number of closed lists returned was not as expected."
 
-    def test_list_main_no_table(self, api_gateway_event, monkeypatch, dynamodb_mock):
+    def test_list_main_no_table(self, api_list_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'userId-index')
-        response = list.list_main(api_gateway_event)
+        response = list.list_main(api_list_event)
         body = json.loads(response['body'])
 
         assert body['error'] == 'Unexpected error when getting lists from table.', "Exception was not as expected."
 
-    def test_list_main_user_with_no_lists(self, api_gateway_event, env_vars, dynamodb_mock):
-        api_gateway_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
-        response = list.list_main(api_gateway_event)
+    def test_list_main_user_with_no_lists(self, api_list_event, env_vars, dynamodb_mock):
+        api_list_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
+        response = list.list_main(api_list_event)
         body = json.loads(response['body'])
 
         assert len(body['owned']) == 0, "Number of lists returned was not as expected."
         assert len(body['closed']) == 0, "Number of lists was not 0."
 
 
-def test_handler(api_gateway_event, env_vars, dynamodb_mock):
-    response = list.handler(api_gateway_event, None)
+def test_handler(api_list_event, env_vars, dynamodb_mock):
+    response = list.handler(api_list_event, None)
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
     assert re.match('{"user": .*}', response['body'])

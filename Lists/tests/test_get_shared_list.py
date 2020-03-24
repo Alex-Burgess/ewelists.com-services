@@ -2,47 +2,9 @@ import pytest
 import os
 import re
 import json
-import boto3
-from moto import mock_dynamodb2
 from lists import get_shared_list, logger
-from tests import fixtures
 
 log = logger.setup_logger()
-
-
-@pytest.fixture
-def api_gateway_unauthed_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl",
-    event['httpMethod'] = "GET"
-    event['pathParameters'] = {"id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = None
-    event['requestContext']['identity'] = {
-        "cognitoIdentityPoolId": None,
-        "accountId": None,
-        "cognitoIdentityId": None,
-        "caller": None,
-        "accessKey": None,
-        "cognitoAuthenticationType": None,
-        "cognitoAuthenticationProvider": None,
-        "userArn": None,
-        "user": None
-    }
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl",
-    event['httpMethod'] = "GET"
-    event['pathParameters'] = {"id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = None
-
-    return event
 
 
 @pytest.fixture()
@@ -52,41 +14,18 @@ def list_query_response():
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "quantity": {"N": "2"}, "reserved": {"N": "1"}, "purchased": {"N": "0"}, "type": {"S": "products"}},
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-prod-0002-1234-abcdefghijkl"}, "quantity": {"N": "3"}, "reserved": {"N": "1"}, "purchased": {"N": "0"}, "type": {"S": "products"}},
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-notf-0010-1234-abcdefghijkl"}, "quantity": {"N": "2"}, "reserved": {"N": "0"}, "purchased": {"N": "0"}, "type": {"S": "notfound"}},
-        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVED#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl"}, "name": {"S": "Test User2"}, "productId": {"S": "12345678-prod-0001-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "message": {"S": "Happy Birthday"}, "reservedAt": {"N": "1573739584"}, "state": {"S": "reserved"}, "reservationId": {"S": "12345678-resv-0001-1234-abcdefghijkl"}},
-        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVED#12345678-prod-0002-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl"}, "name": {"S": "Test User2"}, "productId": {"S": "12345678-prod-0002-1234-abcdefghijkl"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "reservedAt": {"N": "1573739584"}, "state": {"S": "reserved"}, "reservationId": {"S": "12345678-resv-0002-1234-abcdefghijkl"}},
+        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVATION#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl#12345678-resv-0001-1234-abcdefghijkl"}, "reservationId": {"S": "12345678-resv-0001-1234-abcdefghijkl"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listTitle": {"S": "Child User1 1st Birthday"}, "name": {"S": "Test User2"}, "email": {"S": "test.user2@gmail.com"}, "productId": {"S": "12345678-prod-0001-1234-abcdefghijkl"}, "productType": {"S": "products"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "reservedAt": {"N": "1573739584"}, "state": {"S": "reserved"}},
+        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVATION#12345678-prod-0002-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl#12345678-resv-0002-1234-abcdefghijkl"}, "reservationId": {"S": "12345678-resv-0002-1234-abcdefghijkl"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listTitle": {"S": "Child User1 1st Birthday"}, "name": {"S": "Test User2"}, "email": {"S": "test.user2@gmail.com"}, "productId": {"S": "12345678-prod-0002-1234-abcdefghijkl"}, "productType": {"S": "products"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "reservedAt": {"N": "1573739584"}, "state": {"S": "reserved"}}
     ]
 
     return response
-
-
-@pytest.fixture
-def dynamodb_mock():
-    mock = mock_dynamodb2()
-    mock.start()
-    dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
-
-    table = dynamodb.create_table(
-        TableName='lists-unittest',
-        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
-    )
-
-    items = fixtures.load_test_data()
-
-    for item in items:
-        table.put_item(TableName='lists-unittest', Item=item)
-
-    yield
-    # teardown: stop moto server
-    mock.stop()
 
 
 class TestGetListQuery:
     def test_get_list_query(self, dynamodb_mock):
         list_id = "12345678-list-0001-1234-abcdefghijkl"
         items = get_shared_list.get_list_query('lists-unittest', list_id)
-        assert len(items) == 13, "Number of items deleted was not as expected."
+        assert len(items) == 14, "Number of items deleted was not as expected."
 
     def test_get_list_query_no_table_name(self, dynamodb_mock):
         list_id = "12345678-list-0001-1234-abcdefghijkl"
@@ -120,15 +59,15 @@ class TestGenerateListObject:
         assert len(items['reserved']) == 2, "Number of products reserved was not 2."
         assert len(items['reserved']["12345678-prod-0001-1234-abcdefghijkl"]) == 1, "Number of users that have reserved product not correct."
         assert len(items['reserved']["12345678-prod-0002-1234-abcdefghijkl"]) == 1, "Number of users that have reserved product not correct."
-        assert items['reserved']["12345678-prod-0001-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday", "state": "reserved", "reservationId": '12345678-resv-0001-1234-abcdefghijkl'}, "Reserved object not correct."
-        assert items['reserved']["12345678-prod-0002-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0002-1234-abcdefghijkl'}, "Reserved object not correct."
+        assert items['reserved']["12345678-prod-0001-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0001-1234-abcdefghijkl', "listId": '12345678-list-0001-1234-abcdefghijkl', "listTitle": 'Child User1 1st Birthday', "productType": 'products'}, "Reserved object not correct."
+        assert items['reserved']["12345678-prod-0002-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0002-1234-abcdefghijkl', "listId": '12345678-list-0001-1234-abcdefghijkl', "listTitle": 'Child User1 1st Birthday', "productType": 'products'}, "Reserved object not correct."
 
 
 class TestGetSharedListMain:
-    def test_get_shared_list_main(self, monkeypatch, api_gateway_event, dynamodb_mock):
+    def test_get_shared_list_main(self, monkeypatch, api_get_shared_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
-        response = get_shared_list.get_shared_list_main(api_gateway_event)
+        response = get_shared_list.get_shared_list_main(api_get_shared_list_event)
         body = json.loads(response['body'])
 
         assert body['list']['listId'] == "12345678-list-0001-1234-abcdefghijkl", "Get list response did not contain a listId."
@@ -139,59 +78,82 @@ class TestGetSharedListMain:
         assert body['list']['imageUrl'] == "/images/celebration-default.jpg", "Get list response did not contain an imageUrl."
         assert body['list']['state'] == "open", "List state was incorrect."
 
-        assert len(body['products']) == 6, "Get list response did not contain correct number of products."
-        assert body['products']["12345678-prod-0001-1234-abcdefghijkl"] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "quantity": 3, "reserved": 2, "purchased": 0, "type": "products"}, "Product object not correct."
-        assert body['products']["12345678-prod-0002-1234-abcdefghijkl"] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 0, "type": "products"}, "Product object not correct."
-        assert body['products']["12345678-prod-0003-1234-abcdefghijkl"] == {"productId": "12345678-prod-0003-1234-abcdefghijkl", "quantity": 1, "reserved": 1, "purchased": 0, "type": "products"}, "Product object not correct."
-        assert body['products']["12345678-notf-0010-1234-abcdefghijkl"] == {"productId": "12345678-notf-0010-1234-abcdefghijkl", "quantity": 2, "reserved": 1, "purchased": 0, "type": "notfound"}, "Product object not correct."
-        assert body['products']["12345678-prod-0004-1234-abcdefghijkl"] == {"productId": "12345678-prod-0004-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 1, "type": "products"}, "Product object not correct."
-        assert body['products']["12345678-prod-0005-1234-abcdefghijkl"] == {"productId": "12345678-prod-0005-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 1, "type": "products"}, "Product object not correct."
+        p = body['products']
+        assert len(p) == 6, "Get list response did not contain correct number of products."
+        assert p["12345678-prod-0001-1234-abcdefghijkl"] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "quantity": 3, "reserved": 2, "purchased": 0, "type": "products"}, "Product object not correct."
+        assert p["12345678-prod-0002-1234-abcdefghijkl"] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 0, "type": "products"}, "Product object not correct."
+        assert p["12345678-prod-0003-1234-abcdefghijkl"] == {"productId": "12345678-prod-0003-1234-abcdefghijkl", "quantity": 1, "reserved": 1, "purchased": 0, "type": "products"}, "Product object not correct."
+        assert p["12345678-notf-0010-1234-abcdefghijkl"] == {"productId": "12345678-notf-0010-1234-abcdefghijkl", "quantity": 2, "reserved": 1, "purchased": 0, "type": "notfound"}, "Product object not correct."
+        assert p["12345678-prod-0004-1234-abcdefghijkl"] == {"productId": "12345678-prod-0004-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 1, "type": "products"}, "Product object not correct."
+        assert p["12345678-prod-0005-1234-abcdefghijkl"] == {"productId": "12345678-prod-0005-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 1, "type": "products"}, "Product object not correct."
 
-        assert len(body['reserved']) == 5, "Number of products reserved was not 2."
-        assert len(body['reserved']["12345678-prod-0001-1234-abcdefghijkl"]) == 2, "Number of users that have reserved product not correct."
-        assert len(body['reserved']["12345678-prod-0003-1234-abcdefghijkl"]) == 1, "Number of users that have reserved product not correct."
-        assert len(body['reserved']["12345678-notf-0010-1234-abcdefghijkl"]) == 1, "Number of users that have reserved product not correct."
-        assert body['reserved']["12345678-prod-0001-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0001-1234-abcdefghijkl'}, "Reserved object not correct."
-        assert body['reserved']["12345678-prod-0001-1234-abcdefghijkl"]['12345678-user-0003-1234-abcdefghijkl'] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User3", "userId": "12345678-user-0003-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0002-1234-abcdefghijkl'}, "Reserved object not correct."
-        assert body['reserved']["12345678-prod-0003-1234-abcdefghijkl"]['test.user99@gmail.com'] == {"productId": "12345678-prod-0003-1234-abcdefghijkl", "name": "Test User99", "userId": "test.user99@gmail.com", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0003-1234-abcdefghijkl'}, "Reserved object not correct."
-        assert body['reserved']["12345678-notf-0010-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-notf-0010-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0004-1234-abcdefghijkl'}, "Reserved object not correct."
-        assert body['reserved']["12345678-prod-0004-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0004-1234-abcdefghijkl", "name": "Test User2", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "message": "Happy Birthday", "state": "purchased", "reservationId": '12345678-resv-0006-1234-abcdefghijkl'}, "Reserved object not correct."
-        assert body['reserved']["12345678-prod-0005-1234-abcdefghijkl"]['test.user99@gmail.com'] == {"productId": "12345678-prod-0005-1234-abcdefghijkl", "name": "Test User99", "userId": "test.user99@gmail.com", "quantity": 1, "message": "Happy Birthday to you", "state": "purchased", "reservationId": '12345678-resv-0007-1234-abcdefghijkl'}, "Reserved object not correct."
+        expected_reservation = {
+            "12345678-notf-0010-1234-abcdefghijkl": {
+                "12345678-user-0002-1234-abcdefghijkl": {
+                    "reservationId": "12345678-resv-0004-1234-abcdefghijkl", "productId": "12345678-notf-0010-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "quantity": 1, "state": "reserved", "listTitle": "Child User1 1st Birthday", "productType": "notfound"
+                }
+            },
+            "12345678-prod-0001-1234-abcdefghijkl": {
+                "12345678-user-0002-1234-abcdefghijkl": {
+                    "reservationId": "12345678-resv-0001-1234-abcdefghijkl", "productId": "12345678-prod-0001-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "quantity": 1, "state": "reserved", "listTitle": "Child User1 1st Birthday", "productType": "products"
+                },
+                "12345678-user-0003-1234-abcdefghijkl": {
+                    "reservationId": "12345678-resv-0002-1234-abcdefghijkl", "productId": "12345678-prod-0001-1234-abcdefghijkl", "userId": "12345678-user-0003-1234-abcdefghijkl", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User3", "email": "test.user3@gmail.com", "quantity": 1, "state": "reserved", "listTitle": "Child User1 1st Birthday", "productType": "products"
+                }
+            },
+            "12345678-prod-0003-1234-abcdefghijkl": {
+                "test.user99@gmail.com": {
+                    "reservationId": "12345678-resv-0003-1234-abcdefghijkl", "productId": "12345678-prod-0003-1234-abcdefghijkl", "userId": "test.user99@gmail.com", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User99", "email": "test.user99@gmail.com", "quantity": 1, "state": "reserved", "listTitle": "Child User1 1st Birthday", "productType": "products"
+                }
+            },
+            "12345678-prod-0004-1234-abcdefghijkl": {
+                "12345678-user-0002-1234-abcdefghijkl": {
+                    "reservationId": "12345678-resv-0006-1234-abcdefghijkl", "productId": "12345678-prod-0004-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "quantity": 1, "state": "purchased", "listTitle": "Child User1 1st Birthday", "productType": "products"
+                }
+            },
+            "12345678-prod-0005-1234-abcdefghijkl": {
+                "test.user99@gmail.com": {
+                    "reservationId": "12345678-resv-0007-1234-abcdefghijkl", "productId": "12345678-prod-0005-1234-abcdefghijkl", "userId": "test.user99@gmail.com", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User99", "email": "test.user99@gmail.com", "quantity": 1, "state": "purchased", "listTitle": "Child User1 1st Birthday", "productType": "products"
+                }
+            }
+        }
 
-    def test_get_shared_list_with_no_date(self, monkeypatch, api_gateway_event, dynamodb_mock):
+        assert body['reserved'] == expected_reservation
+
+    def test_get_shared_list_with_no_date(self, monkeypatch, api_get_shared_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['id'] = "12345678-list-0002-1234-abcdefghijkl"
+        api_get_shared_list_event['pathParameters']['id'] = "12345678-list-0002-1234-abcdefghijkl"
 
-        response = get_shared_list.get_shared_list_main(api_gateway_event)
+        response = get_shared_list.get_shared_list_main(api_get_shared_list_event)
         body = json.loads(response['body'])
 
         assert body['list']['listId'] == "12345678-list-0002-1234-abcdefghijkl", "Get list response did not contain a listId."
         assert 'eventDate' not in body['list'], "List date was not empty."
         assert body['list']['occasion'] == "Christmas", "Get list response did not contain an occasion."
 
-    def test_get_shared_list_main_no_table(self, monkeypatch, api_gateway_event, dynamodb_mock):
+    def test_get_shared_list_main_no_table(self, monkeypatch, api_get_shared_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')
 
-        response = get_shared_list.get_shared_list_main(api_gateway_event)
+        response = get_shared_list.get_shared_list_main(api_get_shared_list_event)
         body = json.loads(response['body'])
 
         assert body['error'] == 'Unexpected error when getting list item from table.', "Get list response did not contain the correct error message."
 
-    def test_get_shared_list_with_authenticated_user(self, monkeypatch, api_gateway_event, dynamodb_mock):
+    def test_get_shared_list_with_authenticated_user(self, monkeypatch, api_get_shared_list_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
+        api_get_shared_list_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
 
-        response = get_shared_list.get_shared_list_main(api_gateway_event)
+        response = get_shared_list.get_shared_list_main(api_get_shared_list_event)
         body = json.loads(response['body'])
 
         assert body['list']['listId'] == "12345678-list-0001-1234-abcdefghijkl", "Get list response did not contain a listId."
         assert len(body['products']) == 6, "Get list response did not contain correct number of products."
         assert len(body['reserved']) == 5, "Number of products reserved was not correct."
 
-    def test_get_shared_list_with_unauthenticated_user(self, monkeypatch, api_gateway_unauthed_event, dynamodb_mock):
+    def test_get_shared_list_with_unauthenticated_user(self, monkeypatch, api_get_shared_list_unauthed_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
 
-        response = get_shared_list.get_shared_list_main(api_gateway_unauthed_event)
+        response = get_shared_list.get_shared_list_main(api_get_shared_list_unauthed_event)
         body = json.loads(response['body'])
 
         assert body['list']['listId'] == "12345678-list-0001-1234-abcdefghijkl", "Get list response did not contain a listId."
@@ -199,9 +161,9 @@ class TestGetSharedListMain:
         assert len(body['reserved']) == 5, "Number of products reserved was not correct."
 
 
-def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
+def test_handler(api_get_shared_list_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    response = get_shared_list.handler(api_gateway_event, None)
+    response = get_shared_list.handler(api_get_shared_list_event, None)
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
     assert re.match('{"list": .*}', response['body'])

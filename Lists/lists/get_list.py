@@ -2,7 +2,7 @@ import json
 import os
 import boto3
 from lists import common, logger
-from lists.common_entities import List, Product, Reserved
+from lists.common_entities import List, Product, Reservation
 from botocore.exceptions import ClientError
 
 log = logger.setup_logger()
@@ -46,9 +46,9 @@ def generate_list_object(response_items):
             product = Product(item).get_details()
             productId = product['productId']
             list['products'][productId] = product
-        elif item['SK']['S'].startswith("RESERVED"):
+        elif item['SK']['S'].startswith("RESERVATION") and item['state']['S'] != 'cancelled':
             log.info("Reserved Item: {}".format(item))
-            reserved = Reserved(item).get_details()
+            reserved = Reservation(item).get_details()
             list['reserved'].append(reserved)
 
     return list

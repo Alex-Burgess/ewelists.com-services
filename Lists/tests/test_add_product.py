@@ -3,46 +3,9 @@ import os
 import re
 import json
 import boto3
-from moto import mock_dynamodb2
 from lists import add_product, logger
-from tests import fixtures
 
 log = logger.setup_test_logger()
-
-
-@pytest.fixture
-def api_gateway_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/lists/{id}/product/{productid}"
-    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0100-1234-abcdefghijkl"
-    event['httpMethod'] = "POST"
-    event['pathParameters'] = {"productid": "12345678-prod-0100-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
-    event['body'] = "{\n    \"quantity\": 1,\n    \"productType\": \"products\"\n}"
-
-    return event
-
-
-@pytest.fixture
-def dynamodb_mock():
-    mock = mock_dynamodb2()
-    mock.start()
-    dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
-
-    table = dynamodb.create_table(
-        TableName='lists-unittest',
-        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{'AttributeName': 'PK', 'AttributeType': 'S'}, {'AttributeName': 'SK', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
-    )
-
-    items = fixtures.load_test_data()
-
-    for item in items:
-        table.put_item(TableName='lists-unittest', Item=item)
-
-    yield
-    # teardown: stop moto server
-    mock.stop()
 
 
 class TestCreateProductItem:
@@ -93,58 +56,58 @@ class TestCreateProductItem:
 
 
 class TestCreateProductMain:
-    def test_create_product_for_products(self, api_gateway_event, monkeypatch, dynamodb_mock):
+    def test_create_product_for_products(self, api_add_product_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        response = add_product.add_product_main(api_gateway_event)
+        response = add_product.add_product_main(api_add_product_event)
         body = json.loads(response['body'])
         assert body['message'], "Add product main response did not contain the correct status."
 
-    def test_create_product_with_wrong_type(self, api_gateway_event, monkeypatch, dynamodb_mock):
+    def test_create_product_with_wrong_type(self, api_add_product_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['body'] = '{\n    \"quantity\": 1,\n    \"productType\": \"wrong\"\n}'
-        response = add_product.add_product_main(api_gateway_event)
+        api_add_product_event['body'] = '{\n    \"quantity\": 1,\n    \"productType\": \"wrong\"\n}'
+        response = add_product.add_product_main(api_add_product_event)
         body = json.loads(response['body'])
         assert body['error'] == "API Event did not contain a product type of products or notfound.", "Error not as expected."
 
-    def test_create_product_with_no_quantity(self, api_gateway_event, monkeypatch, dynamodb_mock):
+    def test_create_product_with_no_quantity(self, api_add_product_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['body'] = '{\n    \"productType\": \"products\"\n}'
-        response = add_product.add_product_main(api_gateway_event)
+        api_add_product_event['body'] = '{\n    \"productType\": \"products\"\n}'
+        response = add_product.add_product_main(api_add_product_event)
         body = json.loads(response['body'])
         assert body['error'] == "API Event did not contain a quantity body attribute.", "Error not as expected."
 
-    def test_create_product_with_not_owner(self, api_gateway_event, monkeypatch, dynamodb_mock):
+    def test_create_product_with_not_owner(self, api_add_product_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
-        response = add_product.add_product_main(api_gateway_event)
+        api_add_product_event['requestContext']['identity']['cognitoAuthenticationProvider'] = "cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7,cognito-idp.eu-west-1.amazonaws.com/eu-west-1_vqox9Z8q7:CognitoSignIn:12345678-user-0003-1234-abcdefghijkl"
+        response = add_product.add_product_main(api_add_product_event)
         body = json.loads(response['body'])
-        assert body['error'] == "Owner of List ID 12345678-list-0001-1234-abcdefghijkl did not match user id of requestor: 12345678-user-0003-1234-abcdefghijkl.", "Error not as expected."
+        assert body['error'] == "User 12345678-user-0003-1234-abcdefghijkl was not owner of List 12345678-list-0001-1234-abcdefghijkl.", "Error not as expected."
 
-    def test_add_product_with_no_list_id(self, api_gateway_event, monkeypatch, dynamodb_mock):
+    def test_add_product_with_no_list_id(self, api_add_product_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['id'] = '12345678-list-0200-1234-abcdefghijkl'
-        response = add_product.add_product_main(api_gateway_event)
+        api_add_product_event['pathParameters']['id'] = '12345678-list-0200-1234-abcdefghijkl'
+        response = add_product.add_product_main(api_add_product_event)
         body = json.loads(response['body'])
-        assert body['error'] == "No list exists with this ID.", "Error not as expected."
+        assert body['error'] == "User 12345678-user-0001-1234-abcdefghijkl was not owner of List 12345678-list-0200-1234-abcdefghijkl.", "Error not as expected."
 
-    def test_add_product_with_no_product_id(self, api_gateway_event, monkeypatch, dynamodb_mock):
+    def test_add_product_with_no_product_id(self, api_add_product_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['productid'] = 'null'
-        response = add_product.add_product_main(api_gateway_event)
+        api_add_product_event['pathParameters']['productid'] = 'null'
+        response = add_product.add_product_main(api_add_product_event)
         body = json.loads(response['body'])
         assert body['error'] == "Path contained a null productid parameter.", "Error not as expected."
 
-    def test_add_product_which_already_exists(self, api_gateway_event, monkeypatch, dynamodb_mock):
+    def test_add_product_which_already_exists(self, api_add_product_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-        api_gateway_event['pathParameters']['productid'] = '12345678-prod-0001-1234-abcdefghijkl'
-        response = add_product.add_product_main(api_gateway_event)
+        api_add_product_event['pathParameters']['productid'] = '12345678-prod-0001-1234-abcdefghijkl'
+        response = add_product.add_product_main(api_add_product_event)
         body = json.loads(response['body'])
         assert body['error'] == "Product already exists in list.", "Error not as expected."
 
 
-def test_handler(api_gateway_event, monkeypatch, dynamodb_mock):
+def test_handler(api_add_product_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    response = add_product.handler(api_gateway_event, None)
+    response = add_product.handler(api_add_product_event, None)
     assert response['statusCode'] == 200, "Response statusCode was not as expected."
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, "Response headers were not as expected."
     assert re.match('{"message": .*}', response['body']), "Response body was not as expected."

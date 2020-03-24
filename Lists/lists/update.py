@@ -24,9 +24,7 @@ def update_list_main(event):
         items = get_items_to_update(table_name, list_id)
         updated_attributes = update_list(table_name, items, attribute_details)
     except Exception as e:
-        log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
-        log.info("Returning response: {}".format(response))
         return response
 
     response = common.create_response(200, json.dumps(updated_attributes))

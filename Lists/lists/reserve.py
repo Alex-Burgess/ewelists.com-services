@@ -42,10 +42,9 @@ def reserve_main(event):
 
         # Step 4 - Update, in one transaction, the product reserved quantity and create reserved item.
         resv_id = str(uuid.uuid4())
-        product_key = create_product_key(list_id, product_id)
-        reserved_item = create_reserved_item(list_id, product_id, resv_id, user, request_reserve_quantity)
+        product_key = common.create_product_key(list_id, product_id)
         reservation_item = create_reservation_item(list_id, list_title, product_id, product['type'], resv_id, user, request_reserve_quantity)
-        create_reservation(table_name, resv_id, new_product_reserved_quantity, product_key, reserved_item, reservation_item)
+        create_reservation(table_name, new_product_reserved_quantity, product_key, reservation_item)
 
         # Step 5 - Send reserve confirmation email
         data = create_email_data(domain_name, user['name'], resv_id, list_id, list_title, request_reserve_quantity, product)
@@ -62,45 +61,25 @@ def reserve_main(event):
     return response
 
 
-def create_product_key(list_id, product_id):
-    return {
-        'PK': {'S': "LIST#{}".format(list_id)},
-        'SK': {'S': "PRODUCT#{}".format(product_id)}
-    }
-
-
-def create_reserved_item(list_id, product_id, resv_id, user, request_reserve_quantity):
-    return {
-        'PK': {'S': "LIST#{}".format(list_id)},
-        'SK': {'S': "RESERVED#{}#{}".format(product_id, user['id'])},
-        'name': {'S': user['name']},
-        'productId': {'S': product_id},
-        'userId': {'S': user['id']},
-        'quantity': {'N': str(request_reserve_quantity)},
-        'reservedAt': {'N': str(int(time.time()))},
-        'reservationId': {'S': resv_id},
-        'state': {'S': 'reserved'}
-    }
-
-
 def create_reservation_item(list_id, list_title, product_id, product_type, resv_id, user, request_reserve_quantity):
     return {
-        'PK': {'S': "RESERVATION#{}".format(resv_id)},
-        'SK': {'S': "RESERVATION#{}".format(resv_id)},
+        'PK': {'S': "LIST#{}".format(list_id)},
+        'SK': {'S': "RESERVATION#{}#{}#{}".format(product_id, user['id'], resv_id)},
         'reservationId': {'S': resv_id},
-        'userId': {'S': user['id']},
-        'email': {'S': user['email']},
-        'name': {'S': user['name']},
-        'listId': {'S': list_id},
-        'title': {'S': list_title},
         'productId': {'S': product_id},
-        'productType': {'S': product_type},
+        'userId': {'S': user['id']},
+        'listId': {'S': list_id},
+        'name': {'S': user['name']},
+        'email': {'S': user['email']},
         'quantity': {'N': str(request_reserve_quantity)},
-        'state': {'S': 'reserved'}
+        'state': {'S': 'reserved'},
+        'reservedAt': {'N': str(int(time.time()))},
+        'listTitle': {'S': list_title},
+        'productType': {'S': product_type}
     }
 
 
-def create_reservation(table_name, resv_id, new_product_reserved_quantity, product_key, reserved_item, reservation_item):
+def create_reservation(table_name, new_product_reserved_quantity, product_key, reservation_item):
     try:
         response = dynamodb.transact_write_items(
             TransactItems=[
@@ -112,12 +91,6 @@ def create_reservation(table_name, resv_id, new_product_reserved_quantity, produ
                         'ExpressionAttributeValues': {
                             ':r': {'N': str(new_product_reserved_quantity)},
                         }
-                    }
-                },
-                {
-                    'Put': {
-                        'TableName': table_name,
-                        'Item': reserved_item
                     }
                 },
                 {
