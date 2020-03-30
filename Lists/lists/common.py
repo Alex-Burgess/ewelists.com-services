@@ -80,14 +80,24 @@ def calculate_new_reserved_quantity(product_item, update_amount):
 
 def confirm_owner(table_name, user_id, list_id):
     """Confirms that the user owns a specified list, from the response items relating to a query for the same list."""
+
     try:
         common_table_ops.get_list(table_name, user_id, list_id)
     except Exception as e:
-        if str(e) == 'No list exists with this ID.':
-            raise Exception("User {} was not owner of List {}.".format(user_id, list_id))
-        else:
+        if str(e) != 'List ID for user does not exist.':
             log.info("Error: " + str(e))
             raise Exception("Unexpected error when getting list items from table.")
+        else:
+            try:
+                query_response = common_table_ops.get_list_query(table_name, list_id)
+            except Exception as e:
+                log.info("Error: " + str(e))
+                raise Exception("Unexpected error when querying for list items from table.")
+
+            if len(query_response) > 0:
+                raise Exception("User {} was not owner of List {}.".format(user_id, list_id))
+            else:
+                raise Exception("List {} does not exist.".format(list_id))
 
     log.info("User {} was owner of list {}".format(user_id, list_id))
     return True

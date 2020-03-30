@@ -310,9 +310,9 @@ def api_delete_event():
 def api_purchase_event():
     event = api_event_no_auth()
     event['httpMethod'] = "POST"
-    event['resource'] = "/lists/purchase/{reservationId}/email/{email}"
+    event['resource'] = "/lists/purchase/{reservationid}/email/{email}"
     event['path'] = "/lists/purchase/12345678-resv-0001-1234-abcdefghijkl/email/test.user2@gmail.com"
-    event['pathParameters'] = {"reservationId": "12345678-resv-0001-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
+    event['pathParameters'] = {"reservationid": "12345678-resv-0001-1234-abcdefghijkl", "email": "test.user2@gmail.com"}
     event['body'] = json.dumps({
         "product": {
             "type": "products",

@@ -88,7 +88,7 @@ class TestCreateProductMain:
         api_add_product_event['pathParameters']['id'] = '12345678-list-0200-1234-abcdefghijkl'
         response = add_product.add_product_main(api_add_product_event)
         body = json.loads(response['body'])
-        assert body['error'] == "User 12345678-user-0001-1234-abcdefghijkl was not owner of List 12345678-list-0200-1234-abcdefghijkl.", "Error not as expected."
+        assert body['error'] == "List 12345678-list-0200-1234-abcdefghijkl does not exist.", "Error not as expected."
 
     def test_add_product_with_no_product_id(self, api_add_product_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

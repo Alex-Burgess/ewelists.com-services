@@ -3468,13 +3468,14 @@
 									"    ",
 									"    var product_reservation = list_obj.reserved[reserved_keys[0]]",
 									"    var user_keys = Object.keys(product_reservation)",
-									"    ",
 									"    var user_reservation = product_reservation[user_keys[0]]",
-									"    pm.expect(user_reservation.name).to.eql(\"Ewe Api2\");",
-									"    pm.expect(user_reservation.quantity).to.eql(1);",
-									"    pm.expect(user_reservation.productId.length).to.eql(36);",
-									"    pm.expect(user_reservation.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
-									"    pm.expect(user_reservation.state).to.eql(\"reserved\");",
+									"    pm.expect(user_reservation.length).to.eql(1);",
+									"    ",
+									"    pm.expect(user_reservation[0].userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
+									"    pm.expect(user_reservation[0].name).to.eql(\"Ewe Api2\");",
+									"    pm.expect(user_reservation[0].quantity).to.eql(1);",
+									"    pm.expect(user_reservation[0].state).to.eql(\"reserved\");",
+									"    pm.expect(user_reservation[0].productId.length).to.eql(36);",
 									"});",
 									""
 								],
@@ -5416,12 +5417,14 @@
 									"    ",
 									"    var product_reservation = list_obj.reserved[reserved_keys[0]]",
 									"    var user_keys = Object.keys(product_reservation)",
-									"    ",
 									"    var user_reservation = product_reservation[user_keys[0]]",
-									"    pm.expect(user_reservation.name).to.eql(\"Success Simulator\");",
-									"    pm.expect(user_reservation.quantity).to.eql(1);",
-									"    pm.expect(user_reservation.productId.length).to.eql(36);",
-									"    pm.expect(user_reservation.userId).to.eql(\"success@simulator.amazonses.com\");",
+									"    pm.expect(user_reservation.length).to.eql(1);",
+									"    ",
+									"    pm.expect(user_reservation[0].userId).to.eql(\"success@simulator.amazonses.com\");",
+									"    pm.expect(user_reservation[0].name).to.eql(\"Success Simulator\");",
+									"    pm.expect(user_reservation[0].quantity).to.eql(1);",
+									"    pm.expect(user_reservation[0].state).to.eql(\"reserved\");",
+									"    pm.expect(user_reservation[0].productId.length).to.eql(36);",
 									"});",
 									""
 								],
@@ -7338,13 +7341,14 @@
 									"    ",
 									"    var product_reservation = list_obj.reserved[reserved_keys[0]]",
 									"    var user_keys = Object.keys(product_reservation)",
-									"    ",
 									"    var user_reservation = product_reservation[user_keys[0]]",
-									"    pm.expect(user_reservation.name).to.eql(\"Ewe Api2\");",
-									"    pm.expect(user_reservation.quantity).to.eql(1);",
-									"    pm.expect(user_reservation.productId.length).to.eql(36);",
-									"    pm.expect(user_reservation.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
-									"    pm.expect(user_reservation.state).to.eql(\"reserved\");",
+									"    pm.expect(user_reservation.length).to.eql(1);",
+									"    ",
+									"    pm.expect(user_reservation[0].userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
+									"    pm.expect(user_reservation[0].name).to.eql(\"Ewe Api2\");",
+									"    pm.expect(user_reservation[0].quantity).to.eql(1);",
+									"    pm.expect(user_reservation[0].state).to.eql(\"reserved\");",
+									"    pm.expect(user_reservation[0].productId.length).to.eql(36);",
 									"});",
 									""
 								],
@@ -7773,13 +7777,14 @@
 									"    ",
 									"    var product_reservation = list_obj.reserved[reserved_keys[0]]",
 									"    var user_keys = Object.keys(product_reservation)",
-									"    ",
 									"    var user_reservation = product_reservation[user_keys[0]]",
-									"    pm.expect(user_reservation.name).to.eql(\"Ewe Api2\");",
-									"    pm.expect(user_reservation.quantity).to.eql(1);",
-									"    pm.expect(user_reservation.productId.length).to.eql(36);",
-									"    pm.expect(user_reservation.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
-									"    pm.expect(user_reservation.state).to.eql(\"purchased\");",
+									"    pm.expect(user_reservation.length).to.eql(1);",
+									"    ",
+									"    pm.expect(user_reservation[0].userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
+									"    pm.expect(user_reservation[0].name).to.eql(\"Ewe Api2\");",
+									"    pm.expect(user_reservation[0].quantity).to.eql(1);",
+									"    pm.expect(user_reservation[0].state).to.eql(\"purchased\");",
+									"    pm.expect(user_reservation[0].productId.length).to.eql(36);",
 									"});",
 									""
 								],
@@ -9019,12 +9024,14 @@
 									"    ",
 									"    var product_reservation = list_obj.reserved[reserved_keys[0]]",
 									"    var user_keys = Object.keys(product_reservation)",
-									"    ",
 									"    var user_reservation = product_reservation[user_keys[0]]",
-									"    pm.expect(user_reservation.name).to.eql(\"Success Simulator\");",
-									"    pm.expect(user_reservation.quantity).to.eql(1);",
-									"    pm.expect(user_reservation.productId.length).to.eql(36);",
-									"    pm.expect(user_reservation.userId).to.eql(\"success@simulator.amazonses.com\");",
+									"    pm.expect(user_reservation.length).to.eql(1);",
+									"    ",
+									"    pm.expect(user_reservation[0].userId).to.eql(\"success@simulator.amazonses.com\");",
+									"    pm.expect(user_reservation[0].name).to.eql(\"Success Simulator\");",
+									"    pm.expect(user_reservation[0].quantity).to.eql(1);",
+									"    pm.expect(user_reservation[0].state).to.eql(\"reserved\");",
+									"    pm.expect(user_reservation[0].productId.length).to.eql(36);",
 									"});",
 									""
 								],
@@ -9452,12 +9459,14 @@
 									"    ",
 									"    var product_reservation = list_obj.reserved[reserved_keys[0]]",
 									"    var user_keys = Object.keys(product_reservation)",
-									"    ",
 									"    var user_reservation = product_reservation[user_keys[0]]",
-									"    pm.expect(user_reservation.name).to.eql(\"Success Simulator\");",
-									"    pm.expect(user_reservation.quantity).to.eql(1);",
-									"    pm.expect(user_reservation.productId.length).to.eql(36);",
-									"    pm.expect(user_reservation.userId).to.eql(\"success@simulator.amazonses.com\");",
+									"    pm.expect(user_reservation.length).to.eql(1);",
+									"    ",
+									"    pm.expect(user_reservation[0].userId).to.eql(\"success@simulator.amazonses.com\");",
+									"    pm.expect(user_reservation[0].name).to.eql(\"Success Simulator\");",
+									"    pm.expect(user_reservation[0].quantity).to.eql(1);",
+									"    pm.expect(user_reservation[0].state).to.eql(\"purchased\");",
+									"    pm.expect(user_reservation[0].productId.length).to.eql(36);",
 									"});",
 									""
 								],
@@ -10507,7 +10516,7 @@
 							"raw": "{\n    \"quantity\": {{reserve_quantity}},\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
 						},
 						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/purchase/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/purchase/{{reservation_id}}/email/eweuser8%2Btest2%40gmail.com",
 							"protocol": "https",
 							"host": [
 								"{{lists_url_id}}",
@@ -10519,9 +10528,8 @@
 							"path": [
 								"{{env}}",
 								"lists",
-								"{{list_id}}",
 								"purchase",
-								"{{p_product_id}}",
+								"{{reservation_id}}",
 								"email",
 								"eweuser8%2Btest2%40gmail.com"
 							]
@@ -10557,7 +10565,7 @@
 									"    pm.expect(obj.name).to.eql(\"Ewe Api2\");",
 									"    pm.expect(obj.email).to.eql(\"eweuser8+test2@gmail.com\");",
 									"    pm.expect(obj.listId.length).to.eql(36);",
-									"    pm.expect(obj.title).to.eql(\"My Birthday List\");",
+									"    pm.expect(obj.listTitle).to.eql(\"My Birthday List\");",
 									"    pm.expect(obj.productId.length).to.eql(36);",
 									"    pm.expect(obj.productType).to.eql(\"products\");",
 									"    pm.expect(obj.quantity).to.eql(1);",
@@ -10629,6 +10637,446 @@
 					"response": []
 				},
 				{
+					"name": "reserve product second time",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should be created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var reservation_id = jsonData['reservation_id'];",
+									"    pm.expect(reservation_id.length).to.eql(36);",
+									"    pm.environment.set(\"reservation_id\", reservation_id);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									"pm.environment.set(\"reserve_quantity\", 1);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 1,\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/reserve/{{p_product_id}}/email/eweuser8%2Btest2%40gmail.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"reserve",
+								"{{p_product_id}}",
+								"email",
+								"eweuser8%2Btest2%40gmail.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "get list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fb81bbcd-559a-430f-9b5a-0ef955261e1c",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Expected list details were not correct.\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    pm.expect(list_obj.list.listId.length).to.eql(36);",
+									"    pm.expect(list_obj.list.title).to.eql(\"My Birthday List\");",
+									"    pm.expect(list_obj.list.description).to.eql(\"A gift wish list for my birthday.\");",
+									"    pm.expect(list_obj.list.eventDate).to.eql(\"20 December 2020\");",
+									"    pm.expect(list_obj.list.occasion).to.eql(\"Birthday\");",
+									"    pm.expect(list_obj.list.imageUrl).to.eql(\"/images/celebration-default.jpg\");",
+									"});",
+									"",
+									"pm.test(\"Expected producted details were not correct\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    var product_keys = Object.keys(list_obj.products)",
+									"    pm.expect(product_keys.length).to.eql(1);",
+									"    ",
+									"    var product = list_obj.products[product_keys[0]]",
+									"    pm.expect(product.type).to.eql(\"products\");",
+									"    pm.expect(product.productId.length).to.eql(36);",
+									"    pm.expect(product.quantity).to.eql(2);",
+									"    pm.expect(product.reserved).to.eql(1);",
+									"    pm.expect(product.purchased).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"Expected list of reserved products were not correct\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    pm.expect(list_obj.reserved.length).to.eql(2);",
+									"    ",
+									"    var reservation1 = list_obj.reserved[0]",
+									"    pm.expect(reservation1.reservationId.length).to.eql(36);",
+									"    pm.expect(reservation1.state).to.be.oneOf([\"purchased\", \"reserved\"]);",
+									"    pm.expect(reservation1.quantity).to.eql(1);",
+									"    ",
+									"    var reservation2 = list_obj.reserved[1]",
+									"    pm.expect(reservation2.reservationId.length).to.eql(36);",
+									"    pm.expect(reservation2.state).to.be.oneOf([\"purchased\", \"reserved\"]);",
+									"    pm.expect(reservation2.quantity).to.eql(1);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c6b1463f-8426-42ea-aeee-c6583fa1ad97",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "get shared list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"The returned object should contain the correct list details\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    pm.expect(list_obj.list.listId.length).to.eql(36);",
+									"    pm.expect(list_obj.list.title).to.eql(\"My Birthday List\");",
+									"    pm.expect(list_obj.list.description).to.eql(\"A gift wish list for my birthday.\");",
+									"    pm.expect(list_obj.list.eventDate).to.eql(\"20 December 2020\");",
+									"    pm.expect(list_obj.list.occasion).to.eql(\"Birthday\");",
+									"    pm.expect(list_obj.list.imageUrl).to.eql(\"/images/celebration-default.jpg\");",
+									"});",
+									"",
+									"pm.test(\"Expected producted details were not correct\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    var product_keys = Object.keys(list_obj.products)",
+									"    pm.expect(product_keys.length).to.eql(1);",
+									"    ",
+									"    var product = list_obj.products[product_keys[0]]",
+									"    pm.expect(product.type).to.eql(\"products\");",
+									"    pm.expect(product.productId.length).to.eql(36);",
+									"    pm.expect(product.quantity).to.eql(2);",
+									"    pm.expect(product.reserved).to.eql(1);",
+									"    pm.expect(product.purchased).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"Expected reserved products details were not correct\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    var reserved_keys = Object.keys(list_obj.reserved)",
+									"    pm.expect(reserved_keys.length).to.eql(1);",
+									"    ",
+									"    var product_reservation = list_obj.reserved[reserved_keys[0]]",
+									"    var user_keys = Object.keys(product_reservation)",
+									"    ",
+									"    var user_reservations = product_reservation[user_keys[0]]",
+									"    pm.expect(user_reservations[0].productId.length).to.eql(36);",
+									"    pm.expect(user_reservations[0].quantity).to.eql(1);",
+									"    pm.expect(user_reservations[0].state).to.be.oneOf([\"purchased\", \"reserved\"]);",
+									"    ",
+									"    pm.expect(user_reservations[1].productId.length).to.eql(36);",
+									"    pm.expect(user_reservations[1].quantity).to.eql(1);",
+									"    pm.expect(user_reservations[1].state).to.be.oneOf([\"purchased\", \"reserved\"]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6edda888-5b8d-41df-ade2-164d43c93f3d",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey2}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/shared",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"shared"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "purchase second reservation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should be created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData['purchased']).to.eql(true);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a43cd30-b909-4d0c-be83-8b7c0b328c72",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": {{reserve_quantity}},\n    \"title\": \"{{list_title}}\",\n    \"product\": {\n        \"type\": \"products\",\n        \"brand\": \"{{product_brand}}\",\n        \"details\": \"{{product_details}}\",\n        \"productUrl\": \"{{product_productUrl}}\",\n        \"imageUrl\": \"{{product_imageUrl}}\"\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/purchase/{{reservation_id}}/email/eweuser8%2Btest2%40gmail.com",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"purchase",
+								"{{reservation_id}}",
+								"email",
+								"eweuser8%2Btest2%40gmail.com"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
 					"name": "get list",
 					"event": [
 						{
@@ -10668,19 +11116,22 @@
 									"    pm.expect(product.productId.length).to.eql(36);",
 									"    pm.expect(product.quantity).to.eql(2);",
 									"    pm.expect(product.reserved).to.eql(0);",
-									"    pm.expect(product.purchased).to.eql(1);",
+									"    pm.expect(product.purchased).to.eql(2);",
 									"});",
 									"",
 									"pm.test(\"Expected list of reserved products were not correct\", function () {",
 									"    var list_obj = pm.response.json();",
-									"    pm.expect(list_obj.reserved.length).to.eql(1);",
+									"    pm.expect(list_obj.reserved.length).to.eql(2);",
 									"    ",
-									"    var reserved_product = list_obj.reserved[0]",
-									"    pm.expect(reserved_product.name).to.eql(\"Ewe Api2\");",
-									"    pm.expect(reserved_product.quantity).to.eql(1);",
-									"    pm.expect(reserved_product.productId.length).to.eql(36);",
-									"    pm.expect(reserved_product.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
-									"    pm.expect(reserved_product.state).to.eql(\"purchased\");",
+									"    var reservation1 = list_obj.reserved[0]",
+									"    pm.expect(reservation1.reservationId.length).to.eql(36);",
+									"    pm.expect(reservation1.state).to.be.oneOf([\"purchased\", \"reserved\"]);",
+									"    pm.expect(reservation1.quantity).to.eql(1);",
+									"    ",
+									"    var reservation2 = list_obj.reserved[1]",
+									"    pm.expect(reservation2.reservationId.length).to.eql(36);",
+									"    pm.expect(reservation2.state).to.be.oneOf([\"purchased\", \"reserved\"]);",
+									"    pm.expect(reservation2.quantity).to.eql(1);",
 									"});",
 									"",
 									""
@@ -10787,7 +11238,7 @@
 									"    pm.expect(product.productId.length).to.eql(36);",
 									"    pm.expect(product.quantity).to.eql(2);",
 									"    pm.expect(product.reserved).to.eql(0);",
-									"    pm.expect(product.purchased).to.eql(1);",
+									"    pm.expect(product.purchased).to.eql(2);",
 									"});",
 									"",
 									"pm.test(\"Expected reserved products details were not correct\", function () {",
@@ -10798,12 +11249,14 @@
 									"    var product_reservation = list_obj.reserved[reserved_keys[0]]",
 									"    var user_keys = Object.keys(product_reservation)",
 									"    ",
-									"    var user_reservation = product_reservation[user_keys[0]]",
-									"    pm.expect(user_reservation.name).to.eql(\"Ewe Api2\");",
-									"    pm.expect(user_reservation.quantity).to.eql(1);",
-									"    pm.expect(user_reservation.productId.length).to.eql(36);",
-									"    pm.expect(user_reservation.userId).to.eql(\"81efb0af-7d4a-4e8b-b9c3-4211005cb65d\");",
-									"    pm.expect(user_reservation.state).to.eql(\"purchased\");",
+									"    var user_reservations = product_reservation[user_keys[0]]",
+									"    pm.expect(user_reservations[0].productId.length).to.eql(36);",
+									"    pm.expect(user_reservations[0].quantity).to.eql(1);",
+									"    pm.expect(user_reservations[0].state).to.be.oneOf([\"purchased\", \"reserved\"]);",
+									"    ",
+									"    pm.expect(user_reservations[1].productId.length).to.eql(36);",
+									"    pm.expect(user_reservations[1].quantity).to.eql(1);",
+									"    pm.expect(user_reservations[1].state).to.be.oneOf([\"purchased\", \"reserved\"]);",
 									"});",
 									""
 								],
@@ -10871,99 +11324,6 @@
 					"response": []
 				},
 				{
-					"name": "delete reservation item",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c1d15acd-34d8-44e6-9a0d-08ef32565ef8",
-								"exec": [
-									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"response must be valid and have a body\", function () {",
-									"     // assert that the status code is 200",
-									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
-									"     // assert that the response has a valid JSON body",
-									"     pm.response.to.be.withBody;",
-									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
-									"});",
-									"",
-									"pm.test(\"Response should confirm deleted\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData['deleted']).to.eql(true);",
-									"});",
-									"",
-									"pm.test(\"Clear environment variables\", function() {",
-									"    pm.environment.unset(\"reservation_id\")",
-									"    pm.environment.unset(\"reserve_quantity\")",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "awsv4",
-							"awsv4": [
-								{
-									"key": "secretKey",
-									"value": "{{SecretKey}}",
-									"type": "string"
-								},
-								{
-									"key": "accessKey",
-									"value": "{{AccessKey}}",
-									"type": "string"
-								},
-								{
-									"key": "service",
-									"value": "",
-									"type": "string"
-								},
-								{
-									"key": "region",
-									"value": "eu-west-1",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/reservation/{{reservation_id}}",
-							"protocol": "https",
-							"host": [
-								"{{lists_url_id}}",
-								"execute-api",
-								"eu-west-1",
-								"amazonaws",
-								"com"
-							],
-							"path": [
-								"{{env}}",
-								"lists",
-								"reservation",
-								"{{reservation_id}}"
-							]
-						},
-						"description": "Create list"
-					},
-					"response": []
-				},
-				{
 					"name": "delete list",
 					"event": [
 						{
@@ -10992,13 +11352,15 @@
 									"pm.test(\"Response should have a delete count\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var count = jsonData['count'];",
-									"    pm.expect(count).to.eql(3);",
+									"    pm.expect(count).to.eql(4);",
 									"});",
 									"",
 									"pm.test(\"Clear environment variables\", function() {",
 									"    pm.environment.unset(\"list_id\")",
 									"    pm.environment.unset(\"list_title\")",
 									"    pm.environment.unset(\"user2_id\")",
+									"    pm.environment.unset(\"reservation_id\")",
+									"    pm.environment.unset(\"reserve_quantity\")",
 									"});"
 								],
 								"type": "text/javascript"
@@ -11983,7 +12345,7 @@
 									"pm.test(\"Response message should exist\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var message = jsonData['error'];",
-									"    pm.expect(message).to.eql('No list exists with this ID.');",
+									"    pm.expect(message).to.eql('List 1234abcd does not exist.');",
 									"});",
 									"",
 									""
@@ -12073,7 +12435,7 @@
 									"pm.test(\"Response message should exist\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var message = jsonData['error'];",
-									"    pm.expect(message).to.eql('No list exists with this ID.');",
+									"    pm.expect(message).to.eql('List 1234abcd does not exist.');",
 									"});",
 									""
 								],
@@ -12246,7 +12608,7 @@
 									"pm.test(\"Response message should exist\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var message = jsonData['error'];",
-									"    pm.expect(message).to.eql(\"Owner of List ID \" + pm.variables.get(\"list_id\") + \" did not match user id of requestor: 81efb0af-7d4a-4e8b-b9c3-4211005cb65d.\");",
+									"    pm.expect(message).to.eql(\"User 81efb0af-7d4a-4e8b-b9c3-4211005cb65d was not owner of List \" + pm.variables.get(\"list_id\") + \".\");",
 									"});",
 									""
 								],

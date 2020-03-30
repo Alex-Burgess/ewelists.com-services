@@ -1,4 +1,5 @@
 import boto3
+import json
 from lists import logger
 from lists.common_entities import User, List, Product, Reservation
 from botocore.exceptions import ClientError
@@ -9,10 +10,10 @@ log = logger.setup_logger()
 dynamodb = boto3.client('dynamodb')
 
 
-def get_list(table_name, cognito_user_id, list_id):
+def get_list(table_name, user_id, list_id):
     key = {
         'PK': {'S': "LIST#" + list_id},
-        'SK': {'S': "USER#" + cognito_user_id}
+        'SK': {'S': "USER#" + user_id}
     }
 
     try:
@@ -25,10 +26,30 @@ def get_list(table_name, cognito_user_id, list_id):
         raise Exception("Unexpected error: " + e.response['Error']['Message'])
 
     if 'Item' not in response:
-        log.info("No items for the list {} were found.".format(list_id))
-        raise Exception("No list exists with this ID.")
+        log.info("List ID {} for user {} does not exist.".format(list_id, user_id))
+        raise Exception("List ID for user does not exist.")
 
     return List(response['Item']).get_details()
+
+
+def get_list_query(table_name, list_id):
+    log.info("Querying table {} for list ID {}.".format(table_name, list_id))
+
+    try:
+        response = dynamodb.query(
+            TableName=table_name,
+            KeyConditionExpression="PK = :PK",
+            ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
+        )
+        log.info("Response: " + json.dumps(response))
+    except ClientError as e:
+        log.info("get item response: " + json.dumps(e.response))
+        raise Exception("Unexpected error when getting list item from table.")
+
+    # if len(response['Items']) == 0:
+    #     raise Exception("List does not exist.")
+
+    return response['Items']
 
 
 def get_users_details(table_name, user_id):

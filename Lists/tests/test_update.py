@@ -114,7 +114,7 @@ class TestUpdateListMain:
 
         response = update.update_list_main(api_update_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'User 12345678-user-0001-1234-abcdefghijkl was not owner of List 12345678-list-0009-1234-abcdefghijkl.', "Update main response did not contain the correct error message."
+        assert body['error'] == 'List 12345678-list-0009-1234-abcdefghijkl does not exist.', "Update main response did not contain the correct error message."
 
     def test_update_list_with_bad_table(self, monkeypatch, api_update_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittes')

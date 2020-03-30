@@ -15,31 +15,12 @@ def list_query_response():
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-prod-0002-1234-abcdefghijkl"}, "quantity": {"N": "3"}, "reserved": {"N": "1"}, "purchased": {"N": "0"}, "type": {"S": "products"}},
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-notf-0010-1234-abcdefghijkl"}, "quantity": {"N": "2"}, "reserved": {"N": "0"}, "purchased": {"N": "0"}, "type": {"S": "notfound"}},
         {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVATION#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl#12345678-resv-0001-1234-abcdefghijkl"}, "reservationId": {"S": "12345678-resv-0001-1234-abcdefghijkl"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listTitle": {"S": "Child User1 1st Birthday"}, "name": {"S": "Test User2"}, "email": {"S": "test.user2@gmail.com"}, "productId": {"S": "12345678-prod-0001-1234-abcdefghijkl"}, "productType": {"S": "products"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "reservedAt": {"N": "1573739584"}, "state": {"S": "reserved"}},
-        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVATION#12345678-prod-0002-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl#12345678-resv-0002-1234-abcdefghijkl"}, "reservationId": {"S": "12345678-resv-0002-1234-abcdefghijkl"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listTitle": {"S": "Child User1 1st Birthday"}, "name": {"S": "Test User2"}, "email": {"S": "test.user2@gmail.com"}, "productId": {"S": "12345678-prod-0002-1234-abcdefghijkl"}, "productType": {"S": "products"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "reservedAt": {"N": "1573739584"}, "state": {"S": "reserved"}}
+        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVATION#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0003-1234-abcdefghijkl#12345678-resv-0004-1234-abcdefghijkl"}, "reservationId": {"S": "12345678-resv-0004-1234-abcdefghijkl"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listTitle": {"S": "Child User1 1st Birthday"}, "name": {"S": "Test User3"}, "email": {"S": "test.user3@gmail.com"}, "productId": {"S": "12345678-prod-0001-1234-abcdefghijkl"}, "productType": {"S": "products"}, "userId": {"S": "12345678-user-0003-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "reservedAt": {"N": "1573739584"}, "state": {"S": "reserved"}},
+        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVATION#12345678-prod-0002-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl#12345678-resv-0002-1234-abcdefghijkl"}, "reservationId": {"S": "12345678-resv-0002-1234-abcdefghijkl"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listTitle": {"S": "Child User1 1st Birthday"}, "name": {"S": "Test User2"}, "email": {"S": "test.user2@gmail.com"}, "productId": {"S": "12345678-prod-0002-1234-abcdefghijkl"}, "productType": {"S": "products"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "reservedAt": {"N": "1573739584"}, "state": {"S": "purchased"}},
+        {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "RESERVATION#12345678-prod-0002-1234-abcdefghijkl#12345678-user-0002-1234-abcdefghijkl#12345678-resv-0003-1234-abcdefghijkl"}, "reservationId": {"S": "12345678-resv-0003-1234-abcdefghijkl"}, "listId": {"S": "12345678-list-0001-1234-abcdefghijkl"}, "listTitle": {"S": "Child User1 1st Birthday"}, "name": {"S": "Test User2"}, "email": {"S": "test.user2@gmail.com"}, "productId": {"S": "12345678-prod-0002-1234-abcdefghijkl"}, "productType": {"S": "products"}, "userId": {"S": "12345678-user-0002-1234-abcdefghijkl"}, "quantity": {"N": "1"}, "reservedAt": {"N": "1573739584"}, "state": {"S": "reserved"}}
     ]
 
     return response
-
-
-class TestGetListQuery:
-    def test_get_list_query(self, dynamodb_mock):
-        list_id = "12345678-list-0001-1234-abcdefghijkl"
-        items = get_shared_list.get_list_query('lists-unittest', list_id)
-        assert len(items) == 14, "Number of items deleted was not as expected."
-
-    def test_get_list_query_no_table_name(self, dynamodb_mock):
-        list_id = "12345678-list-0001-1234-abcdefghijkl"
-
-        with pytest.raises(Exception) as e:
-            get_shared_list.get_list_query('lists-unittes', list_id)
-        assert str(e.value) == "Unexpected error when getting list item from table.", "Exception not as expected."
-
-    def test_get_list_query_for_item_that_does_not_exist(self, dynamodb_mock):
-        list_id = "12345678-list-0009-1234-abcdefghijkl"
-
-        with pytest.raises(Exception) as e:
-            get_shared_list.get_list_query('lists-unittest', list_id)
-        assert str(e.value) == "No results for List ID 12345678-list-0009-1234-abcdefghijkl.", "Exception not as expected."
 
 
 class TestGenerateListObject:
@@ -57,10 +38,26 @@ class TestGenerateListObject:
         assert items['products']["12345678-notf-0010-1234-abcdefghijkl"] == {"productId": "12345678-notf-0010-1234-abcdefghijkl", "quantity": 2, "reserved": 0, "purchased": 0, "type": "notfound"}, "Product object not correct."
 
         assert len(items['reserved']) == 2, "Number of products reserved was not 2."
-        assert len(items['reserved']["12345678-prod-0001-1234-abcdefghijkl"]) == 1, "Number of users that have reserved product not correct."
+        assert len(items['reserved']["12345678-prod-0001-1234-abcdefghijkl"]) == 2, "Number of users that have reserved product not correct."
         assert len(items['reserved']["12345678-prod-0002-1234-abcdefghijkl"]) == 1, "Number of users that have reserved product not correct."
-        assert items['reserved']["12345678-prod-0001-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0001-1234-abcdefghijkl', "listId": '12345678-list-0001-1234-abcdefghijkl', "listTitle": 'Child User1 1st Birthday', "productType": 'products'}, "Reserved object not correct."
-        assert items['reserved']["12345678-prod-0002-1234-abcdefghijkl"]['12345678-user-0002-1234-abcdefghijkl'] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0002-1234-abcdefghijkl', "listId": '12345678-list-0001-1234-abcdefghijkl', "listTitle": 'Child User1 1st Birthday', "productType": 'products'}, "Reserved object not correct."
+
+        expected_product1 = {
+            "12345678-user-0002-1234-abcdefghijkl": [
+                {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0001-1234-abcdefghijkl', "listId": '12345678-list-0001-1234-abcdefghijkl', "listTitle": 'Child User1 1st Birthday', "productType": 'products'}
+            ],
+            "12345678-user-0003-1234-abcdefghijkl": [
+                {"productId": "12345678-prod-0001-1234-abcdefghijkl", "name": "Test User3", "email": "test.user3@gmail.com", "userId": "12345678-user-0003-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0004-1234-abcdefghijkl', "listId": '12345678-list-0001-1234-abcdefghijkl', "listTitle": 'Child User1 1st Birthday', "productType": 'products'}
+            ]
+        }
+        assert items['reserved']["12345678-prod-0001-1234-abcdefghijkl"] == expected_product1, "Reserved object not correct."
+
+        expected_product2 = {
+            "12345678-user-0002-1234-abcdefghijkl": [
+                {"productId": "12345678-prod-0002-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "purchased", "reservationId": '12345678-resv-0002-1234-abcdefghijkl', "listId": '12345678-list-0001-1234-abcdefghijkl', "listTitle": 'Child User1 1st Birthday', "productType": 'products'},
+                {"productId": "12345678-prod-0002-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "userId": "12345678-user-0002-1234-abcdefghijkl", "quantity": 1, "state": "reserved", "reservationId": '12345678-resv-0003-1234-abcdefghijkl', "listId": '12345678-list-0001-1234-abcdefghijkl', "listTitle": 'Child User1 1st Birthday', "productType": 'products'}
+            ]
+        }
+        assert items['reserved']["12345678-prod-0002-1234-abcdefghijkl"] == expected_product2, "Reserved object not correct."
 
 
 class TestGetSharedListMain:
@@ -89,32 +86,32 @@ class TestGetSharedListMain:
 
         expected_reservation = {
             "12345678-notf-0010-1234-abcdefghijkl": {
-                "12345678-user-0002-1234-abcdefghijkl": {
+                "12345678-user-0002-1234-abcdefghijkl": [{
                     "reservationId": "12345678-resv-0004-1234-abcdefghijkl", "productId": "12345678-notf-0010-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "quantity": 1, "state": "reserved", "listTitle": "Child User1 1st Birthday", "productType": "notfound"
-                }
+                }]
             },
             "12345678-prod-0001-1234-abcdefghijkl": {
-                "12345678-user-0002-1234-abcdefghijkl": {
+                "12345678-user-0002-1234-abcdefghijkl": [{
                     "reservationId": "12345678-resv-0001-1234-abcdefghijkl", "productId": "12345678-prod-0001-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "quantity": 1, "state": "reserved", "listTitle": "Child User1 1st Birthday", "productType": "products"
-                },
-                "12345678-user-0003-1234-abcdefghijkl": {
+                }],
+                "12345678-user-0003-1234-abcdefghijkl": [{
                     "reservationId": "12345678-resv-0002-1234-abcdefghijkl", "productId": "12345678-prod-0001-1234-abcdefghijkl", "userId": "12345678-user-0003-1234-abcdefghijkl", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User3", "email": "test.user3@gmail.com", "quantity": 1, "state": "reserved", "listTitle": "Child User1 1st Birthday", "productType": "products"
-                }
+                }]
             },
             "12345678-prod-0003-1234-abcdefghijkl": {
-                "test.user99@gmail.com": {
+                "test.user99@gmail.com": [{
                     "reservationId": "12345678-resv-0003-1234-abcdefghijkl", "productId": "12345678-prod-0003-1234-abcdefghijkl", "userId": "test.user99@gmail.com", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User99", "email": "test.user99@gmail.com", "quantity": 1, "state": "reserved", "listTitle": "Child User1 1st Birthday", "productType": "products"
-                }
+                }]
             },
             "12345678-prod-0004-1234-abcdefghijkl": {
-                "12345678-user-0002-1234-abcdefghijkl": {
+                "12345678-user-0002-1234-abcdefghijkl": [{
                     "reservationId": "12345678-resv-0006-1234-abcdefghijkl", "productId": "12345678-prod-0004-1234-abcdefghijkl", "userId": "12345678-user-0002-1234-abcdefghijkl", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User2", "email": "test.user2@gmail.com", "quantity": 1, "state": "purchased", "listTitle": "Child User1 1st Birthday", "productType": "products"
-                }
+                }]
             },
             "12345678-prod-0005-1234-abcdefghijkl": {
-                "test.user99@gmail.com": {
+                "test.user99@gmail.com": [{
                     "reservationId": "12345678-resv-0007-1234-abcdefghijkl", "productId": "12345678-prod-0005-1234-abcdefghijkl", "userId": "test.user99@gmail.com", "listId": "12345678-list-0001-1234-abcdefghijkl", "name": "Test User99", "email": "test.user99@gmail.com", "quantity": 1, "state": "purchased", "listTitle": "Child User1 1st Birthday", "productType": "products"
-                }
+                }]
             }
         }
 

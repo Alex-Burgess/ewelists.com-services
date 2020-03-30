@@ -1,9 +1,8 @@
 import json
 import os
 import boto3
-from lists import common, logger
+from lists import common, common_table_ops, logger
 from lists.common_entities import List, Product, Reservation
-from botocore.exceptions import ClientError
 
 log = logger.setup_logger()
 
@@ -22,7 +21,7 @@ def get_list_main(event):
         list_id = common.get_path_parameter(event, 'id')
         common.confirm_owner(table_name, identity, list_id)
 
-        response_items = get_list_query(table_name, identity, list_id)
+        response_items = common_table_ops.get_list_query(table_name, list_id)
         list_object = generate_list_object(response_items)
     except Exception as e:
         log.error("Exception: {}".format(e))
@@ -52,24 +51,3 @@ def generate_list_object(response_items):
             list['reserved'].append(reserved)
 
     return list
-
-
-def get_list_query(table_name, cognito_user_id, list_id):
-    log.info("Querying table {} for list ID {} owned by user ID {} .".format(table_name, cognito_user_id, list_id))
-
-    try:
-        response = dynamodb.query(
-            TableName=table_name,
-            KeyConditionExpression="PK = :PK",
-            ExpressionAttributeValues={":PK":  {'S': "LIST#{}".format(list_id)}}
-        )
-        log.info("Response: " + json.dumps(response))
-    except ClientError as e:
-        log.info("get item response: " + json.dumps(e.response))
-        raise Exception("Unexpected error when getting list item from table.")
-
-    if len(response['Items']) == 0:
-        log.info("No query results for List ID {} and user: {}.".format(list_id, cognito_user_id))
-        raise Exception("No results for List ID {}.".format(list_id))
-
-    return response['Items']

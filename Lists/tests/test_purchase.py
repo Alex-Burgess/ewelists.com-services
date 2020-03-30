@@ -10,7 +10,7 @@ log = logger.setup_logger()
 @pytest.fixture
 def env_vars(monkeypatch):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
-    monkeypatch.setitem(os.environ, 'reservationid_INDEX', 'reservationid-index')
+    monkeypatch.setitem(os.environ, 'RESERVATIONID_INDEX', 'reservationId-index')
     monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
     monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://test.ewelists.com')
 

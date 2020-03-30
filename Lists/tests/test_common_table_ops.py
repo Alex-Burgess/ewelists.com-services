@@ -6,6 +6,31 @@ from lists import common_table_ops, logger
 log = logger.setup_logger()
 
 
+class TestGetListQuery:
+    def test_get_list_query(self, dynamodb_mock):
+        list_id = "12345678-list-0001-1234-abcdefghijkl"
+        items = common_table_ops.get_list_query('lists-unittest', list_id)
+        assert len(items) == 14, "Number of items deleted was not as expected."
+
+    def test_get_list_query_no_table_name(self, dynamodb_mock):
+        list_id = "12345678-list-0001-1234-abcdefghijkl"
+
+        with pytest.raises(Exception) as e:
+            common_table_ops.get_list_query('lists-unittes', list_id)
+        assert str(e.value) == "Unexpected error when getting list item from table.", "Exception not as expected."
+
+    def test_get_list_query_for_item_that_does_not_exist(self, dynamodb_mock):
+        list_id = "12345678-list-0009-1234-abcdefghijkl"
+
+        response = common_table_ops.get_list_query('lists-unittest', list_id)
+        assert len(response) == 0, "Response was not empty."
+
+        # Used to give exception, but no longer.
+        # with pytest.raises(Exception) as e:
+        #     common_table_ops.get_list_query('lists-unittest', list_id)
+        # assert str(e.value) == "No results for List ID 12345678-list-0009-1234-abcdefghijkl.", "Exception not as expected."
+
+
 class TestGetList:
     def test_get_list(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
@@ -18,7 +43,7 @@ class TestGetList:
         list_id = '12345678-list-0009-1234-abcdefghijkl'
         with pytest.raises(Exception) as e:
             common_table_ops.get_list('lists-unittest', user_id, list_id)
-        assert str(e.value) == "No list exists with this ID.", "Exception not as expected."
+        assert str(e.value) == "List ID for user does not exist.", "Exception not as expected."
 
 
 class TestGetUsersDetails:

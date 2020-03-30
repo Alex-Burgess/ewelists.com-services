@@ -87,7 +87,7 @@ class TestDeleteMain:
 
         response = delete.delete_main(api_delete_event)
         body = json.loads(response['body'])
-        assert body['error'] == 'User 12345678-user-0001-1234-abcdefghijkl was not owner of List 12345678-list-0100-1234-abcdefghijkl.', "Create main response did not contain the correct error message."
+        assert body['error'] == 'List 12345678-list-0100-1234-abcdefghijkl does not exist.', "Create main response did not contain the correct error message."
 
 
 def test_handler(api_delete_event, monkeypatch, dynamodb_mock):

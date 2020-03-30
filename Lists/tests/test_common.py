@@ -111,6 +111,13 @@ class TestConfirmOwner:
             common.confirm_owner('lists-unittest', user_id, list_id)
         assert str(e.value) == "User 12345678-user-0002-1234-abcdefghijkl was not owner of List 12345678-list-0001-1234-abcdefghijkl.", "Exception not thrown for list not being owned by user."
 
+    def test_list_does_not_exist(self, dynamodb_mock):
+        user_id = '12345678-user-0002-1234-abcdefghijkl'
+        list_id = '12345678-list-9999-1234-abcdefghijkl'
+        with pytest.raises(Exception) as e:
+            common.confirm_owner('lists-unittest', user_id, list_id)
+        assert str(e.value) == "List 12345678-list-9999-1234-abcdefghijkl does not exist.", "Exception not thrown for list not being owned by user."
+
 
 class TestConfirmReservationOwner:
     def test_confirm_reservation_owner(self, reservation_item):

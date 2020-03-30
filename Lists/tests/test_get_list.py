@@ -21,30 +21,6 @@ def list_query_response():
     return response
 
 
-class TestGetListQuery:
-    def test_get_list_with_owner(self, dynamodb_mock):
-        user_id = "12345678-user-0001-1234-abcdefghijkl"
-        list_id = "12345678-list-0001-1234-abcdefghijkl"
-        items = get_list.get_list_query('lists-unittest', user_id, list_id)
-        assert len(items) == 14, "Number of items returned was not as expected."
-
-    def test_get_list_query_wrong_table(self, dynamodb_mock):
-        user_id = "12345678-user-0001-1234-abcdefghijkl"
-        list_id = "12345678-list-0001-1234-abcdefghijkl"
-
-        with pytest.raises(Exception) as e:
-            get_list.get_list_query('lists-unittes', user_id, list_id)
-        assert str(e.value) == "Unexpected error when getting list item from table.", "Exception not as expected."
-
-    def test_get_list_query_with_list_that_does_not_exist(self, dynamodb_mock):
-        user_id = "12345678-user-0001-1234-abcdefghijkl"
-        list_id = "12345678-list-0009-1234-abcdefghijkl"
-
-        with pytest.raises(Exception) as e:
-            get_list.get_list_query('lists-unittest', user_id, list_id)
-        assert str(e.value) == "No results for List ID 12345678-list-0009-1234-abcdefghijkl.", "Exception not as expected."
-
-
 class TestGenerateListObject:
     def test_generate_list_object(self, list_query_response):
         items = get_list.generate_list_object(list_query_response)
@@ -120,6 +96,15 @@ class TestGetListMain:
         body = json.loads(response['body'])
 
         assert body['error'] == "User 12345678-user-0001-1234-abcdefghijkl was not owner of List 12345678-list-0004-1234-abcdefghijkl.", "Get list response did not contain the correct error message."
+
+    def test_get_list_that_does_not_exist(self, monkeypatch, api_gateway_get_list_event, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        api_gateway_get_list_event['pathParameters']['id'] = "12345678-list-0010-1234-abcdefghijkl"
+
+        response = get_list.get_list_main(api_gateway_get_list_event)
+        body = json.loads(response['body'])
+
+        assert body['error'] == "List 12345678-list-0010-1234-abcdefghijkl does not exist.", "Get list response did not contain the correct error message."
 
 
 def test_handler(api_gateway_get_list_event, monkeypatch, dynamodb_mock):
