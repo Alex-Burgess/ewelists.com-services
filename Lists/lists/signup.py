@@ -37,7 +37,7 @@ def handler(event, context):
 
         # Send welcome email
         data = create_email_data(domain_name, new_user['name'])
-        common.send(new_user['email'], template, data)
+        common.send_email(new_user['email'], template, data)
     else:
         log.info("User does not have entry in userpool.")
 
