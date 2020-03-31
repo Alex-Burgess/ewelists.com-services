@@ -353,3 +353,15 @@ class TestCreateReservationKey:
 
         key = common.create_reservation_key(item)
         assert key == expected_object, "Key was not as expected."
+
+
+class TestCheckImageUrl:
+    def test_url_with_https_prefix(self):
+        url = 'https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$'
+        result = common.check_image_url(url)
+        assert result == 'https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$'
+
+    def test_url_without_https_prefix(self):
+        url = '//ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&amp;ASIN=B07DJ5KX53&amp;Format=_SL250_&amp;ID=AsinImage&amp;MarketPlace=GB&amp;ServiceVersion=20070822&amp;WS=1&amp;tag=ewelists-21'
+        result = common.check_image_url(url)
+        assert result == 'https://ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&amp;ASIN=B07DJ5KX53&amp;Format=_SL250_&amp;ID=AsinImage&amp;MarketPlace=GB&amp;ServiceVersion=20070822&amp;WS=1&amp;tag=ewelists-21'

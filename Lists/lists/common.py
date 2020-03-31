@@ -121,6 +121,7 @@ def create_response(code, body):
 
 
 def send_email(email, template, template_data):
+    log.info("Sending email template {} with data: {}".format(template, template_data))
     try:
         response = ses.send_templated_email(
             Source=SENDER,
@@ -228,3 +229,10 @@ def create_reservation_key(item):
         'PK': {'S': "LIST#{}".format(item['listId'])},
         'SK': {'S': "RESERVATION#{}#{}#{}".format(item['productId'], item['userId'], item['reservationId'])}
     }
+
+
+def check_image_url(url):
+    if re.match(r'^//', url):
+        url = 'https:' + url
+
+    return url

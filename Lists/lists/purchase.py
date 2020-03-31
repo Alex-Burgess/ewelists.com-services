@@ -115,6 +115,8 @@ def update_product_and_reservation(table_name, product_key, product_reserved_q, 
 
 
 def create_email_data(domain_name, name, list_id, title, quantity, product):
+    imageUrl = common.check_image_url(product['imageUrl'])
+
     template_data = {
         "name": name,
         "list_title": title,
@@ -123,7 +125,7 @@ def create_email_data(domain_name, name, list_id, title, quantity, product):
         "brand": product['brand'],
         "details": product['details'],
         "product_url": product['productUrl'],
-        "image_url": product['imageUrl']
+        "image_url": imageUrl
     }
 
     return template_data

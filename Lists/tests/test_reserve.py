@@ -79,6 +79,27 @@ class TestCreateEmailData:
         assert len(data) == 10, "Number of fields in email data was not as expected."
         assert data == expected_data, "Email data json object was not as expected."
 
+    def test_create_email_data_with_amazon_product(self):
+        domain_name = 'http://localhost:3000'
+        name = 'Test User'
+        resv_id = '12345678-resv-0001-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        list_title = 'Test List Title'
+        quantity = 1
+        product = {
+            "type": "products",
+            "brand": "Baby Bjorn",
+            "details": "Travel Cot",
+            "productUrl": "https://www.amazon.co.uk/BABYBJ%C3%96RN-Travel-Easy-Anthracite-transport/dp/B07DJ5KX53/ref=as_li_ss_il?ref_=ast_sto_dp&amp;th=1&amp;psc=1&amp;linkCode=li3&amp;tag=ewelists-21&amp;linkId=53810d50be55070942f429bbbb607867",
+            "imageUrl": "//ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&amp;ASIN=B07DJ5KX53&amp;Format=_SL250_&amp;ID=AsinImage&amp;MarketPlace=GB&amp;ServiceVersion=20070822&amp;WS=1&amp;tag=ewelists-21"
+        }
+
+        data = reserve.create_email_data(domain_name, name, resv_id, list_id, list_title, quantity, product)
+
+        expected_image_url = 'https://ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&amp;ASIN=B07DJ5KX53&amp;Format=_SL250_&amp;ID=AsinImage&amp;MarketPlace=GB&amp;ServiceVersion=20070822&amp;WS=1&amp;tag=ewelists-21'
+        assert len(data) == 10, "Number of fields in email data was not as expected."
+        assert data['image_url'] == expected_image_url, "Email data json object was not as expected."
+
 
 class TestCreateReservationItem:
     def test_create_reservation_item(self):

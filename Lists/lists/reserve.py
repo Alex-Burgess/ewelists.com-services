@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import time
 import uuid
 import boto3
@@ -111,6 +112,8 @@ def create_reservation(table_name, new_product_reserved_quantity, product_key, r
 
 
 def create_email_data(domain_name, name, resv_id, list_id, title, quantity, product):
+    imageUrl = common.check_image_url(product['imageUrl'])
+
     template_data = {
         "name": name,
         "list_title": title,
@@ -121,7 +124,7 @@ def create_email_data(domain_name, name, resv_id, list_id, title, quantity, prod
         "brand": product['brand'],
         "details": product['details'],
         "product_url": product['productUrl'],
-        "image_url": product['imageUrl']
+        "image_url": imageUrl
     }
 
     return template_data
