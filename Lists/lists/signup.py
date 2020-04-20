@@ -28,9 +28,9 @@ def handler(event, context):
     exists = get_user_from_userpool(user_pool_id, new_user['email'])
 
     if exists['exists']:
-        log.info("User exists in userpool.")
+        log.info("User exists in userpool with email address, linking accounts.")
         link_accounts(user_pool_id, new_user['email'], exists['user_sub'], new_user['type'], new_user['username'])
-        raise Exception("Linked new account to existing user account matching on email address.")
+        raise Exception(new_user['type'] + " LinkedLogon")
     elif trigger == 'PreSignUp_AdminCreateUser':
         log.info("Admin Creating User Account, remember this could be as part of a social signup.")
         create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])
@@ -53,7 +53,7 @@ def handler(event, context):
             set_random_password(user_pool_id, new_user['email'])
 
             log.info("Completed signup process for user. Raising exception to prevent normal signup process from continuing as not required.")
-            raise Exception("Sign up process complete for user.")
+            raise Exception(new_user['type'] + " Signup")
         else:
             log.info("New User is using username and password..")
             create_user_in_lists_db(table_name, new_user['username'], new_user['email'], new_user['name'])

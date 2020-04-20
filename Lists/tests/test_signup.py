@@ -222,7 +222,7 @@ class TestHandler:
         signup_social_event['userName'] = "Google_109769169322789401234"
         with pytest.raises(Exception) as e:
             signup.handler(signup_social_event, None)
-        assert str(e.value) == "Sign up process complete for user.", "Exception not as expected."
+        assert str(e.value) == "Google Signup", "Exception not as expected."
 
     def test_sign_up_with_fb(self, signup_social_event, monkeypatch, env_vars, dynamodb_mock):
         client = boto3.client('cognito-idp', region_name='eu-west-1')
@@ -232,7 +232,7 @@ class TestHandler:
         signup_social_event['userName'] = "Facebook_10156460942006789"
         with pytest.raises(Exception) as e:
             signup.handler(signup_social_event, None)
-        assert str(e.value) == "Sign up process complete for user.", "Exception not as expected."
+        assert str(e.value) == "Facebook Signup", "Exception not as expected."
 
     def test_sign_up_with_amazon(self, signup_social_event, monkeypatch, env_vars, dynamodb_mock):
         client = boto3.client('cognito-idp', region_name='eu-west-1')
@@ -242,7 +242,7 @@ class TestHandler:
         signup_social_event['userName'] = "LoginWithAmazon_amzn1.account.AH2EWIJQPC4QJNTUDTVRABCDEFGH"
         with pytest.raises(Exception) as e:
             signup.handler(signup_social_event, None)
-        assert str(e.value) == "Sign up process complete for user.", "Exception not as expected."
+        assert str(e.value) == "LoginWithAmazon Signup", "Exception not as expected."
 
     def test_link_accounts_with_social_first(self, signup_social_event, signup_with_u_and_p_event, monkeypatch, env_vars, dynamodb_mock):
         client = boto3.client('cognito-idp', region_name='eu-west-1')
@@ -253,23 +253,23 @@ class TestHandler:
         signup_social_event['userName'] = "LoginWithAmazon_amzn1.account.AH2EWIJQPC4QJNTUDTVRABCDEFGH"
         with pytest.raises(Exception) as e:
             signup.handler(signup_social_event, None)
-        assert str(e.value) == "Sign up process complete for user.", "Exception not as expected."
+        assert str(e.value) == "LoginWithAmazon Signup", "Exception not as expected."
 
         # Sign up with google - should link
         signup_social_event['userName'] = "Google_109769169322789401234"
         with pytest.raises(Exception) as e:
             signup.handler(signup_social_event, None)
-        assert str(e.value) == "Linked new account to existing user account matching on email address.", "Exception not as expected."
+        assert str(e.value) == "Google LinkedLogon", "Exception not as expected."
 
-        # Sign up with google - should link
-        signup_social_event['userName'] = "Google_109769169322789401234"
+        # Sign up with facebook - should link
+        signup_social_event['userName'] = "Facebook_10156460942006789"
         with pytest.raises(Exception) as e:
             signup.handler(signup_social_event, None)
-        assert str(e.value) == "Linked new account to existing user account matching on email address.", "Exception not as expected."
+        assert str(e.value) == "Facebook LinkedLogon", "Exception not as expected."
 
         with pytest.raises(Exception) as e:
             signup.handler(signup_with_u_and_p_event, None)
-        assert str(e.value) == "Linked new account to existing user account matching on email address.", "Exception not as expected."
+        assert str(e.value) == "Cognito LinkedLogon", "Exception not as expected."
 
     def test_link_accounts_with_u_and_p_first(self, signup_social_event, monkeypatch, env_vars, dynamodb_mock):
         client = boto3.client('cognito-idp', region_name='eu-west-1')
@@ -285,4 +285,4 @@ class TestHandler:
         signup_social_event['userName'] = "Google_109769169322789401234"
         with pytest.raises(Exception) as e:
             signup.handler(signup_social_event, None)
-        assert str(e.value) == "Linked new account to existing user account matching on email address.", "Exception not as expected."
+        assert str(e.value) == "Google LinkedLogon", "Exception not as expected."
