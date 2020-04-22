@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'AWS SES Template Sample Template'
+
+Parameters:
+  Environment:
+    Description: Environment type.
+    Default: prod
+    Type: String
+    AllowedValues:
+      - prod
+      - staging
+      - dev
+      - test
+  BucketEndpoint:
+    Description: Name of the bucket that the nest stack templates reside in.
+    Default: https://services-email-templates.s3-eu-west-1.amazonaws.com
+    Type: String
+
+Resources:
+  WelcomeEmailStack:
+      Type: AWS::CloudFormation::Stack
+      Properties:
+        TemplateURL: !Sub "${BucketEndpoint}/email-template-welcome.yaml"
+        Parameters:
+          Environment: !Ref Environment
+
+  ReserveConfirmationEmailStack:
+      Type: AWS::CloudFormation::Stack
+      Properties:
+        TemplateURL: !Sub "${BucketEndpoint}/email-template-reserve-confirmation.yaml"
+        Parameters:
+          Environment: !Ref Environment
+
+  PurchaseConfirmationEmailStack:
+      Type: AWS::CloudFormation::Stack
+      Properties:
+        TemplateURL: !Sub "${BucketEndpoint}/email-template-purchase-confirmation.yaml"
+        Parameters:
+          Environment: !Ref Environment

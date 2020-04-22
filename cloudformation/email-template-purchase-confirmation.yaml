@@ -1,0 +1,231 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'AWS SES Template Sample Template'
+Parameters:
+  TemplateName:
+    Type: String
+    Default: PurchaseConfirmationTemplate
+  Subject:
+    Type: String
+    Default: 'Purchase confirmation of your reserved gift.'
+  Environment:
+    Description: Environment type.
+    Default: prod
+    Type: String
+    AllowedValues:
+      - prod
+      - staging
+      - dev
+      - test
+
+Conditions:
+  Prod: !Equals [ !Ref Environment, prod ]
+
+Resources:
+  Template:
+    Type: AWS::SES::Template
+    Properties:
+      Template:
+        TemplateName: !Sub '${TemplateName}-${Environment}'
+        SubjectPart: !If [Prod, !Ref Subject, !Sub '${Subject} (${Environment})']
+        TextPart: "Dear {{name}},\r\nWelcome to ewelists."
+        HtmlPart: |
+          <!doctype html>
+          <html>
+            <head>
+              <meta name="viewport" content="width=device-width">
+              <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+              <title>Simple Transactional Email</title>
+              <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
+              <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+              <style>
+              /* -------------------------------------
+                  INLINED WITH htmlemail.io/inline
+              ------------------------------------- */
+              /* -------------------------------------
+                  RESPONSIVE AND MOBILE FRIENDLY STYLES
+              ------------------------------------- */
+              @media only screen and (max-width: 620px) {
+                table[class=body] h1 {
+                  font-size: 28px !important;
+                  margin-bottom: 10px !important;
+                }
+                table[class=body] p,
+                      table[class=body] ul,
+                      table[class=body] ol,
+                      table[class=body] td,
+                      table[class=body] span,
+                      table[class=body] a {
+                  font-size: 16px !important;
+                }
+                table[class=body] .wrapper,
+                      table[class=body] .article {
+                  padding: 10px !important;
+                }
+                table[class=body] .content {
+                  padding: 0 !important;
+                }
+                table[class=body] .container {
+                  padding: 0 !important;
+                  width: 100% !important;
+                }
+                table[class=body] .main {
+                  border-left-width: 0 !important;
+                  border-radius: 0 !important;
+                  border-right-width: 0 !important;
+                }
+                table[class=body] .btn table {
+                  width: 100% !important;
+                }
+                table[class=body] .btn a {
+                  width: 100% !important;
+                }
+                table[class=body] .img-responsive {
+                  height: auto !important;
+                  max-width: 100% !important;
+                  width: auto !important;
+                }
+                .gift-image {
+                  /* width: 120px; */
+                  height: 150px;
+                  max-width: 120px;
+                  padding-right: 20px !important;
+                }
+                .lists-image {
+                  width: 350px
+                }
+              }
+
+              /* -------------------------------------
+                  PRESERVE THESE STYLES IN THE HEAD
+              ------------------------------------- */
+              @media all {
+                .ExternalClass {
+                  width: 100%;
+                }
+                .ExternalClass,
+                      .ExternalClass p,
+                      .ExternalClass span,
+                      .ExternalClass font,
+                      .ExternalClass td,
+                      .ExternalClass div {
+                  line-height: 100%;
+                }
+                .apple-link a {
+                  color: inherit !important;
+                  font-family: inherit !important;
+                  font-size: inherit !important;
+                  font-weight: inherit !important;
+                  line-height: inherit !important;
+                  text-decoration: none !important;
+                }
+                .btn-primary table td:hover {
+                  background-color: #9c27b0 !important;
+                }
+                .btn-primary a:hover {
+                  background-color: #9c27b0 !important;
+                  border-color: #9c27b0 !important;
+                }
+              }
+              </style>
+            </head>
+            <body class="" style="background-color: #f6f6f6; font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4; margin: 0; padding: 0; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;">
+              <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background-color: #f6f6f6;">
+                <tr>
+                  <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
+                  <td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; Margin: 0 auto; max-width: 580px; padding: 10px; width: 580px;">
+                    <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
+
+                      <!-- START CENTERED WHITE CONTAINER -->
+                      <table class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #ffffff; border-radius: 3px;">
+
+                        <!-- START LOGO HEADER -->
+                        <tr>
+                          <div class="logo-container" style="box-sizing: border-box; display: flex; Margin: 0 auto; max-width: 580px; padding: 15px 20px; justify-content: left; align-items: center; background: #00acc1;">
+                            <div class="logo-content">
+                              <a href="https://ewelists.com" target="_blank" style="text-align: center;">
+                                <img class="logo_top" style="display:block; border:none;" src="https://ewelists.com/images/logo-white.png" width="140" alt="Ewelists">
+                              </a>
+                            </div>
+                          </div>
+                        </tr>
+
+                        <!-- START MAIN CONTENT AREA -->
+                        <tr>
+                          <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px; padding-bottom: 0px;">
+                            <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+                              <tr>
+                                <td style="font-family: Roboto Slab; font-size: 16px; vertical-align: top;">
+                                  <p style="font-family: Roboto Slab; font-size: 22px; font-weight: 700; color: #3C4858 ; margin: 20px 0;"> Hi {{name}}, </p>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+
+                        <!-- PURCHASE CONFIRMATION AREA -->
+                        <tr>
+                          <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px; !important; padding-top: 0px;">
+                            <div class="confirmed-container" style="box-sizing: border-box; display: flex; Margin: 0 auto; max-width: 580px; padding: 15px 20px; justify-content: left; align-items: center; background: #5cb860;">
+                              <div class="confirmed-content" style="font-family: Roboto; color: white; font-size: 16px;">
+                                Thanks for confirming you purchased this gift.  Head back to <a href="{{list_url}}" style="font-family: Roboto; font-weight: 700; color: white; text-decoration: none"> {{list_title}}</a> to reserve another product.
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+
+                        <!-- START PRODUCT DETAILS AREA -->
+                        <tr>
+                          <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; background: #ffffff; border-top:1pt solid rgba(0, 0, 0, 0.1);  padding-bottom: 20px; padding-top: 20px">
+                            <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+                              <tr>
+                                <td>
+                                  <div class="list-ideas" style="box-sizing: border-box; display: flex; Margin: 0 auto; align-items: center;">
+                                    <img class="gift-image" style="display:block; border:none; padding-right: 0px; max-height: 150px; object-fit: contain;" width="200" alt="Ewelists"
+                                      src="{{image_url}}"
+                                    >
+                                  </div>
+                                </td>
+                                <td style="font-family: Roboto Slab; font-size: 16px; vertical-align: center;">
+                                  <h4 style="font-family: Roboto Slab; font-size: 15px; font-weight: 700; color: #3C4858; margin: 0;"> {{brand}} </h4>
+                                  <p style="font-family: Roboto; font-size: 13px !important; font-weight: 300; color: #999; margin: 0; Margin-bottom: 15px; line-height: 24px">
+                                    {{details}}
+                                  </p>
+                                  <h6 style="font-family: Roboto; font-size: 13px; color: #3C4858; margin: 0;">QUANTITY: {{quantity}}</h6>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; background: #ffffff; border-top:1pt solid rgba(0, 0, 0, 0.1);  padding-bottom: 20px;">
+                          </td>
+                        </tr>
+
+                      <!-- END MAIN CONTENT AREA -->
+                      </table>
+
+                      <!-- START FOOTER -->
+                      <div class="footer" style="clear: both; Margin-top: 10px; text-align: center; width: 100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+                          <tr>
+                            <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
+                              <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;"> Lytchett House 13 Freeland Park, Wareham Road, Poole, Dorset, United Kingdom, BH16 6FA.</span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="content-block powered-by" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
+                              Sent to you by <a href="http://ewelists.com" style="color: #999999; font-size: 12px; text-align: center; text-decoration: none;">https://ewelists.com</a>.
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                      <!-- END FOOTER -->
+
+                    <!-- END CENTERED WHITE CONTAINER -->
+                    </div>
+                  </td>
+                  <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
+                </tr>
+              </table>
+            </body>
+          </html>

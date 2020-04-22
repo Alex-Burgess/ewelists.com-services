@@ -67,6 +67,29 @@ Local testing of the API, ensures that API and lambda function are correctly con
 aws cloudformation create-stack --stack-name sam-builds-lists-test --template-body file://sam-builds-bucket.yaml
 ```
 
+### Create Email Templates
+Create bucket that will
+```
+aws s3 mb s3://email-templates-ewelists-test
+```
+
+Copy email templates to bucket:
+```
+cd ewelists.com-services/cloudformation
+aws s3 cp . s3://email-templates-ewelists-test/ --recursive --exclude "*" --include "email-template-*"
+```
+
+Create email template stack:
+```
+aws cloudformation create-stack --stack-name Email-Templates-Test --template-body file://email-templates-master-stack.yaml
+```
+
+To update email template stack:
+```
+aws cloudformation update-stack --stack-name Email-Templates-Test --template-body file://email-templates-master-stack.yaml
+```
+
+
 ### Deploy to test environment
 ```
 sam build

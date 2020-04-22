@@ -293,7 +293,7 @@ Resources:
           USERPOOL_ID: !Sub '{{resolve:ssm:/CognitoUserPoolId/${Environment}:1}}'
           POSTMAN_USERPOOL_SUB: !Ref PostmanSub1
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
-          TEMPLATE_NAME: !Sub 'Welcome-${Environment}'
+          TEMPLATE_NAME: !Sub 'WelcomeTemplate-${Environment}'
           DOMAIN_NAME: !If [Prod, !Sub "'https://${DomainName}'",
                           !If [Staging, !Sub "'https://${Environment}.${DomainName}'", "http://localhost:3000"]
                         ]
@@ -314,7 +314,7 @@ Resources:
           INDEX_NAME: "email-index"
           POSTMAN_USERPOOL_SUB: !Ref PostmanSub1
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
-          TEMPLATE_NAME: !Sub 'Reserve-Confirmation-${Environment}'
+          TEMPLATE_NAME: !Sub 'ReserveConfirmationTemplate-${Environment}'
           DOMAIN_NAME: !If [Prod, !Sub "https://${DomainName}",
                           !If [Staging, !Sub "https://${Environment}.${DomainName}", "http://localhost:3000"]
                         ]
@@ -436,7 +436,7 @@ Resources:
           RESERVATIONID_INDEX: "reservationId-index"
           POSTMAN_USERPOOL_SUB: !Ref PostmanSub1
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
-          TEMPLATE_NAME: !Sub 'Purchase-Confirmation-${Environment}'
+          TEMPLATE_NAME: !Sub 'PurchaseConfirmationTemplate-${Environment}'
           DOMAIN_NAME: !If [Prod, !Sub "https://${DomainName}",
                           !If [Staging, !Sub "https://${Environment}.${DomainName}", "http://localhost:3000"]
                         ]
