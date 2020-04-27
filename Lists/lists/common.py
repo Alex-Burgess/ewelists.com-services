@@ -56,11 +56,14 @@ def parse_email(email):
     email = email.strip()
     email = email.lower()
 
-    if '@googlemail.com' in email:
-        fields = email.split('@')
-        email = fields[0] + '@gmail.com'
-
     return email
+
+
+def is_google_email(email):
+    if '@gmail.com' not in email and '@googlemail.com' not in email:
+        return False
+
+    return True
 
 
 def calculate_new_reserved_quantity(product_item, update_amount):

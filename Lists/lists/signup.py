@@ -25,6 +25,10 @@ def handler(event, context):
     domain_name = common.get_env_variable(os.environ, 'DOMAIN_NAME')
     new_user = get_user_from_event(event)
     trigger = get_trigger_source_event(event)
+
+    if common.is_google_email(new_user['email']):
+        check_no_alternate_google_email(user_pool_id, new_user['email'])
+
     exists = get_user_from_userpool(user_pool_id, new_user['email'])
 
     if exists['exists']:
@@ -203,28 +207,59 @@ def get_trigger_source_event(event):
     return event['triggerSource']
 
 
-def get_user_from_userpool(user_pool_id, email):
-    log.info("Check if userpool has an entry already for user with email: " + email)
+def check_no_alternate_google_email(user_pool_id, email):
+    log.info("Checking if userpool has an entry with similar google mail domains: " + email)
 
+    email = switch_google_domain(email)
+
+    log.info("Checking for: " + email)
+
+    users = get_user_client_call(user_pool_id, email)
+
+    if (len(users)):
+        raise Exception('User exists with different google email address.')
+
+    return True
+
+
+def switch_google_domain(email):
+    if '@gmail.com' in email:
+        fields = email.split('@')
+        email = fields[0] + '@googlemail.com'
+    elif '@googlemail.com' in email:
+        fields = email.split('@')
+        email = fields[0] + '@gmail.com'
+
+    return email
+
+
+def get_user_client_call(user_pool_id, email):
     response = client.list_users(
         UserPoolId=user_pool_id,
-        AttributesToGet=[
-            'sub',
-            'email'
-        ],
+        AttributesToGet=['sub', 'email'],
         Limit=10,
         Filter='email ="' + email + '"'
     )
 
-    log.info("Number of users returned {}: ".format(len(response['Users'])))
+    log.info("Users: {}.".format(response))
+
+    return response['Users']
+
+
+def get_user_from_userpool(user_pool_id, email):
+    log.info("Check if userpool has an entry already for user with email: " + email)
+
+    users = get_user_client_call(user_pool_id, email)
+
+    log.info("Number of users returned {}: ".format(len(users)))
 
     check_result = {}
-    if len(response['Users']) > 0:
-        log.info("Entry existed in userpool with email {}: {}".format(email, response['Users'][0]['Username']))
-        log.info("Attributes: {}".format(response['Users'][0]['Attributes']))
+    if len(users) > 0:
+        log.info("Entry existed in userpool with email {}: {}".format(email, users[0]['Username']))
+        log.info("Attributes: {}".format(users[0]['Attributes']))
         check_result['exists'] = True
-        check_result['user_sub'] = response['Users'][0]['Username']
-        check_result['user_attributes'] = response['Users'][0]['Attributes']
+        check_result['user_sub'] = users[0]['Username']
+        check_result['user_attributes'] = users[0]['Attributes']
     else:
         log.info("No entry existed in userpool with email {}.".format(email))
         check_result['exists'] = False

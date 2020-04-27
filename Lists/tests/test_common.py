@@ -94,7 +94,18 @@ class TestGetBodyAttribute:
 class TestParseEmail:
     def test_parse_email(self):
         assert common.parse_email(' Test.user@gmail.com ') == 'test.user@gmail.com'
-        assert common.parse_email(' Test.user@googlemail.com ') == 'test.user@gmail.com'
+        assert common.parse_email(' Test.user@googlemail.com ') == 'test.user@googlemail.com'
+
+
+class TestIsGoogleEmail:
+    def test_with_gmail(self):
+        assert common.is_google_email('test.user@gmail.com')
+
+    def test_with_googlemail(self):
+        assert common.is_google_email('test.user@googlemail.com')
+
+    def test_with_not_google_email(self):
+        assert not common.is_google_email('test.user@random.com')
 
 
 class TestConfirmOwner:
