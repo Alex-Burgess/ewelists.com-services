@@ -1,6 +1,8 @@
 import pytest
 import os
 from lists import common, logger
+from moto import mock_ses
+import boto3
 
 log = logger.setup_logger()
 
@@ -183,13 +185,22 @@ class TestCalculateNewReservedQuantity:
         assert str(e.value) == "Reserved quantity for product (1) could not be updated by 2 as exceeds required quantity (3).", "Exception message not correct."
 
 
-@pytest.mark.skip(reason="Not sure how to mock ses.")
+@pytest.mark.skip(reason="Create template has not been implemented: https://github.com/spulec/moto/issues/2549.")
+# @mock_ses
 class TestSendEmail:
     def test_send_email(self):
-        email = 'eweuser8@gmail.com'
-        name = 'Ewe User8'
-        template = 'reserve-template'
-        assert common.send_email(email, name, template)
+        # ses = boto3.client('ses', region_name='eu-west-1')
+        #
+        # response = ses.create_template(
+        #     Template={
+        #         'TemplateName': 'reserve-template',
+        #         'SubjectPart': 'string',
+        #         'TextPart': 'string',
+        #         'HtmlPart': 'string'
+        #     }
+        # )
+
+        assert common.send_email('eweuser8@gmail.com', 'Ewe User8', 'reserve-template')
 
 
 class TestGetUser:

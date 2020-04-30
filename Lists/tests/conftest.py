@@ -7,61 +7,58 @@ from moto import mock_dynamodb2
 
 @pytest.fixture
 def dynamodb_mock():
-    mock = mock_dynamodb2()
-    mock.start()
-    dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
+    with mock_dynamodb2():
+        dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
 
-    table = dynamodb.create_table(
-        TableName='lists-unittest',
-        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[
-            {'AttributeName': 'PK', 'AttributeType': 'S'},
-            {'AttributeName': 'SK', 'AttributeType': 'S'},
-            {'AttributeName': 'email', 'AttributeType': 'S'},
-            {'AttributeName': 'reservationId', 'AttributeType': 'S'},
-            {'AttributeName': 'userId', 'AttributeType': 'S'}
-        ],
-        ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
-        GlobalSecondaryIndexes=[
-            {
-                'IndexName': 'email-index',
-                'KeySchema': [{'AttributeName': 'email', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
-                'Projection': {
-                    'ProjectionType': 'ALL'
+        table = dynamodb.create_table(
+            TableName='lists-unittest',
+            KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
+            AttributeDefinitions=[
+                {'AttributeName': 'PK', 'AttributeType': 'S'},
+                {'AttributeName': 'SK', 'AttributeType': 'S'},
+                {'AttributeName': 'email', 'AttributeType': 'S'},
+                {'AttributeName': 'reservationId', 'AttributeType': 'S'},
+                {'AttributeName': 'userId', 'AttributeType': 'S'}
+            ],
+            ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
+            GlobalSecondaryIndexes=[
+                {
+                    'IndexName': 'email-index',
+                    'KeySchema': [{'AttributeName': 'email', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
+                    'Projection': {
+                        'ProjectionType': 'ALL'
+                    }
+                },
+                {
+                    'IndexName': 'userId-index',
+                    'KeySchema': [{'AttributeName': 'userId', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
+                    'Projection': {
+                        'ProjectionType': 'ALL'
+                    }
+                },
+                {
+                    'IndexName': 'SK-index',
+                    'KeySchema': [{'AttributeName': 'SK', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
+                    'Projection': {
+                        'ProjectionType': 'ALL'
+                    }
+                },
+                {
+                    'IndexName': 'reservationId-index',
+                    'KeySchema': [{'AttributeName': 'reservationId', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
+                    'Projection': {
+                        'ProjectionType': 'ALL'
+                    }
                 }
-            },
-            {
-                'IndexName': 'userId-index',
-                'KeySchema': [{'AttributeName': 'userId', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
-                'Projection': {
-                    'ProjectionType': 'ALL'
-                }
-            },
-            {
-                'IndexName': 'SK-index',
-                'KeySchema': [{'AttributeName': 'SK', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
-                'Projection': {
-                    'ProjectionType': 'ALL'
-                }
-            },
-            {
-                'IndexName': 'reservationId-index',
-                'KeySchema': [{'AttributeName': 'reservationId', 'KeyType': 'HASH'}, {'AttributeName': 'PK', 'KeyType': 'RANGE'}],
-                'Projection': {
-                    'ProjectionType': 'ALL'
-                }
-            }
-        ]
-    )
+            ]
+        )
 
-    items = load_test_data()
+        items = load_test_data()
 
-    for item in items:
-        table.put_item(TableName='lists-unittest', Item=item)
+        for item in items:
+            table.put_item(TableName='lists-unittest', Item=item)
 
-    yield
-    # teardown: stop moto server
-    mock.stop()
+        yield
 
 
 def load_test_data():

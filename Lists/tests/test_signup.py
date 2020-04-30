@@ -24,27 +24,25 @@ def env_vars(monkeypatch):
 
 @pytest.fixture
 def cognito_mock():
-    mock = mock_cognitoidp()
-    mock.start()
-    client = boto3.client('cognito-idp', region_name='eu-west-1')
+    with mock_cognitoidp():
+        client = boto3.client('cognito-idp', region_name='eu-west-1')
 
-    user_pool_id = client.create_user_pool(PoolName='ewelists-unittest')["UserPool"]["Id"]
-    print("Userpool ID: " + user_pool_id)
+        user_pool_id = client.create_user_pool(PoolName='ewelists-unittest')["UserPool"]["Id"]
+        print("Userpool ID: " + user_pool_id)
 
-    client.admin_create_user(
-        UserPoolId=user_pool_id,
-        Username=str(uuid.uuid4()),
-        UserAttributes=[{"Name": "email", "Value": 'test.exists@gmail.com'}]
-    )
+        client.admin_create_user(
+            UserPoolId=user_pool_id,
+            Username=str(uuid.uuid4()),
+            UserAttributes=[{"Name": "email", "Value": 'test.exists@gmail.com'}]
+        )
 
-    client.admin_create_user(
-        UserPoolId=user_pool_id,
-        Username=str(uuid.uuid4()),
-        UserAttributes=[{"Name": "email", "Value": 'test.exists2@googlemail.com'}]
-    )
+        client.admin_create_user(
+            UserPoolId=user_pool_id,
+            Username=str(uuid.uuid4()),
+            UserAttributes=[{"Name": "email", "Value": 'test.exists2@googlemail.com'}]
+        )
 
-    yield
-    mock.stop()
+        yield
 
 
 @pytest.fixture
