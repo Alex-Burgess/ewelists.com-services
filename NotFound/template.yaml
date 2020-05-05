@@ -48,6 +48,7 @@ Resources:
       Timeout: 3
       Description: Creates an item for a product in notfound table
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -71,6 +72,7 @@ Resources:
       Timeout: 3
       Description: Deletes a product item from the notfound table
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -94,6 +96,7 @@ Resources:
       Timeout: 3
       Description: Gets a product from the notfound table
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -137,11 +140,21 @@ Resources:
                 Resource:
                   - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}"
                   - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}/*"
+        - PolicyName: TracingPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'xray:PutTraceSegments'
+                  - 'xray:PutTelemetryRecords'
+                Resource: '*'
 
   Api:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Environment
+      TracingEnabled: true
       MethodSettings:
         - DataTraceEnabled: true
           HttpMethod: "*"

@@ -56,6 +56,7 @@ Resources:
       Timeout: 3
       Description: Creates list items in table
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -79,6 +80,7 @@ Resources:
       Timeout: 3
       Description: Gets all list items for a user in the table
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -103,6 +105,7 @@ Resources:
       Timeout: 3
       Description: Gets a list item for a user in the table
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -126,6 +129,7 @@ Resources:
       Timeout: 3
       Description: Gets a list item that was shared with a user
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -149,6 +153,7 @@ Resources:
       Timeout: 3
       Description: Updates a list item for a user in the table
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -172,6 +177,7 @@ Resources:
       Timeout: 3
       Description: Closes a list for a given user in the table
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -195,6 +201,7 @@ Resources:
       Timeout: 3
       Description: Deletes a list item for a given user in the table
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -218,6 +225,7 @@ Resources:
       Timeout: 3
       Description: Adds a product to the list.
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -241,6 +249,7 @@ Resources:
       Timeout: 3
       Description: Adds a product to the list.
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -264,6 +273,7 @@ Resources:
       Timeout: 3
       Description: Updates a product that is added to a list.
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -287,6 +297,7 @@ Resources:
       Timeout: 3
       Description: Creates a user in the lists table.
       Role: !GetAtt SignUpFunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -308,6 +319,7 @@ Resources:
       Timeout: 3
       Description: Reserves a product that is added to a list.
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -336,6 +348,7 @@ Resources:
       Timeout: 3
       Description: Reserves a product that is added to a list.
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -361,6 +374,7 @@ Resources:
       Timeout: 3
       Description: Updates the quantity of a product reservation.
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -386,6 +400,7 @@ Resources:
       Timeout: 3
       Description: Retrieves resrvation details for a user.
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -408,6 +423,7 @@ Resources:
       Timeout: 3
       Description: Deletes a reservation item.
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -430,6 +446,7 @@ Resources:
       Timeout: 3
       Description: Purchases a product that is added to a list.
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
@@ -488,6 +505,15 @@ Resources:
                 Resource:
                   # - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/contact@ewelists.com"
                   - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/*"
+        - PolicyName: TracingPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'xray:PutTraceSegments'
+                  - 'xray:PutTelemetryRecords'
+                Resource: '*'
 
   SignUpFunctionRole:
     Type: AWS::IAM::Role
@@ -536,11 +562,21 @@ Resources:
                   - 'ses:SendTemplatedEmail'
                 Resource:
                   - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/*"
+        - PolicyName: TracingPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'xray:PutTraceSegments'
+                  - 'xray:PutTelemetryRecords'
+                Resource: '*'
 
   Api:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Environment
+      TracingEnabled: true
       MethodSettings:
         - DataTraceEnabled: true
           HttpMethod: "*"

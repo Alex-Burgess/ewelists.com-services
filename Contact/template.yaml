@@ -44,6 +44,7 @@ Resources:
       Timeout: 3
       Description: Sends email to contact mailbox
       Role: !GetAtt FunctionRole.Arn
+      Tracing: Active
       Events:
         ContactUs:
           Type: Api
@@ -78,11 +79,21 @@ Resources:
                 Resource:
                   # - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/contact@ewelists.com"
                   - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/*"
+        - PolicyName: TracingPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'xray:PutTraceSegments'
+                  - 'xray:PutTelemetryRecords'
+                Resource: '*'
 
   Api:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Environment
+      TracingEnabled: true
       MethodSettings:
         - DataTraceEnabled: true
           HttpMethod: "*"
