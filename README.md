@@ -21,11 +21,20 @@ More general information about these services and the application as a whole is 
 
 ## General
 
+### Setup Environment
+The local python environment is kept in sync with the python environment we use in pipeline codebuild project, which is currently 3.7.6.
+```
+pyenv install 3.7.6
+pyenv local 3.7.6
+pip install moto pytest requests_mock boto3
+pip install -r Lists/requirements.txt
+```
+
 ### Create a new SAM project
 
 To create a new SAM serverless api and function project structure:
 ```
-sam init --runtime python3.6 --name lists
+sam init --runtime python3.7 --name lists
 ```
 
 ### Builds Bucket
@@ -36,11 +45,6 @@ aws s3 mb sam-builds-contact-test
 ```
 
 ### Unit Testing
-Python version 3.6 is used with the lambda, so a matching local python environment is also used:
-```
-pyenv local 3.6.8
-```
-
 Example test executions:
 ```
 All: pytest

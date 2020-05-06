@@ -1,7 +1,7 @@
 import json
 import os
 import boto3
-from lists import common, common_table_ops, logger
+from lists import common, common_table_ops, common_kpi, logger
 
 log = logger.setup_logger()
 
@@ -55,6 +55,8 @@ def purchase_main(event):
         response = common.create_response(500, json.dumps({'error': str(e)}))
         log.info("Returning response: {}".format(response))
         return response
+
+    common_kpi.post(os.environ, event, 'Purchased')
 
     data = {'purchased': True}
     response = common.create_response(200, json.dumps(data))

@@ -3,7 +3,7 @@ import boto3
 import json
 import random
 import string
-from lists import common, logger
+from lists import common, common_kpi, logger
 
 log = logger.setup_logger()
 
@@ -57,6 +57,7 @@ def handler(event, context):
             set_random_password(user_pool_id, new_user['email'])
 
             log.info("Completed signup process for user. Raising exception to prevent normal signup process from continuing as not required.")
+            common_kpi.post(os.environ, event, 'Users')
             raise Exception(new_user['type'] + " Signup")
         else:
             log.info("New User is using username and password..")
@@ -65,6 +66,7 @@ def handler(event, context):
             # Send welcome email
             data = create_email_data(domain_name, new_user['name'])
             common.send_email(new_user['email'], template, data)
+            common_kpi.post(os.environ, event, 'Users')
             log.info("Allowing signup process to complete for user.")
 
     return event

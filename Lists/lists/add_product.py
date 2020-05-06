@@ -1,7 +1,7 @@
 import json
 import os
 import boto3
-from lists import common, logger
+from lists import common, common_kpi, logger
 from botocore.exceptions import ClientError
 
 log = logger.setup_logger()
@@ -30,6 +30,8 @@ def add_product_main(event):
         response = common.create_response(500, json.dumps({'error': str(e)}))
         log.info("Returning response: {}".format(response))
         return response
+
+    common_kpi.post(os.environ, event, 'Gifts Added')
 
     data = {'message': message}
     response = common.create_response(200, json.dumps(data))

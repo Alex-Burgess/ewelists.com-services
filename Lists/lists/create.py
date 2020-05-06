@@ -3,7 +3,7 @@ import os
 import boto3
 import time
 import uuid
-from lists import common, common_table_ops, logger
+from lists import common, common_table_ops, common_kpi, logger
 
 log = logger.setup_logger()
 
@@ -29,8 +29,9 @@ def create_main(event):
         response = common.create_response(500, json.dumps({'error': str(e)}))
         return response
 
-    data = {'listId': listId}
+    common_kpi.post(os.environ, event, 'New Lists')
 
+    data = {'listId': listId}
     response = common.create_response(200, json.dumps(data))
     return response
 

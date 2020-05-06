@@ -4,7 +4,7 @@ Description: Serverless resources for lists service
 
 Globals:
     Function:
-        Timeout: 3
+        Timeout: 10
 
 Parameters:
   Environment:
@@ -39,10 +39,22 @@ Parameters:
     Description: Userpool sub of postman user account 2.
     Default: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
     Type: String
+  PushKpis:
+    Description: Environment type.
+    Default: false
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    ConstraintDescription: Must specify true or false.
+  KpiUrl:
+    Type : 'AWS::SSM::Parameter::Value<String>'
+    Default: /KPI/Lists/test
 
 Conditions:
   Staging: !Equals [ !Ref Environment, staging ]
   Prod: !Equals [ !Ref Environment, prod ]
+  KpisTrue: !Equals [ !Ref PushKpis, true ]
 
 
 Resources:
@@ -51,7 +63,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-createlist-${Environment}'
       Handler: lists/create.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Creates list items in table
@@ -62,6 +74,8 @@ Resources:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
           POSTMAN_USERPOOL_SUB: !Ref PostmanSub1
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
+          KPI_URL: !If [KpisTrue, !Ref KpiUrl, !Ref "AWS::NoValue" ]
+          KPI_COLOUR: '#A68B03'
       Events:
         CreateList:
           Type: Api
@@ -75,7 +89,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-listall-${Environment}'
       Handler: lists/list.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Gets all list items for a user in the table
@@ -100,7 +114,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-getlist-${Environment}'
       Handler: lists/get_list.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Gets a list item for a user in the table
@@ -124,7 +138,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-getsharedlist-${Environment}'
       Handler: lists/get_shared_list.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Gets a list item that was shared with a user
@@ -148,7 +162,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-updatelist-${Environment}'
       Handler: lists/update.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Updates a list item for a user in the table
@@ -172,7 +186,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-close-${Environment}'
       Handler: lists/close.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Closes a list for a given user in the table
@@ -196,7 +210,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-delete-${Environment}'
       Handler: lists/delete.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Deletes a list item for a given user in the table
@@ -220,7 +234,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-addproduct-${Environment}'
       Handler: lists/add_product.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Adds a product to the list.
@@ -231,6 +245,8 @@ Resources:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
           POSTMAN_USERPOOL_SUB: !Ref PostmanSub1
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
+          KPI_URL: !If [KpisTrue, !Ref KpiUrl, !Ref "AWS::NoValue" ]
+          KPI_COLOUR: '#246B73'
       Events:
         CreateList:
           Type: Api
@@ -244,7 +260,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-deleteproduct-${Environment}'
       Handler: lists/delete_product.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Adds a product to the list.
@@ -268,7 +284,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-updateproduct-${Environment}'
       Handler: lists/update_product.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Updates a product that is added to a list.
@@ -292,7 +308,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-signup-${Environment}'
       Handler: lists/signup.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Creates a user in the lists table.
@@ -304,6 +320,8 @@ Resources:
           USERPOOL_ID: !Sub '{{resolve:ssm:/CognitoUserPoolId/${Environment}:1}}'
           POSTMAN_USERPOOL_SUB: !Ref PostmanSub1
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
+          KPI_URL: !If [KpisTrue, !Ref KpiUrl, !Ref "AWS::NoValue" ]
+          KPI_COLOUR: '#5752D9'
           TEMPLATE_NAME: !Sub 'WelcomeTemplate-${Environment}'
           DOMAIN_NAME: !If [Prod, !Sub "'https://${DomainName}'",
                           !If [Staging, !Sub "'https://${Environment}.${DomainName}'", "http://localhost:3000"]
@@ -314,7 +332,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-reserveproduct-${Environment}'
       Handler: lists/reserve.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Reserves a product that is added to a list.
@@ -326,6 +344,8 @@ Resources:
           INDEX_NAME: "email-index"
           POSTMAN_USERPOOL_SUB: !Ref PostmanSub1
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
+          KPI_URL: !If [KpisTrue, !Ref KpiUrl, !Ref "AWS::NoValue" ]
+          KPI_COLOUR: '#2A8C82'
           TEMPLATE_NAME: !Sub 'ReserveConfirmationTemplate-${Environment}'
           DOMAIN_NAME: !If [Prod, !Sub "https://${DomainName}",
                           !If [Staging, !Sub "https://${Environment}.${DomainName}", "http://localhost:3000"]
@@ -343,7 +363,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-unreserveproduct-${Environment}'
       Handler: lists/unreserve.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Reserves a product that is added to a list.
@@ -369,7 +389,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-updateproductreservation-${Environment}'
       Handler: lists/update_reservation.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Updates the quantity of a product reservation.
@@ -395,7 +415,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-reservation-${Environment}'
       Handler: lists/reservation.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Retrieves resrvation details for a user.
@@ -418,7 +438,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-deletereservation-${Environment}'
       Handler: lists/delete_reservation.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Deletes a reservation item.
@@ -441,7 +461,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-purchase-${Environment}'
       Handler: lists/purchase.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Purchases a product that is added to a list.
@@ -453,6 +473,8 @@ Resources:
           RESERVATIONID_INDEX: "reservationId-index"
           POSTMAN_USERPOOL_SUB: !Ref PostmanSub1
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
+          KPI_URL: !If [KpisTrue, !Ref KpiUrl, !Ref "AWS::NoValue" ]
+          KPI_COLOUR: '#D9CB04'
           TEMPLATE_NAME: !Sub 'PurchaseConfirmationTemplate-${Environment}'
           DOMAIN_NAME: !If [Prod, !Sub "https://${DomainName}",
                           !If [Staging, !Sub "https://${Environment}.${DomainName}", "http://localhost:3000"]

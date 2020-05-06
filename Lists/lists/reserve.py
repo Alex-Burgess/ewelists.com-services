@@ -3,7 +3,7 @@ import os
 import time
 import uuid
 import boto3
-from lists import common, common_table_ops, logger
+from lists import common, common_table_ops, common_kpi, logger
 
 log = logger.setup_logger()
 
@@ -56,6 +56,7 @@ def reserve_main(event):
         log.info("Returning response: {}".format(response))
         return response
 
+    common_kpi.post(os.environ, event, 'Reserved')
     data = {'reservation_id': resv_id}
     response = common.create_response(200, json.dumps(data))
     return response

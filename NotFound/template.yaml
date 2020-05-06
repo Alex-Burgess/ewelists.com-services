@@ -43,7 +43,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-createproduct-${Environment}'
       Handler: notfound/create.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Creates an item for a product in notfound table
@@ -67,7 +67,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-delete-${Environment}'
       Handler: notfound/delete.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Deletes a product item from the notfound table
@@ -91,7 +91,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-getproduct-${Environment}'
       Handler: notfound/product.handler
-      Runtime: python3.6
+      Runtime: python3.7
       MemorySize: 512
       Timeout: 3
       Description: Gets a product from the notfound table

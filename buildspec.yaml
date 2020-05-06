@@ -1,27 +1,28 @@
 version: 0.2
 
 phases:
-  pre_build:
+  install:
     commands:
       - pip install --upgrade pip
       - sam --version
   build:
     commands:
-      - echo "Starting build `date` in `pwd`"
-      - sam package --template-file Lists/template.yaml --s3-bucket $LISTS_BUILD_OUTPUT_BUCKET --output-template-file lists-packaged.yaml
-      - sam package --template-file NotFound/template.yaml --s3-bucket $NOTFOUND_BUILD_OUTPUT_BUCKET --output-template-file notfound-packaged.yaml
-      - sam package --template-file Products/template.yaml --s3-bucket $PRODUCTS_BUILD_OUTPUT_BUCKET --output-template-file products-packaged.yaml
-      - sam package --template-file Contact/template.yaml --s3-bucket $CONTACT_BUILD_OUTPUT_BUCKET --output-template-file contact-packaged.yaml
-      - echo "Copying email templates used by email cloudformation stack."
-      - aws s3 cp cloudformation/ s3://services-email-templates/ --recursive --exclude "*" --include "email-template-*"
+      - cd Lists && sam build && cd ../
+      - cd NotFound && sam build && cd ../
+      - cd Products && sam build && cd ../
+      - cd Contact && sam build && cd ../
   post_build:
     commands:
-      - echo "build completed on `date`"
-
+      - cd Lists && sam package --s3-bucket $LISTS_BUILD_OUTPUT_BUCKET --output-template-file lists-packaged.yaml && cd ../
+      - cd NotFound && sam package --s3-bucket $NOTFOUND_BUILD_OUTPUT_BUCKET --output-template-file notfound-packaged.yaml && cd ../
+      - cd Products && sam package --s3-bucket $PRODUCTS_BUILD_OUTPUT_BUCKET --output-template-file products-packaged.yaml && cd ../
+      - cd Contact && sam package --s3-bucket $CONTACT_BUILD_OUTPUT_BUCKET --output-template-file contact-packaged.yaml && cd ../
+      - echo "Copying email templates used by email cloudformation stack."
+      - aws s3 cp cloudformation/ s3://services-email-templates/ --recursive --exclude "*" --include "email-template-*" && cd ../
 artifacts:
   files:
-    - lists-packaged.yaml
-    - notfound-packaged.yaml
-    - products-packaged.yaml
-    - contact-packaged.yaml
+    - Lists/lists-packaged.yaml
+    - NotFound/notfound-packaged.yaml
+    - Products/products-packaged.yaml
+    - Contact/contact-packaged.yaml
   discard-paths: yes
