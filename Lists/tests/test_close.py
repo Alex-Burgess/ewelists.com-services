@@ -2,7 +2,7 @@ import os
 import json
 from lists import close, logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 class TestUpdateList:

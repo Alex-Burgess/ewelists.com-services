@@ -4,7 +4,7 @@ import pytest
 import json
 from lists import delete, logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 class TestDeleteItems:

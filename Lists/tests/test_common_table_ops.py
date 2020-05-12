@@ -3,7 +3,7 @@ import pytest
 import mock
 from lists import common_table_ops, logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 class TestGetListQuery:

@@ -4,7 +4,7 @@ import re
 import json
 from lists import list, logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 @pytest.fixture

@@ -4,7 +4,7 @@ import json
 import mock
 from lists import reserve, logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 @pytest.fixture

@@ -5,7 +5,7 @@ import json
 import boto3
 from lists import delete_product, logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 class TestDeleteProductItem:

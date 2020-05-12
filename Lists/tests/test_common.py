@@ -4,7 +4,7 @@ from lists import common, logger
 from moto import mock_ses
 import boto3
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 @pytest.fixture

@@ -3,7 +3,7 @@ import os
 import json
 from lists import update, logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 class TestGetAttributeDetails:

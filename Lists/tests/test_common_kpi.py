@@ -1,7 +1,7 @@
 import os
 from lists import common_kpi, logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 response = {
     "json": {"status": "ok", "message": "Data pushed"}

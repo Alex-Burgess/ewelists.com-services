@@ -1,7 +1,7 @@
 from lists.common_entities import User, List, Product, Reservation
 from lists import logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 class TestUser:

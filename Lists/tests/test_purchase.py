@@ -4,7 +4,7 @@ import mock
 import json
 from lists import purchase, logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 @pytest.fixture

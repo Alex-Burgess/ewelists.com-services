@@ -6,7 +6,7 @@ import boto3
 from moto import mock_cognitoidp
 from lists import signup, logger
 
-log = logger.setup_logger()
+log = logger.setup_test_logger()
 
 
 @pytest.fixture
