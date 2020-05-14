@@ -317,7 +317,12 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
-          USERPOOL_ID: !Sub '{{resolve:ssm:/CognitoUserPoolId/${Environment}:1}}'
+          # PRODUCTS_TABLE_NAME:
+          #   Fn::ImportValue:
+          #     !Sub "ProductsTable-${Environment}"
+          USERPOOL_ID:
+            Fn::ImportValue:
+              !Sub 'Auth-${Environment}-UserPoolId'
           POSTMAN_USERPOOL_SUB: !Ref PostmanSub1
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
           KPI_URL: !If [KpisTrue, !Ref KpiUrl, !Ref "AWS::NoValue" ]
