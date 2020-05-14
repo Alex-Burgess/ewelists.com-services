@@ -4,7 +4,7 @@ Description: Serverless resources for products service
 
 Globals:
     Function:
-        Timeout: 3
+        Timeout: 5
 
 Parameters:
   Environment:
@@ -19,10 +19,6 @@ Parameters:
     ConstraintDescription: must specify prod, staging, dev or test.
   ServiceName:
     Description: Service name.
-    Default: products
-    Type: String
-  TableNamePrefix:
-    Description: Name of dynamoDB table.
     Default: products
     Type: String
   DomainName:
@@ -45,13 +41,15 @@ Resources:
       Handler: products/product.handler
       Runtime: python3.7
       MemorySize: 512
-      Timeout: 3
+      Timeout: 5
       Description: Gets a product from the products table
       Role: !GetAtt FunctionRole.Arn
       Tracing: Active
       Environment:
         Variables:
-          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          TABLE_NAME:
+            Fn::ImportValue:
+              !Sub "ProductsTable-${Environment}"
           POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
           POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
       Events:
@@ -69,13 +67,15 @@ Resources:
       Handler: products/search_url.handler
       Runtime: python3.7
       MemorySize: 512
-      Timeout: 3
+      Timeout: 5
       Description: Searches for a product by url in a gsi of the products table.
       Role: !GetAtt FunctionRole.Arn
       Tracing: Active
       Environment:
         Variables:
-          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          TABLE_NAME:
+            Fn::ImportValue:
+              !Sub "ProductsTable-${Environment}"
           INDEX_NAME: producturl-index
           POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
           POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
@@ -94,13 +94,15 @@ Resources:
       Handler: products/create.handler
       Runtime: python3.7
       MemorySize: 512
-      Timeout: 3
+      Timeout: 5
       Description: Creates an item for a product in products table
       Role: !GetAtt FunctionRole.Arn
       Tracing: Active
       Environment:
         Variables:
-          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          TABLE_NAME:
+            Fn::ImportValue:
+              !Sub "ProductsTable-${Environment}"
           POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
           POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
       Events:
@@ -118,13 +120,15 @@ Resources:
       Handler: products/delete.handler
       Runtime: python3.7
       MemorySize: 512
-      Timeout: 3
+      Timeout: 5
       Description: Deletes a product item from the products table
       Role: !GetAtt FunctionRole.Arn
       Tracing: Active
       Environment:
         Variables:
-          TABLE_NAME: !Sub '${TableNamePrefix}-${Environment}'
+          TABLE_NAME:
+            Fn::ImportValue:
+              !Sub "ProductsTable-${Environment}"
           POSTMAN_USERPOOL_SUB: "c67c2511-f22e-47e0-8709-db4de48de03e"
           POSTMAN_USERPOOL_SUB2: "81efb0af-7d4a-4e8b-b9c3-4211005cb65d"
       Events:
@@ -163,8 +167,11 @@ Resources:
                   - 'dynamodb:Scan'
                   - 'dynamodb:DeleteItem'
                 Resource:
-                  - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}"
-                  - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableNamePrefix}-${Environment}/*"
+                  - !Sub
+                    - "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}*"
+                    - tablename:
+                        Fn::ImportValue:
+                          !Sub "ProductsTable-${Environment}"
         - PolicyName: TracingPolicy
           PolicyDocument:
             Version: '2012-10-17'
