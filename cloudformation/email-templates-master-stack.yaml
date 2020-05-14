@@ -37,3 +37,22 @@ Resources:
         TemplateURL: !Sub "${BucketEndpoint}/email-template-purchase-confirmation.yaml"
         Parameters:
           Environment: !Ref Environment
+
+Outputs:
+  WelcomeEmail:
+    Description: Welcome Email Template Name.
+    Value: !GetAtt WelcomeEmailStack.Outputs.TemplateName
+    Export:
+      Name: !Sub 'WelcomeEmail-TemplateName-${Environment}'
+
+  ReserveConfirmationEmail:
+    Description: Reserve Confirmation Email Template Name.
+    Value: !GetAtt ReserveConfirmationEmailStack.Outputs.TemplateName
+    Export:
+      Name: !Sub 'ReserveConfirmationEmail-TemplateName-${Environment}'
+
+  PurchaseConfirmationEmail:
+    Description: Purchase confirmation Email Template Name.
+    Value: !GetAtt PurchaseConfirmationEmailStack.Outputs.TemplateName
+    Export:
+      Name: !Sub 'PurchaseConfirmationEmail-TemplateName-${Environment}'

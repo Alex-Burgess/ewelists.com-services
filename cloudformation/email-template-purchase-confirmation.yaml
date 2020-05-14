@@ -229,3 +229,8 @@ Resources:
               </table>
             </body>
           </html>
+
+Outputs:
+  TemplateName:
+    Description: Welcome Email Template Name.
+    Value: !Ref Template
