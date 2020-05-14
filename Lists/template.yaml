@@ -342,7 +342,9 @@ Resources:
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
           KPI_URL: !If [KpisTrue, !Ref KpiUrl, !Ref "AWS::NoValue" ]
           KPI_COLOUR: '#5752D9'
-          TEMPLATE_NAME: !Sub 'WelcomeTemplate-${Environment}'
+          TEMPLATE_NAME:
+            Fn::ImportValue:
+              !Sub "WelcomeEmail-TemplateName-${Environment}"
           DOMAIN_NAME: !If [Prod, !Sub "'https://${DomainName}'",
                           !If [Staging, !Sub "'https://${Environment}.${DomainName}'", "http://localhost:3000"]
                         ]
@@ -368,7 +370,9 @@ Resources:
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
           KPI_URL: !If [KpisTrue, !Ref KpiUrl, !Ref "AWS::NoValue" ]
           KPI_COLOUR: '#2A8C82'
-          TEMPLATE_NAME: !Sub 'ReserveConfirmationTemplate-${Environment}'
+          TEMPLATE_NAME:
+            Fn::ImportValue:
+              !Sub "ReserveConfirmationEmail-TemplateName-${Environment}"
           DOMAIN_NAME: !If [Prod, !Sub "https://${DomainName}",
                           !If [Staging, !Sub "https://${Environment}.${DomainName}", "http://localhost:3000"]
                         ]
@@ -507,7 +511,9 @@ Resources:
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
           KPI_URL: !If [KpisTrue, !Ref KpiUrl, !Ref "AWS::NoValue" ]
           KPI_COLOUR: '#D9CB04'
-          TEMPLATE_NAME: !Sub 'PurchaseConfirmationTemplate-${Environment}'
+          TEMPLATE_NAME:
+            Fn::ImportValue:
+              !Sub "PurchaseConfirmationEmail-TemplateName-${Environment}"
           DOMAIN_NAME: !If [Prod, !Sub "https://${DomainName}",
                           !If [Staging, !Sub "https://${Environment}.${DomainName}", "http://localhost:3000"]
                         ]
