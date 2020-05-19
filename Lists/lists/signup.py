@@ -219,7 +219,7 @@ def check_no_alternate_google_email(user_pool_id, email):
     users = get_user_client_call(user_pool_id, email)
 
     if (len(users)):
-        raise Exception('User exists with different google email address.')
+        raise Exception('User exists with different google email address ' + email + '.')
 
     return True
 
