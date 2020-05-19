@@ -118,7 +118,7 @@ class TestCheckNoAlternateGoogleEmail:
     def test_gmail_alternate_exists(self, cognito_mock, user_pool_id):
         with pytest.raises(Exception) as e:
             signup.check_no_alternate_google_email(user_pool_id, 'test.exists@googlemail.com')
-        assert str(e.value) == "User exists with different google email address.", "A gmail alternate should not exist."
+        assert str(e.value) == "User exists with different google email address test.exists@gmail.com.", "A gmail alternate should not exist."
 
     @mock.patch("lists.signup.get_user_client_call", mock.MagicMock(return_value=[
         {'Username': 'e8853ecf-b11e-44b9-81c7-059ec15dfcda', 'Attributes': [{'Name': 'email', 'Value': 'test.new@googlemail.com'}], 'UserCreateDate': 'Apr 27, 2020 12:45:05 PM', 'UserLastModifiedDate': 'Apr 27, 2020 12:45:05 PM', 'Enabled': True, 'UserStatus': 'FORCE_CHANGE_PASSWORD', 'MFAOptions': []}
@@ -133,8 +133,8 @@ class TestCheckNoAlternateGoogleEmail:
         )
 
         with pytest.raises(Exception) as e:
-            signup.check_no_alternate_google_email(user_pool_id, 'test.new@gmail.com')
-        assert str(e.value) == "User exists with different google email address.", "A googlemail alternate should not exist."
+            signup.check_no_alternate_google_email(user_pool_id, 'test.new@googlemail.com')
+        assert str(e.value) == "User exists with different google email address test.new@gmail.com.", "A googlemail alternate should not exist."
 
 
 class TestSwitchGoogleDomain:
@@ -327,7 +327,7 @@ class TestHandler:
 
         with pytest.raises(Exception) as e:
             signup.handler(signup_with_u_and_p_event, None)
-        assert str(e.value) == "User exists with different google email address.", "A googlemail alternate should not exist."
+        assert str(e.value) == "User exists with different google email address test.exists@gmail.com.", "A googlemail alternate should not exist."
 
     @mock.patch("lists.signup.get_user_client_call", mock.MagicMock(return_value=[
         {'Username': 'e8853ecf-b11e-44b9-81c7-059ec15dfcda', 'Attributes': [{'Name': 'email', 'Value': 'test.exists2@googlemail.com'}], 'UserCreateDate': 'Apr 27, 2020 12:45:05 PM', 'UserLastModifiedDate': 'Apr 27, 2020 12:45:05 PM', 'Enabled': True, 'UserStatus': 'FORCE_CHANGE_PASSWORD', 'MFAOptions': []}
@@ -337,7 +337,7 @@ class TestHandler:
 
         with pytest.raises(Exception) as e:
             signup.handler(signup_with_u_and_p_event, None)
-        assert str(e.value) == "User exists with different google email address.", "A googlemail alternate should not exist."
+        assert str(e.value) == "User exists with different google email address test.exists2@googlemail.com.", "A googlemail alternate should not exist."
 
     @mock.patch("lists.signup.get_user_client_call", mock.MagicMock(return_value=[
         {'Username': 'e8853ecf-b11e-44b9-81c7-059ec15dfcda', 'Attributes': [{'Name': 'email', 'Value': 'test.exists@gmail.com'}], 'UserCreateDate': 'Apr 27, 2020 12:45:05 PM', 'UserLastModifiedDate': 'Apr 27, 2020 12:45:05 PM', 'Enabled': True, 'UserStatus': 'FORCE_CHANGE_PASSWORD', 'MFAOptions': []}
@@ -348,4 +348,4 @@ class TestHandler:
 
         with pytest.raises(Exception) as e:
             signup.handler(signup_social_event, None)
-        assert str(e.value) == "User exists with different google email address.", "A googlemail alternate should not exist."
+        assert str(e.value) == "User exists with different google email address test.exists@gmail.com.", "A googlemail alternate should not exist."
