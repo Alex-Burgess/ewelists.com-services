@@ -121,7 +121,7 @@ def create_new_cognito_user(user_pool_id, email, name):
         )
     except Exception as e:
         log.error("Account could not be created: " + str(e))
-        raise Exception('Account could not be created.')
+        raise Exception('Account creation failed for ' + email + '.')
 
     log.info("Link response: " + json.dumps(response['User']['Username']))
     log.info("Link response: " + json.dumps(response['User']['Attributes']))
@@ -152,7 +152,7 @@ def link_accounts(user_pool_id, email, existing_sub, new_type, new_id):
         log.info("Link response: " + json.dumps(response))
     except Exception as e:
         log.error("Accounts could not be joined: " + str(e))
-        raise Exception('Accounts could not be joined.')
+        raise Exception('Accounts could not be joined for ' + email + '.')
 
     return True
 
@@ -175,7 +175,7 @@ def create_user_in_lists_db(table_name, sub, email, name):
         dynamodb.put_item(TableName=table_name, Item=user_item)
     except Exception as e:
         log.error("User entry could not be created: {}".format(e))
-        raise Exception('User entry could not be created.')
+        raise Exception('User entry could not be created for ' + email + '.')
 
     return True
 

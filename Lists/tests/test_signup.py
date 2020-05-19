@@ -198,7 +198,7 @@ class TestCreateUserInListsDB:
         sub = '12345678-user-fail-1234-abcdefghijkl'
         with pytest.raises(Exception) as e:
             signup.create_user_in_lists_db('lists-unittes', sub, email, name)
-        assert str(e.value) == "User entry could not be created.", "Exception not as expected."
+        assert str(e.value) == "User entry could not be created for test.user@gmail.com.", "Exception not as expected."
 
     def test_create_user_with_no_name(self, dynamodb_mock):
         email = 'test.user10@gmail.com'
