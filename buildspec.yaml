@@ -7,18 +7,19 @@ phases:
       - sam --version
   build:
     commands:
-      - cd Lists && sam build && cd ../
-      - cd NotFound && sam build && cd ../
-      - cd Products && sam build && cd ../
-      - cd Contact && sam build && cd ../
+      - cd $CODEBUILD_SRC_DIR/Lists && sam build
+      - cd $CODEBUILD_SRC_DIR/NotFound && sam build
+      - cd $CODEBUILD_SRC_DIR/Products && sam build
+      - cd $CODEBUILD_SRC_DIR/Contact && sam build
   post_build:
     commands:
-      - cd Lists && sam package --s3-bucket $LISTS_BUILD_OUTPUT_BUCKET --output-template-file lists-packaged.yaml && cd ../
-      - cd NotFound && sam package --s3-bucket $NOTFOUND_BUILD_OUTPUT_BUCKET --output-template-file notfound-packaged.yaml && cd ../
-      - cd Products && sam package --s3-bucket $PRODUCTS_BUILD_OUTPUT_BUCKET --output-template-file products-packaged.yaml && cd ../
-      - cd Contact && sam package --s3-bucket $CONTACT_BUILD_OUTPUT_BUCKET --output-template-file contact-packaged.yaml && cd ../
+      - cd $CODEBUILD_SRC_DIR/Lists && sam package --s3-bucket $LISTS_BUILD_OUTPUT_BUCKET --output-template-file lists-packaged.yaml
+      - cd $CODEBUILD_SRC_DIR/NotFound && sam package --s3-bucket $NOTFOUND_BUILD_OUTPUT_BUCKET --output-template-file notfound-packaged.yaml
+      - cd $CODEBUILD_SRC_DIR/Products && sam package --s3-bucket $PRODUCTS_BUILD_OUTPUT_BUCKET --output-template-file products-packaged.yaml
+      - cd $CODEBUILD_SRC_DIR/Contact && sam package --s3-bucket $CONTACT_BUILD_OUTPUT_BUCKET --output-template-file contact-packaged.yaml
       - echo "Copying email templates used by email cloudformation stack."
-      - aws s3 cp cloudformation/ s3://services-email-templates/ --recursive --exclude "*" --include "email-template-*" && cd ../
+      - cd $CODEBUILD_SRC_DIR
+      - aws s3 cp cloudformation/ s3://services-email-templates/ --recursive --exclude "*" --include "email-template-*"
 artifacts:
   files:
     - Lists/lists-packaged.yaml

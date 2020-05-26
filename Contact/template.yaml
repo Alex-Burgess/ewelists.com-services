@@ -39,7 +39,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-contactus-${Environment}'
       Handler: contact/contact_us.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 128
       Timeout: 10
       Description: Sends email to contact mailbox

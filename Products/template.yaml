@@ -39,7 +39,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-getproduct-${Environment}'
       Handler: products/product.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Gets a product from the products table
@@ -65,7 +65,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-searchurl-${Environment}'
       Handler: products/search_url.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Searches for a product by url in a gsi of the products table.
@@ -92,7 +92,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-createproduct-${Environment}'
       Handler: products/create.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Creates an item for a product in products table
@@ -118,7 +118,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-delete-${Environment}'
       Handler: products/delete.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Deletes a product item from the products table

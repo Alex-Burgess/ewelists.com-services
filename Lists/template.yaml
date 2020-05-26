@@ -59,7 +59,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-createlist-${Environment}'
       Handler: lists/create.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Creates list items in table
@@ -87,7 +87,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-listall-${Environment}'
       Handler: lists/list.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Gets all list items for a user in the table
@@ -114,7 +114,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-getlist-${Environment}'
       Handler: lists/get_list.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Gets a list item for a user in the table
@@ -140,7 +140,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-getsharedlist-${Environment}'
       Handler: lists/get_shared_list.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Gets a list item that was shared with a user
@@ -166,7 +166,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-updatelist-${Environment}'
       Handler: lists/update.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Updates a list item for a user in the table
@@ -192,7 +192,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-close-${Environment}'
       Handler: lists/close.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Closes a list for a given user in the table
@@ -218,7 +218,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-delete-${Environment}'
       Handler: lists/delete.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Deletes a list item for a given user in the table
@@ -244,7 +244,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-addproduct-${Environment}'
       Handler: lists/add_product.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Adds a product to the list.
@@ -272,7 +272,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-deleteproduct-${Environment}'
       Handler: lists/delete_product.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Adds a product to the list.
@@ -298,7 +298,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-updateproduct-${Environment}'
       Handler: lists/update_product.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Updates a product that is added to a list.
@@ -324,7 +324,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-signup-${Environment}'
       Handler: lists/signup.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Creates a user in the lists table.
@@ -354,7 +354,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-reserveproduct-${Environment}'
       Handler: lists/reserve.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Reserves a product that is added to a list.
@@ -389,7 +389,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-unreserveproduct-${Environment}'
       Handler: lists/unreserve.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Reserves a product that is added to a list.
@@ -417,7 +417,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-updateproductreservation-${Environment}'
       Handler: lists/update_reservation.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Updates the quantity of a product reservation.
@@ -445,7 +445,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-reservation-${Environment}'
       Handler: lists/reservation.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Retrieves resrvation details for a user.
@@ -470,7 +470,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-deletereservation-${Environment}'
       Handler: lists/delete_reservation.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Deletes a reservation item.
@@ -495,7 +495,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ServiceName}-purchase-${Environment}'
       Handler: lists/purchase.handler
-      Runtime: python3.7
+      Runtime: python3.8
       MemorySize: 512
       Timeout: 5
       Description: Purchases a product that is added to a list.
