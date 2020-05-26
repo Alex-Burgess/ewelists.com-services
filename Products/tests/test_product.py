@@ -3,6 +3,7 @@ import os
 import re
 import json
 import boto3
+from decimal import Decimal
 from moto import mock_dynamodb2
 from products import product
 from tests import fixtures
@@ -49,8 +50,16 @@ def dynamodb_mock():
             "brand": "BABYBJÖRN",
             "details": "Travel Cot Easy Go, Anthracite, with transport bag",
             "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
-            "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58"
+            "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58",
+            "price": "100.00"
         },
+        {
+            "productId": "12345678-prod-0002-1234-abcdefghijkl",
+            "brand": "BABYBJÖRN",
+            "details": "Travel Cot Easy Go, Anthracite, with transport bag",
+            "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
+            "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58"
+        }
     ]
 
     for item in items:
@@ -69,6 +78,16 @@ class TestGetProduct:
         assert product_object['details'] == "Travel Cot Easy Go, Anthracite, with transport bag", "Attribute details was not as expected."
         assert product_object['imageUrl'] == "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg", "Attribute url was not as expected."
         assert product_object['productUrl'] == "https://www.amazon.co.uk/dp/B01H24LM58", "Attribute url was not as expected."
+        assert product_object['price'] == "100.00", "Attribute price was not as expected."
+
+    def test_get_product_no_price(self, dynamodb_mock):
+        product_id = '12345678-prod-0002-1234-abcdefghijkl'
+        product_object = product.get_product('products-unittest', product_id)
+        assert product_object['brand'] == "BABYBJÖRN", "Attribute brand was not as expected."
+        assert product_object['details'] == "Travel Cot Easy Go, Anthracite, with transport bag", "Attribute details was not as expected."
+        assert product_object['imageUrl'] == "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg", "Attribute url was not as expected."
+        assert product_object['productUrl'] == "https://www.amazon.co.uk/dp/B01H24LM58", "Attribute url was not as expected."
+        assert 'price' not in product_object, "Attribute price was not as expected."
 
     def test_with_missing_product_id(self, dynamodb_mock):
         product_id = '12345678-notf-0011-1234-abcdefghijkl'

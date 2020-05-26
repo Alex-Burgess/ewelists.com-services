@@ -70,6 +70,9 @@ def put_product(table_name, product_info):
         'createdAt': {'N': str(int(time.time()))}
     }
 
+    if 'price' in product_info:
+        item['price'] = {'S': product_info['price']}
+
     try:
         logger.info("Product item to be put in table: {}".format(item))
         dynamodb.put_item(TableName=table_name, Item=item)

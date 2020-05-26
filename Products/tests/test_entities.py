@@ -9,7 +9,8 @@ def response_item():
         "brand": {'S': "BABYBJÖRN"},
         "details": {'S': "Travel Cot Easy Go, Anthracite, with transport bag"},
         "imageUrl": {'S': "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg"},
-        "productUrl": {'S': "https://www.amazon.co.uk/dp/B01H24LM58"}
+        "productUrl": {'S': "https://www.amazon.co.uk/dp/B01H24LM58"},
+        "price": {'S': "100.00"}
     }
 
     return response_item
@@ -24,3 +25,4 @@ class TestProduct:
         assert product['details'] == 'Travel Cot Easy Go, Anthracite, with transport bag', "Product details were not as expected."
         assert product['imageUrl'] == 'https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg', "Product url not as expected."
         assert product['productUrl'] == 'https://www.amazon.co.uk/dp/B01H24LM58', "Product url not as expected."
+        assert product['price'] == '100.00', "Product price not as expected."

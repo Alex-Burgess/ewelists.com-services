@@ -17,10 +17,19 @@ logger.addHandler(stream_handler)
 
 
 @pytest.fixture
-def api_gateway_create_event():
+def api_create_event():
     event = fixtures.api_gateway_base_event()
     event['httpMethod'] = "POST"
     event['body'] = "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
+
+    return event
+
+
+@pytest.fixture
+def api_create_with_price_event():
+    event = fixtures.api_gateway_base_event()
+    event['httpMethod'] = "POST"
+    event['body'] = "{\n    \"retailer\": \"amazon\",\n    \"price\": \"100.00\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
 
     return event
 
@@ -47,16 +56,16 @@ def dynamodb_mock():
 
 
 class TestGetProductInfo:
-    def test_get_product_info(self, api_gateway_create_event):
-        product_info = create.get_product_info(api_gateway_create_event)
+    def test_get_product_info(self, api_create_event):
+        product_info = create.get_product_info(api_create_event)
         assert product_info['retailer'] == "amazon", "Attribute was not as expected."
         assert product_info['brand'] == "BABYBJÖRN", "Attribute was not as expected."
         assert product_info['details'] == "Travel Cot Easy Go, Anthracite, with transport bag", "Attribute was not as expected."
         assert product_info['productUrl'] == "https://www.amazon.co.uk/dp/B01H24LM58", "Attribute was not as expected."
         assert product_info['imageUrl'] == "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg", "Attribute was not as expected."
 
-    def test_with_empty_body_throws_exception(self, api_gateway_create_event):
-        event_no_body = copy.deepcopy(api_gateway_create_event)
+    def test_with_empty_body_throws_exception(self, api_create_event):
+        event_no_body = copy.deepcopy(api_create_event)
         event_no_body['body'] = None
 
         with pytest.raises(Exception) as e:
@@ -92,16 +101,24 @@ class TestPutProduct:
 
 
 class TestCreateMain:
-    def test_create_main(self, monkeypatch, api_gateway_create_event, dynamodb_mock):
+    def test_create_main(self, monkeypatch, api_create_event, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittest')
 
-        response = create.create_main(api_gateway_create_event)
+        response = create.create_main(api_create_event)
         body = json.loads(response['body'])
 
         assert len(body['productId']) == 36, "Create main response did not contain a listId."
 
-    def test_with_no_event_body(self, monkeypatch, api_gateway_create_event, dynamodb_mock):
-        event_no_body = copy.deepcopy(api_gateway_create_event)
+    def test_create_with_price(self, monkeypatch, api_create_with_price_event, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittest')
+
+        response = create.create_main(api_create_with_price_event)
+        body = json.loads(response['body'])
+
+        assert len(body['productId']) == 36, "Create main response did not contain a listId."
+
+    def test_with_no_event_body(self, monkeypatch, api_create_event, dynamodb_mock):
+        event_no_body = copy.deepcopy(api_create_event)
         event_no_body['body'] = None
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittest')
 
@@ -110,9 +127,9 @@ class TestCreateMain:
         assert body['error'] == 'API Event did not contain a valid body.', "Create main response did not contain the correct error message."
 
 
-def test_handler(api_gateway_create_event, monkeypatch, dynamodb_mock):
+def test_handler(api_create_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittest')
-    response = create.handler(api_gateway_create_event, None)
+    response = create.handler(api_create_event, None)
     assert response['statusCode'] == 200
     assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
     assert re.match('{"productId": .*}', response['body'])
