@@ -33,6 +33,7 @@ class TestCreateReservation:
             'productId': {'S': '12345678-prod-0001-1234-abcdefghijkl'},
             'userId': {'S': '12345678-user-0001-1234-abcdefghijkl'},
             'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'},
+            'listOwnerId': {'S': '12345678-user-0001-1234-abcdefghijkl'},
             'name': {'S': 'Test User'},
             'email': {'S': 'test.user1@gmail.com'},
             'quantity': {'N': '1'},
@@ -104,6 +105,7 @@ class TestCreateEmailData:
 class TestCreateReservationItem:
     def test_create_reservation_item(self):
         list_id = '12345678-list-0001-1234-abcdefghijkl'
+        list_owner_id = '12345678-user-0001-1234-abcdefghijkl'
         list_title = 'Test List Title'
         product_id = '12345678-prod-0001-1234-abcdefghijkl'
         product_type = 'products'
@@ -115,9 +117,9 @@ class TestCreateReservationItem:
         request_reserve_quantity = 1
         resv_id = '12345678-resv-0001-1234-abcdefghijkl'
 
-        object = reserve.create_reservation_item(list_id, list_title, product_id, product_type, resv_id, user, request_reserve_quantity)
+        object = reserve.create_reservation_item(list_id, list_owner_id, list_title, product_id, product_type, resv_id, user, request_reserve_quantity)
 
-        assert list(object.keys()) == ['PK', 'SK', 'reservationId', 'productId', 'userId', 'listId', 'name', 'email', 'quantity', 'state', 'reservedAt', 'listTitle', 'productType']
+        assert list(object.keys()) == ['PK', 'SK', 'reservationId', 'productId', 'userId', 'listId', 'listOwnerId', 'name', 'email', 'quantity', 'state', 'reservedAt', 'listTitle', 'productType']
 
         assert object['PK']['S'] == "LIST#12345678-list-0001-1234-abcdefghijkl", "Object was not as expected."
         assert object['SK']['S'] == "RESERVATION#12345678-prod-0001-1234-abcdefghijkl#12345678-user-0001-1234-abcdefghijkl#12345678-resv-0001-1234-abcdefghijkl", "Object was not as expected."
@@ -125,6 +127,7 @@ class TestCreateReservationItem:
         assert object['productId']['S'] == "12345678-prod-0001-1234-abcdefghijkl", "Object was not as expected."
         assert object['userId']['S'] == "12345678-user-0001-1234-abcdefghijkl", "Object was not as expected."
         assert object['listId']['S'] == "12345678-list-0001-1234-abcdefghijkl", "Object was not as expected."
+        assert object['listOwnerId']['S'] == "12345678-user-0001-1234-abcdefghijkl", "Object was not as expected."
         assert object['name']['S'] == "Test User1", "Object was not as expected."
         assert object['email']['S'] == "test.user1@gmail.com", "Object was not as expected."
         assert object['quantity']['N'] == "1", "Object was not as expected."

@@ -38,6 +38,13 @@ Resources:
         Parameters:
           Environment: !Ref Environment
 
+  PurchaseUpdateEmailStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BucketEndpoint}/email-template-purchase-update.yaml"
+      Parameters:
+        Environment: !Ref Environment
+
 Outputs:
   WelcomeEmail:
     Description: Welcome Email Template Name.
@@ -56,3 +63,9 @@ Outputs:
     Value: !GetAtt PurchaseConfirmationEmailStack.Outputs.TemplateName
     Export:
       Name: !Sub 'PurchaseConfirmationEmail-TemplateName-${Environment}'
+
+  PurchaseUpdateEmail:
+    Description: Purchase Update Email Template Name.
+    Value: !GetAtt PurchaseUpdateEmailStack.Outputs.TemplateName
+    Export:
+      Name: !Sub 'PurchaseUpdateEmailStack-TemplateName-${Environment}'

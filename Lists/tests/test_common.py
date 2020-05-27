@@ -387,3 +387,22 @@ class TestCheckImageUrl:
         url = '//ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&amp;ASIN=B07DJ5KX53&amp;Format=_SL250_&amp;ID=AsinImage&amp;MarketPlace=GB&amp;ServiceVersion=20070822&amp;WS=1&amp;tag=ewelists-21'
         result = common.check_image_url(url)
         assert result == 'https://ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&amp;ASIN=B07DJ5KX53&amp;Format=_SL250_&amp;ID=AsinImage&amp;MarketPlace=GB&amp;ServiceVersion=20070822&amp;WS=1&amp;tag=ewelists-21'
+
+
+class TestGetListDetails:
+    def test_get_list_details(self, dynamodb_mock):
+        list_id = "12345678-list-0001-1234-abcdefghijkl"
+        list = common.get_list_details('lists-unittest', list_id)
+
+        expected_list_object = {
+            'description': 'A gift list for Child User1 birthday.',
+            'eventDate': '31 October 2018',
+            'imageUrl': '/images/celebration-default.jpg',
+            'listId': '12345678-list-0001-1234-abcdefghijkl',
+            'listOwner': '12345678-user-0001-1234-abcdefghijkl',
+            'occasion': 'Birthday',
+            'state': 'open',
+            'title': 'Child User1 1st Birthday'
+        }
+
+        assert list == expected_list_object, "List details were not as expected"

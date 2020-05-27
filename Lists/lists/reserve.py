@@ -43,7 +43,8 @@ def reserve_main(event):
         # Step 4 - Update, in one transaction, the product reserved quantity and create reserved item.
         resv_id = str(uuid.uuid4())
         product_key = common.create_product_key(list_id, product_id)
-        reservation_item = create_reservation_item(list_id, list_title, product_id, product['type'], resv_id, user, request_reserve_quantity)
+        list_details = common.get_list_details(table_name, list_id)
+        reservation_item = create_reservation_item(list_id, list_details['listOwner'], list_title, product_id, product['type'], resv_id, user, request_reserve_quantity)
         create_reservation(table_name, new_product_reserved_quantity, product_key, reservation_item)
 
         # Step 5 - Send reserve confirmation email
@@ -62,7 +63,7 @@ def reserve_main(event):
     return response
 
 
-def create_reservation_item(list_id, list_title, product_id, product_type, resv_id, user, request_reserve_quantity):
+def create_reservation_item(list_id, list_owner_id, list_title, product_id, product_type, resv_id, user, request_reserve_quantity):
     return {
         'PK': {'S': "LIST#{}".format(list_id)},
         'SK': {'S': "RESERVATION#{}#{}#{}".format(product_id, user['id'], resv_id)},
@@ -70,6 +71,7 @@ def create_reservation_item(list_id, list_title, product_id, product_type, resv_
         'productId': {'S': product_id},
         'userId': {'S': user['id']},
         'listId': {'S': list_id},
+        'listOwnerId': {'S': list_owner_id},
         'name': {'S': user['name']},
         'email': {'S': user['email']},
         'quantity': {'N': str(request_reserve_quantity)},

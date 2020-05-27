@@ -11,7 +11,8 @@ log = logger.setup_test_logger()
 def env_vars(monkeypatch):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
     monkeypatch.setitem(os.environ, 'RESERVATIONID_INDEX', 'reservationId-index')
-    monkeypatch.setitem(os.environ, 'TEMPLATE_NAME', 'Email-Template')
+    monkeypatch.setitem(os.environ, 'CONFIRM_TEMPLATE_NAME', 'Email-Template')
+    monkeypatch.setitem(os.environ, 'UPDATE_TEMPLATE_NAME', 'Update-Email-Template')
     monkeypatch.setitem(os.environ, 'DOMAIN_NAME', 'https://test.ewelists.com')
 
     return monkeypatch
@@ -30,7 +31,7 @@ class TestNewPurchasedQuantity:
 
 
 class TestCreateEmailData:
-    def test_create_email_data(self):
+    def test_create_confirm_email_data(self):
         domain_name = 'http://localhost:3000'
         name = 'Test User'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
@@ -44,7 +45,7 @@ class TestCreateEmailData:
             "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
         }
 
-        data = purchase.create_email_data(domain_name, name, list_id, list_title, quantity, product)
+        data = purchase.create_confirm_email_data(domain_name, name, list_id, list_title, quantity, product)
 
         expected_data = {
             "name": "Test User",
@@ -60,7 +61,7 @@ class TestCreateEmailData:
         assert len(data) == 8, "Number of fields in email data was not as expected."
         assert data == expected_data, "Email data json object was not as expected."
 
-    def test_create_email_data_with_amazon_product(self):
+    def test_create_confirm_email_data_with_amazon_product(self):
         domain_name = 'http://localhost:3000'
         name = 'Test User'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
@@ -74,11 +75,43 @@ class TestCreateEmailData:
             "imageUrl": "//ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&amp;ASIN=B07DJ5KX53&amp;Format=_SL250_&amp;ID=AsinImage&amp;MarketPlace=GB&amp;ServiceVersion=20070822&amp;WS=1&amp;tag=ewelists-21"
         }
 
-        data = purchase.create_email_data(domain_name, name, list_id, list_title, quantity, product)
+        data = purchase.create_confirm_email_data(domain_name, name, list_id, list_title, quantity, product)
 
         expected_image_url = 'https://ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&amp;ASIN=B07DJ5KX53&amp;Format=_SL250_&amp;ID=AsinImage&amp;MarketPlace=GB&amp;ServiceVersion=20070822&amp;WS=1&amp;tag=ewelists-21'
         assert len(data) == 8, "Number of fields in email data was not as expected."
         assert data['image_url'] == expected_image_url, "Email data json object was not as expected."
+
+    def test_create_update_email_data(self):
+        domain_name = 'http://localhost:3000'
+        owner_name = 'Test Owner'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        list_title = 'Test List Title'
+        quantity = 2
+        reserved_name = 'Test User'
+        product = {
+            "type": "products",
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "productUrl": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "imageUrl": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+
+        data = purchase.create_update_email_data(domain_name, owner_name, list_id, list_title, quantity, reserved_name, product)
+
+        expected_data = {
+            "name": "Test Owner",
+            "list_title": "Test List Title",
+            "list_url": "http://localhost:3000/edit/12345678-list-0001-1234-abcdefghijkl?tab=2",
+            "quantity": 2,
+            "reserved_name": "Test User",
+            "brand": "Mamas and Papas",
+            "details": "Balloon Print Zip All-in-One",
+            "product_url": "https://www.mamasandpapas.com/en-gb/balloon-print-zip-all-in-one/p/s94frd5",
+            "image_url": "https://media.mamasandpapas.com/i/mamasandpapas/S94FRD5_HERO_AOP%20ZIP%20AIO/Clothing/Baby+Boys+Clothes/Welcome+to+the+World?$pdpimagemobile$"
+        }
+
+        assert len(data) == 9, "Number of fields in email data was not as expected."
+        assert data == expected_data, "Email data json object was not as expected."
 
 
 class TestPurchaseMain:
@@ -99,7 +132,7 @@ class TestPurchaseMain:
     def test_confirm_purchase(self, env_vars, api_purchase_event, dynamodb_mock):
         response = purchase.purchase_main(api_purchase_event)
         body = json.loads(response['body'])
-        assert body['purchased'], "Error for missing environment variable was not as expected."
+        assert body['purchased'], "Purchase was not confirmed."
 
     def test_confirm_reservation_already_confirmed_by_user_with_account(self, env_vars, api_purchase_event, dynamodb_mock):
         api_purchase_event['pathParameters'] = {"reservationid": "12345678-resv-0006-1234-abcdefghijkl", "email": "test.user2@gmail.com"}

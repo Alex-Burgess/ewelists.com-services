@@ -22,7 +22,8 @@ def purchase_main(event):
     try:
         table_name = common.get_env_variable(os.environ, 'TABLE_NAME')
         resv_id_index = common.get_env_variable(os.environ, 'RESERVATIONID_INDEX')
-        template = common.get_env_variable(os.environ, 'TEMPLATE_NAME')
+        confirm_template = common.get_env_variable(os.environ, 'CONFIRM_TEMPLATE_NAME')
+        update_template = common.get_env_variable(os.environ, 'UPDATE_TEMPLATE_NAME')
         domain_name = common.get_env_variable(os.environ, 'DOMAIN_NAME')
 
         resv_id = common.get_path_parameter(event, 'reservationid')
@@ -33,6 +34,9 @@ def purchase_main(event):
         reservation = common_table_ops.get_reservation(table_name, resv_id_index, resv_id)
         common.confirm_reservation_owner(reservation, email)
         common.gift_is_reserved(reservation)
+
+        # Get list owner details
+        list_owner = common_table_ops.get_users_details(table_name, reservation['listOwnerId'])
 
         # Get product to ensure we know the latest quantities.
         product_item = common_table_ops.get_product_item(table_name, reservation['listId'], reservation['productId'])
@@ -47,8 +51,12 @@ def purchase_main(event):
         update_product_and_reservation(table_name, product_key, product_reserved_q, product_purchased_q, reservation_key)
 
         # Send confirmation
-        data = create_email_data(domain_name, reservation['name'], reservation['listId'], reservation['listTitle'], reservation['quantity'], product)
-        common.send_email(reservation['email'], template, data)
+        data = create_confirm_email_data(domain_name, reservation['name'], reservation['listId'], reservation['listTitle'], reservation['quantity'], product)
+        common.send_email(reservation['email'], confirm_template, data)
+
+        # Send update to list owner
+        update_data = create_update_email_data(domain_name, list_owner['name'], reservation['listId'], reservation['listTitle'], reservation['quantity'], reservation['name'], product)
+        common.send_email(list_owner['email'], update_template, update_data)
 
     except Exception as e:
         log.error("Exception: {}".format(e))
@@ -116,7 +124,7 @@ def update_product_and_reservation(table_name, product_key, product_reserved_q, 
     return True
 
 
-def create_email_data(domain_name, name, list_id, title, quantity, product):
+def create_confirm_email_data(domain_name, name, list_id, title, quantity, product):
     imageUrl = common.check_image_url(product['imageUrl'])
 
     template_data = {
@@ -124,6 +132,24 @@ def create_email_data(domain_name, name, list_id, title, quantity, product):
         "list_title": title,
         "list_url": domain_name + "/lists/" + list_id,
         "quantity": quantity,
+        "brand": product['brand'],
+        "details": product['details'],
+        "product_url": product['productUrl'],
+        "image_url": imageUrl
+    }
+
+    return template_data
+
+
+def create_update_email_data(domain_name, name, list_id, title, quantity, reserved_name, product):
+    imageUrl = common.check_image_url(product['imageUrl'])
+
+    template_data = {
+        "name": name,
+        "list_title": title,
+        "list_url": domain_name + "/edit/" + list_id +"?tab=2",
+        "quantity": quantity,
+        "reserved_name": reserved_name,
         "brand": product['brand'],
         "details": product['details'],
         "product_url": product['productUrl'],

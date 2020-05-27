@@ -88,6 +88,7 @@ class Reservation:
         self.name = item.get('name').get('S')
         self.email = item.get('email').get('S')
         self.listId = item.get('listId').get('S')
+        self.listOwnerId = item.get('listOwnerId').get('S')
         self.listTitle = item.get('listTitle').get('S')
         self.productId = item.get('productId').get('S')
         self.productType = item.get('productType').get('S')
@@ -103,6 +104,7 @@ class Reservation:
             'productId': self.productId,
             'userId': self.userId,
             'listId': self.listId,
+            'listOwnerId': self.listOwnerId,
             'name': self.name,
             'email': self.email,
             'quantity': int(self.quantity),

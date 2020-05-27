@@ -70,6 +70,7 @@ class TestReservation:
             'name': {'S': 'Test User2'},
             'email': {'S': 'test.user2@gmail.com'},
             'listId': {'S': '12345678-list-0001-1234-abcdefghijkl'},
+            'listOwnerId': {'S': '12345678-user-0001-1234-abcdefghijkl'},
             'listTitle': {'S': 'Child User1 1st Birthday'},
             'productId': {'S': '12345678-prod-0001-1234-abcdefghijkl'},
             'productType': {'S': 'products'},
@@ -82,6 +83,7 @@ class TestReservation:
         assert reservation['productId'] == '12345678-prod-0001-1234-abcdefghijkl', "Attribute was not correct."
         assert reservation['userId'] == '12345678-user-0002-1234-abcdefghijkl', "Attribute was not correct."
         assert reservation['listId'] == '12345678-list-0001-1234-abcdefghijkl', "Attribute was not correct."
+        assert reservation['listOwnerId'] == '12345678-user-0001-1234-abcdefghijkl', "Attribute was not correct."
         assert reservation['name'] == 'Test User2', "Attribute was not correct."
         assert reservation['email'] == 'test.user2@gmail.com', "Attribute was not correct."
         assert reservation['quantity'] == 1, "Quanity was not correct."

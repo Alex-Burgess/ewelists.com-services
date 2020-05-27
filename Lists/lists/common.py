@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 import boto3
 from urllib.parse import unquote
 from lists import common_table_ops, logger
+from lists.common_entities import List
 
 log = logger.setup_logger()
 
@@ -239,3 +240,13 @@ def check_image_url(url):
         url = 'https:' + url
 
     return url
+
+
+def get_list_details(table_name, list_id):
+    items = common_table_ops.get_list_query(table_name, list_id)
+
+    for item in items:
+        if item['SK']['S'].startswith("USER"):
+            list = List(item).get_details()
+
+    return list

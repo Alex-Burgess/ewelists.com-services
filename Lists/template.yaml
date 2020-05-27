@@ -511,9 +511,12 @@ Resources:
           POSTMAN_USERPOOL_SUB2: !Ref PostmanSub2
           KPI_URL: !If [KpisTrue, !Ref KpiUrl, !Ref "AWS::NoValue" ]
           KPI_COLOUR: '#D9CB04'
-          TEMPLATE_NAME:
+          CONFIRM_TEMPLATE_NAME:
             Fn::ImportValue:
               !Sub "PurchaseConfirmationEmail-TemplateName-${Environment}"
+          UPDATE_TEMPLATE_NAME:
+            Fn::ImportValue:
+              !Sub "PurchaseUpdateEmailStack-TemplateName-${Environment}"
           DOMAIN_NAME: !If [Prod, !Sub "https://${DomainName}",
                           !If [Staging, !Sub "https://${Environment}.${DomainName}", "http://localhost:3000"]
                         ]
