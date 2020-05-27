@@ -6,7 +6,7 @@ Parameters:
     Default: PurchaseUpdateTemplate
   Subject:
     Type: String
-    Default: 'Purchase confirmation of your reserved gift.'
+    Default: 'A Gift was Reserved on {{list_title}}!'
   Environment:
     Description: Environment type.
     Default: prod
