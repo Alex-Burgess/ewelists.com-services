@@ -75,11 +75,16 @@ def url_query(table_name, index_name, url):
 
     product = {}
 
-    product['productId'] = response['Items'][0]['productId']['S']
-    product['brand'] = response['Items'][0]['brand']['S']
-    product['details'] = response['Items'][0]['details']['S']
-    product['imageUrl'] = response['Items'][0]['imageUrl']['S']
-    product['productUrl'] = response['Items'][0]['productUrl']['S']
+    p = response['Items'][0]
+
+    product['productId'] = p['productId']['S']
+    product['brand'] = p['brand']['S']
+    product['details'] = p['details']['S']
+    product['imageUrl'] = p['imageUrl']['S']
+    product['productUrl'] = p['productUrl']['S']
+
+    if 'price' in p:
+        product['price'] = p['price']['S']
 
     return product
 

@@ -61,7 +61,15 @@ def dynamodb_mock():
             "details": "Travel Cot Easy Go, Anthracite, with transport bag",
             "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
             "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58"
-            },
+        },
+        {
+            "productId": "12345678-prod-0002-1234-abcdefghijkl",
+            "brand": "John Lewis & Partners",
+            "details": "Baby GOTS Organic Cotton Elephant Sleepsuit, Pack of 3, White",
+            "price": "13.00",
+            "imageUrl": "https://johnlewis.scene7.com/is/image/JohnLewis/003953444?$rsp-pdp-port-640$",
+            "productUrl": "https://www.johnlewis.com/john-lewis-partners-baby-gots-organic-cotton-elephant-sleepsuit-pack-of-3-white/p4233425"
+        }
     ]
 
     for item in items:
@@ -95,6 +103,16 @@ class TestUrlQuery:
         assert product['details'] == 'Travel Cot Easy Go, Anthracite, with transport bag', "Details was not as expected."
         assert product['imageUrl'] == 'https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg', "Img url was not as expected."
         assert product['productUrl'] == 'https://www.amazon.co.uk/dp/B01H24LM58', "Url was not as expected."
+
+    def test_url_query_with_price(self, dynamodb_mock):
+        query_url = 'https://www.johnlewis.com/john-lewis-partners-baby-gots-organic-cotton-elephant-sleepsuit-pack-of-3-white/p4233425'
+        product = search_url.url_query('products-unittest', 'producturl-index', query_url)
+        assert product['productId'] == '12345678-prod-0002-1234-abcdefghijkl', "Product Id was not as expected."
+        assert product['brand'] == 'John Lewis & Partners', "Brand was not as expected."
+        assert product['details'] == 'Baby GOTS Organic Cotton Elephant Sleepsuit, Pack of 3, White', "Details was not as expected."
+        assert product['price'] == '13.00', "Price was not as expected."
+        assert product['imageUrl'] == 'https://johnlewis.scene7.com/is/image/JohnLewis/003953444?$rsp-pdp-port-640$', "Img url was not as expected."
+        assert product['productUrl'] == 'https://www.johnlewis.com/john-lewis-partners-baby-gots-organic-cotton-elephant-sleepsuit-pack-of-3-white/p4233425', "Url was not as expected."
 
     def test_query_with_wrong_table_name(self, dynamodb_mock):
         query_url = 'https://www.amazon.co.uk/dp/B01H24LM58'
