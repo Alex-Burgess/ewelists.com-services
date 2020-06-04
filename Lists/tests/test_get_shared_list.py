@@ -157,6 +157,16 @@ class TestGetSharedListMain:
         assert len(body['products']) == 6, "Get list response did not contain correct number of products."
         assert len(body['reserved']) == 5, "Number of products reserved was not correct."
 
+    def test_get_list_that_does_not_exist(self, monkeypatch, api_get_shared_list_event, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+
+        api_get_shared_list_event['path'] = "/lists/12345678-list-miss-1234-abcdefghijkl"
+        api_get_shared_list_event['pathParameters'] = {"id": "12345678-list-miss-1234-abcdefghijkl"}
+
+        response = get_shared_list.get_shared_list_main(api_get_shared_list_event)
+        body = json.loads(response['body'])
+        assert body['error'] == "List 12345678-list-miss-1234-abcdefghijkl does not exist.", "Exception not as expected."
+
 
 def test_handler(api_get_shared_list_event, monkeypatch, dynamodb_mock):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

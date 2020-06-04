@@ -22,13 +22,9 @@ class TestGetListQuery:
     def test_get_list_query_for_item_that_does_not_exist(self, dynamodb_mock):
         list_id = "12345678-list-0009-1234-abcdefghijkl"
 
-        response = common_table_ops.get_list_query('lists-unittest', list_id)
-        assert len(response) == 0, "Response was not empty."
-
-        # Used to give exception, but no longer.
-        # with pytest.raises(Exception) as e:
-        #     common_table_ops.get_list_query('lists-unittest', list_id)
-        # assert str(e.value) == "No results for List ID 12345678-list-0009-1234-abcdefghijkl.", "Exception not as expected."
+        with pytest.raises(Exception) as e:
+            common_table_ops.get_list_query('lists-unittest', list_id)
+        assert str(e.value) == "List 12345678-list-0009-1234-abcdefghijkl does not exist.", "Exception not as expected."
 
 
 class TestGetList:
@@ -41,9 +37,8 @@ class TestGetList:
     def test_get_list_with_missing_list_exception(self, dynamodb_mock):
         user_id = '12345678-user-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0009-1234-abcdefghijkl'
-        with pytest.raises(Exception) as e:
-            common_table_ops.get_list('lists-unittest', user_id, list_id)
-        assert str(e.value) == "List ID for user does not exist.", "Exception not as expected."
+        item = common_table_ops.get_list('lists-unittest', user_id, list_id)
+        assert item == {}, "Exception not as expected."
 
 
 class TestGetUsersDetails:

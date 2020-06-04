@@ -11,6 +11,8 @@ dynamodb = boto3.client('dynamodb')
 
 
 def get_list(table_name, user_id, list_id):
+    list_details = {}
+
     key = {
         'PK': {'S': "LIST#" + list_id},
         'SK': {'S': "USER#" + user_id}
@@ -25,11 +27,14 @@ def get_list(table_name, user_id, list_id):
     except ClientError as e:
         raise Exception("Unexpected error: " + e.response['Error']['Message'])
 
-    if 'Item' not in response:
+    if 'Item' in response:
+        list_details = List(response['Item']).get_details()
+    else:
         log.info("List ID {} for user {} does not exist.".format(list_id, user_id))
-        raise Exception("List ID for user does not exist.")
 
-    return List(response['Item']).get_details()
+    log.info("List Details {}.".format(list_details))
+
+    return list_details
 
 
 def get_list_query(table_name, list_id):
@@ -46,8 +51,8 @@ def get_list_query(table_name, list_id):
         log.info("get item response: " + json.dumps(e.response))
         raise Exception("Unexpected error when getting list item from table.")
 
-    # if len(response['Items']) == 0:
-    #     raise Exception("List does not exist.")
+    if len(response['Items']) == 0:
+        raise Exception("List {} does not exist.".format(list_id))
 
     return response['Items']
 
