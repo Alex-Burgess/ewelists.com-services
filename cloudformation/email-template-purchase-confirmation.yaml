@@ -140,10 +140,10 @@ Resources:
 
                         <!-- START LOGO HEADER -->
                         <tr>
-                          <div class="logo-container" style="box-sizing: border-box; display: flex; Margin: 0 auto; max-width: 580px; padding: 15px 20px; justify-content: left; align-items: center; background: #00acc1;">
+                          <div class="logo-container" style="box-sizing: border-box; display: flex; Margin: 0 auto; max-width: 580px; padding: 15px 20px; justify-content: center; align-items: center; background: #577590;">
                             <div class="logo-content">
                               <a href="https://ewelists.com" target="_blank" style="text-align: center;">
-                                <img class="logo_top" style="display:block; border:none;" src="https://ewelists.com/images/logo-white.png" width="140" alt="Ewelists">
+                                <img class="logo_top" style="display:block; border:none;" src="https://ewelists.com/images/logo-vertical-white.svg" width="80" alt="Ewelists">
                               </a>
                             </div>
                           </div>
@@ -229,6 +229,7 @@ Resources:
               </table>
             </body>
           </html>
+
 
 Outputs:
   TemplateName:

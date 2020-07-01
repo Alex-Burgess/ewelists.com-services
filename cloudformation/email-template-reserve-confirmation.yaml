@@ -36,7 +36,7 @@ Resources:
               <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
               <title>Simple Transactional Email</title>
               <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
-              <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+              <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
               <style>
               /* -------------------------------------
                   INLINED WITH htmlemail.io/inline
@@ -140,10 +140,10 @@ Resources:
 
                         <!-- START LOGO HEADER -->
                         <tr>
-                          <div class="logo-container" style="box-sizing: border-box; display: flex; Margin: 0 auto; max-width: 580px; padding: 15px 20px; justify-content: left; align-items: center; background: #00acc1;">
+                          <div class="logo-container" style="box-sizing: border-box; display: flex; Margin: 0 auto; max-width: 580px; padding: 15px 20px; justify-content: center; align-items: center; background: #577590;">
                             <div class="logo-content">
                               <a href="https://ewelists.com" target="_blank" style="text-align: center;">
-                                <img class="logo_top" style="display:block; border:none;" src="https://ewelists.com/images/logo-white.png" width="140" alt="Ewelists">
+                                <img class="logo_top" style="display:block; border:none;" src="https://ewelists.com/images/logo-vertical-white.svg" width="80" alt="Ewelists">
                               </a>
                             </div>
                           </div>
@@ -207,8 +207,8 @@ Resources:
                                           <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
                                             <tbody>
                                               <tr>
-                                                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #9c27b0; border-radius: 5px; text-align: center;">
-                                                  <a href="{{product_url}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #9c27b0; border: solid 1px #9c27b0; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 12px !important; font-weight: 400; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #9c27b0; width: 250px;">BUY GIFT</a> </td>
+                                                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center;">
+                                                  <a href="{{product_url}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #577590; border: solid 1px #577590; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 12px !important; font-weight: 500; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #577590; width: 250px;">BUY GIFT</a> </td>
                                               </tr>
                                             </tbody>
                                           </table>
@@ -230,8 +230,8 @@ Resources:
                                           <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
                                             <tbody>
                                               <tr>
-                                                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #9c27b0; border-radius: 5px; text-align: center;">
-                                                  <a href="{{confirm_url}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #9c27b0; border: solid 1px #9c27b0; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 12px !important; font-weight: 400; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #9c27b0; width: 250px;">I'VE BOUGHT IT</a> </td>
+                                                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center;">
+                                                  <a href="{{confirm_url}}" target="_blank" style="display: inline-block; color: #577590; background-color: #ffffff; border: solid 2px #577590; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 12px !important; font-weight: 500; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #577590; width: 250px;">I'VE BOUGHT IT</a> </td>
                                               </tr>
                                             </tbody>
                                           </table>
@@ -262,8 +262,8 @@ Resources:
                                           <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
                                             <tbody>
                                               <tr>
-                                                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #9c27b0; border-radius: 5px; text-align: center;">
-                                                  <a href="{{edit_url}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #9c27b0; border: solid 1px #9c27b0; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 12px !important; font-weight: 400; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #9c27b0; width: 250px;">EDIT RESERVATION</a> </td>
+                                                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center;">
+                                                  <a href="{{edit_url}}" target="_blank" style="display: inline-block; color: #577590; background-color: #ffffff; border: solid 2px #577590; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 12px !important; font-weight: 500; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #577590; width: 250px;">EDIT RESERVATION</a> </td>
                                               </tr>
                                             </tbody>
                                           </table>
@@ -305,6 +305,7 @@ Resources:
               </table>
             </body>
           </html>
+
 
 Outputs:
   TemplateName:
