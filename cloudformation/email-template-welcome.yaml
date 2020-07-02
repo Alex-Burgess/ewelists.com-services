@@ -85,7 +85,8 @@ Resources:
                   width: auto !important;
                 }
                 .gift-image {
-                  width: 120px
+                  /* width: 16vw;
+                  height: 29.8vw; */
                 }
                 .lists-image {
                   width: 350px
@@ -139,7 +140,7 @@ Resources:
                         <tr>
                           <td align="center" style="font-family: sans-serif; font-size: 14px; vertical-align: top; background: #577590; padding: 15px 20px;">
                             <a href="https://ewelists.com" target="_blank">
-                              <img class="logo_top" style="display:block; border:none;" src="https://ewelists.com/images/logo-vertical-white.png" width="80" alt="Ewelists">
+                              <img class="logo_top" style="display:block; border:none;" src="https://ewelists.com/images/logo-vertical-white-1.png" width="80" alt="Ewelists">
                             </a>
                           </td>
                         </tr>
@@ -184,7 +185,7 @@ Resources:
                               <tr>
                                 <td>
                                   <div class="list-ideas" style="box-sizing: border-box; display: flex; Margin: 0 auto; align-items: center;">
-                                    <img class="gift-image" style="display:block; border:none; padding-right: 30px;" src="https://ewelists.com/images/addtolist.png" width="200" alt="Ewelists">
+                                    <img class="gift-image" style="display:block; border:none; padding-right: 30px; max-width: 200px; max-height: 372px;" src="https://ewelists.com/images/add-to-list-1.png" alt="Ewelists">
                                   </div>
                                 </td>
                                 <td style="font-family: Roboto Slab; font-size: 16px; vertical-align: center;">
@@ -215,7 +216,7 @@ Resources:
                                   </p>
                                   <div class="list-ideas" style="box-sizing: border-box; display: block; Margin: 0 auto;">
                                     <div class="logo-content">
-                                      <img class="lists-image" style="display:block; border:none; Margin: 0 auto; box-shadow: 0 2px 0 rgba(54,45,89,0.15), 0 0 100px rgba(54,45,89,0.2);" src="https://ewelists.com/images/yourlists.png" width="450" alt="Ewelists">
+                                      <img class="lists-image" style="display:block; border:none; Margin: 0 auto; box-shadow: 0 2px 0 rgba(54,45,89,0.15), 0 0 100px rgba(54,45,89,0.2);" src="https://ewelists.com/images/your-lists-1.png" width="450" alt="Ewelists">
                                     </div>
                                   </div>
                                 </td>
@@ -255,6 +256,7 @@ Resources:
               </table>
             </body>
           </html>
+
 
 
 Outputs:
