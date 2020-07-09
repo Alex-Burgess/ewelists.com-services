@@ -127,21 +127,19 @@ Resources:
               </style>
             </head>
             <body class="" style="background-color: #f6f6f6; font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4; margin: 0; padding: 0; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;">
-              <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background-color: #f6f6f6;">
+              <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background-color: #ffffff;">
                 <tr>
                   <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
-                  <td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; Margin: 0 auto; max-width: 580px; padding: 10px; width: 580px;">
-                    <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
+                  <td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; Margin: 0 auto; max-width: 580px; padding: 0px; width: 580px;">
+                    <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 0px;">
 
                       <!-- START CENTERED WHITE CONTAINER -->
-                      <table class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #ffffff; border-radius: 3px;">
+                      <table class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-spacing: 0px; background: #ffffff; border-radius: 3px;">
 
                         <!-- START LOGO HEADER -->
                         <tr>
-                          <td align="center" style="font-family: sans-serif; font-size: 14px; vertical-align: top; background: #577590; padding: 15px 20px;">
-                            <a href="https://ewelists.com" target="_blank">
-                              <img class="logo_top" style="display:block; border:none;" src="https://ewelists.com/images/logo-vertical-white-1.png" width="80" alt="Ewelists">
-                            </a>
+                          <td align="center" style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-collapse: collapse;">
+                            <img class="logo_top" style="display:block; border:none; border-image-width: 0;" src="https://ewelists.com/images/welcome-email-1.png" width="100%" alt="Ewelists">
                           </td>
                         </tr>
 
@@ -179,7 +177,7 @@ Resources:
 
                         <!-- START GIFT IDEAS CONTENT AREA -->
                         <tr>
-                          <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px; background: #e5e5e5;">
+                          <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px; border-top: 1px solid #e5e5e5">
                             <h2 class="list-ideas-heading" style="font-family: Roboto Slab; font-size: 24px; font-weight: 700; color: #3C4858 ; margin-top: 20px; margin-bottom: 40px; text-align: center;"> Need extra gift list ideas? </h2>
                             <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                               <tr>
@@ -203,7 +201,7 @@ Resources:
 
                         <!-- START LOVE LISTS CONTENT AREA -->
                         <tr>
-                          <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px; background: #ffffff;">
+                          <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px; background: #ffffff; border-top: 1px solid #e5e5e5">
                             <h2 class="list-ideas-heading" style="font-family: Roboto Slab; font-size: 24px; font-weight: 700; color: #3C4858 ; margin-top: 20px; margin-bottom: 20px; text-align: center;"> Love Lists? </h2>
                             <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                               <tr>
@@ -232,15 +230,15 @@ Resources:
                       </table>
 
                       <!-- START FOOTER -->
-                      <div class="footer" style="clear: both; Margin-top: 10px; text-align: center; width: 100%;">
+                      <div class="footer" style="clear: both; Margin-top: 20px; text-align: center; width: 100%; border-top: 1px solid #e5e5e5">
                         <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                           <tr>
-                            <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
+                            <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 30px; font-size: 12px; color: #999999; text-align: center;">
                               <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;"> Lytchett House 13 Freeland Park, Wareham Road, Poole, Dorset, United Kingdom, BH16 6FA.</span>
                             </td>
                           </tr>
                           <tr>
-                            <td class="content-block powered-by" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
+                            <td class="content-block powered-by" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #ffffff; text-align: center;">
                               Sent to you by <a href="http://ewelists.com" style="color: #999999; font-size: 12px; text-align: center; text-decoration: none;">https://ewelists.com</a>.
                             </td>
                           </tr>
@@ -256,6 +254,7 @@ Resources:
               </table>
             </body>
           </html>
+
 
 
 
