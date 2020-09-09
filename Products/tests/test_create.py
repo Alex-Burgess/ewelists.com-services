@@ -20,7 +20,7 @@ logger.addHandler(stream_handler)
 def api_create_event():
     event = fixtures.api_gateway_base_event()
     event['httpMethod'] = "POST"
-    event['body'] = "{\n    \"retailer\": \"amazon\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
+    event['body'] = "{\n    \"retailer\": \"amazon.co.uk\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
 
     return event
 
@@ -29,7 +29,7 @@ def api_create_event():
 def api_create_with_price_event():
     event = fixtures.api_gateway_base_event()
     event['httpMethod'] = "POST"
-    event['body'] = "{\n    \"retailer\": \"amazon\",\n    \"price\": \"100.00\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
+    event['body'] = "{\n    \"retailer\": \"amazon.co.uk\",\n    \"price\": \"100.00\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
 
     return event
 
@@ -58,7 +58,7 @@ def dynamodb_mock():
 class TestGetProductInfo:
     def test_get_product_info(self, api_create_event):
         product_info = create.get_product_info(api_create_event)
-        assert product_info['retailer'] == "amazon", "Attribute was not as expected."
+        assert product_info['retailer'] == "amazon.co.uk", "Attribute was not as expected."
         assert product_info['brand'] == "BABYBJÖRN", "Attribute was not as expected."
         assert product_info['details'] == "Travel Cot Easy Go, Anthracite, with transport bag", "Attribute was not as expected."
         assert product_info['productUrl'] == "https://www.amazon.co.uk/dp/B01H24LM58", "Attribute was not as expected."
@@ -76,7 +76,7 @@ class TestGetProductInfo:
 class TestPutProduct:
     def test_put_product(self, dynamodb_mock):
         product_info = {
-            "retailer": "amazon",
+            "retailer": "amazon.co.uk",
             "brand": "BABYBJÖRN",
             "details": "Travel Cot Easy Go, Anthracite, with transport bag",
             "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58",
@@ -88,7 +88,7 @@ class TestPutProduct:
 
     def test_bad_table_name_throws_exception(self, dynamodb_mock):
         product_info = {
-            "retailer": "amazon",
+            "retailer": "amazon.co.uk",
             "brand": "BABYBJÖRN",
             "details": "Travel Cot Easy Go, Anthracite, with transport bag",
             "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58",

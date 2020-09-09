@@ -42,7 +42,7 @@ def dynamodb_mock():
     )
 
     items = [
-        {"productId": "12345678-prod-0010-1234-abcdefghijkl", "retailer": "amazon", "brand": "BABYBJÖRN", "details": "Travel Cot Easy Go, Anthracite, with transport bag", "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58", "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg"},
+        {"productId": "12345678-prod-0010-1234-abcdefghijkl", "retailer": "amazon.co.uk", "brand": "BABYBJÖRN", "details": "Travel Cot Easy Go, Anthracite, with transport bag", "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58", "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg"},
     ]
 
     for item in items:
