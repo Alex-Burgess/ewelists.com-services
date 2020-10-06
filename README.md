@@ -1,7 +1,7 @@
 # ewelists.com-services
-Backend Serverless functions and APIs for the [Ewelists](https://github.com/Alex-Burgess/ewelists.com) application.
+Backend Serverless functions and APIs for the [Ewelists](https://github.com/Ewelists/ewelists.com) application.
 
-More general information about these services and the application as a whole is available at [Ewelists](https://github.com/Alex-Burgess/ewelists.com).
+More general information about these services and the application as a whole is available at [Ewelists](https://github.com/Ewelists/ewelists.com).
 
 
 ## Contents
