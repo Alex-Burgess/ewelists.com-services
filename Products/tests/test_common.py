@@ -1,7 +1,6 @@
 import pytest
 import os
 from products import common
-from tests import fixtures
 
 import sys
 import logging
@@ -9,28 +8,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 stream_handler = logging.StreamHandler(sys.stdout)
 logger.addHandler(stream_handler)
-
-
-@pytest.fixture
-def api_gateway_with_id_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/products/{id}"
-    event['path'] = "/products/12345678-prod-0001-1234-abcdefghijkl"
-    event['httpMethod'] = "GET"
-    event['pathParameters'] = {"id": "12345678-prod-0001-1234-abcdefghijkl"}
-    event['body'] = "null"
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_event_with_no_product_id():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/products"
-    event['path'] = "/products"
-    event['httpMethod'] = "POST"
-
-    return event
 
 
 def test_create_response():

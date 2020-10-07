@@ -5,8 +5,6 @@ from lists import common, common_table_ops, logger
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
 
 def handler(event, context):
     log.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
@@ -37,6 +35,8 @@ def delete_main(event):
 
 
 def delete_reservation_item(table_name, key):
+    dynamodb = boto3.client('dynamodb')
+
     log.info("Deleting reservation id: {}".format(id))
 
     try:

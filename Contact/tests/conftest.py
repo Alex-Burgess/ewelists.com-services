@@ -1,9 +1,33 @@
+import pytest
+import boto3
+from moto import mock_ses
+
+
+@pytest.fixture
+def api_gateway_event():
+    event = api_gateway_base_event()
+    event['resource'] = "/contact"
+    event['path'] = "/contact"
+    event['httpMethod'] = "POST"
+    event['body'] = "{\n    \"name\": \"Test User1\",\n    \"email\": \"test.user1@gmail.com\",\n    \"message\": \"A test message.\"\n}"
+
+    return event
+
+
+@pytest.fixture
+def ses():
+    with mock_ses():
+        ses = boto3.client('ses', region_name='eu-west-1')
+        ses.verify_email_identity(EmailAddress="contact@ewelists.com")
+        yield
+
+
 def api_gateway_base_event():
     """ Generates API GW Event"""
 
     return {
-        "resource": "/products",
-        "path": "/products",
+        "resource": "/lists",
+        "path": "/lists",
         "httpMethod": "GET",
         "headers": {
             "Accept": "*/*",
@@ -34,11 +58,11 @@ def api_gateway_base_event():
         "stageVariables": "null",
         "requestContext": {
             "resourceId": "sgzmgr",
-            "resourcePath": "/products",
+            "resourcePath": "/lists",
             "httpMethod": "GET",
             "extendedRequestId": "BQGojGkBjoEFsTw=",
             "requestTime": "08/Oct/2019:16:22:40 +0000",
-            "path": "/test/products",
+            "path": "/test/lists",
             "accountId": "123456789012",
             "protocol": "HTTP/1.1",
             "stage": "test",

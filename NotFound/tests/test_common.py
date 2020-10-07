@@ -1,76 +1,13 @@
 import pytest
 import os
 from notfound import common
-from tests import fixtures
-
 import sys
 import logging
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 stream_handler = logging.StreamHandler(sys.stdout)
 logger.addHandler(stream_handler)
-
-
-@pytest.fixture
-def api_gateway_with_id_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/notfound/{id}"
-    event['path'] = "/notfound/12345678-notf-0010-1234-abcdefghijkl"
-    event['httpMethod'] = "GET"
-    event['pathParameters'] = {"id": "12345678-notf-0010-1234-abcdefghijkl"}
-    event['body'] = "null"
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_postman_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/notfound/{id}"
-    event['path'] = "/notfound/12345678-notf-0001-1234-abcdefghijkl"
-    event['httpMethod'] = "GET"
-    event['pathParameters'] = {"id": "12345678-notf-0001-1234-abcdefghijkl"}
-    event['body'] = "null"
-
-    event['requestContext']['identity'] = {
-        "cognitoIdentityPoolId": "null",
-        "accountId": "123456789012",
-        "cognitoIdentityId": "null",
-        "caller": "ABCDEFGPDMJL4EB35H6H",
-        "sourceIp": "5.81.150.55",
-        "principalOrgId": "o-d8jj6dyqv2",
-        "accessKey": "ABCDEFGPDMJL4EB35H6H",
-        "cognitoAuthenticationType": "null",
-        "cognitoAuthenticationProvider": "null",
-        "userArn": "arn:aws:iam::123456789012:user/ApiTestUser",
-        "userAgent": "PostmanRuntime/7.15.2",
-        "user": "ABCDEFGPDMJL4EB35H6H"
-    }
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_event_with_no_identity():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/notfound/{id}"
-    event['path'] = "/notfound/12345678-notf-0001-1234-abcdefghijkl"
-    event['httpMethod'] = "GET"
-    event['pathParameters'] = {"id": "12345678-notf-0001-1234-abcdefghijkl"}
-    event['body'] = "null"
-    event['requestContext']['identity'] = {}
-
-    return event
-
-
-@pytest.fixture
-def api_gateway_event_with_no_product_id():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/notfound"
-    event['path'] = "/notfound"
-    event['httpMethod'] = "GET"
-
-    return event
 
 
 def test_create_response():

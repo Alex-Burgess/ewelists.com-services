@@ -13,9 +13,6 @@ if logger.handlers:
     handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
 
 
-dynamodb = boto3.client('dynamodb')
-
-
 def handler(event, context):
     response = search_main(event)
     return response
@@ -55,6 +52,7 @@ def get_url(event):
 
 def url_query(table_name, index_name, url):
     logger.info("Querying table for product with url {}.".format(url))
+    dynamodb = boto3.client('dynamodb')
 
     try:
         response = dynamodb.query(

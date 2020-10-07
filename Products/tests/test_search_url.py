@@ -3,10 +3,7 @@ import os
 import re
 import json
 import copy
-import boto3
-from moto import mock_dynamodb2
 from products import search_url
-from tests import fixtures
 
 import sys
 import logging
@@ -14,70 +11,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 stream_handler = logging.StreamHandler(sys.stdout)
 logger.addHandler(stream_handler)
-
-
-@pytest.fixture
-def api_gateway_search_event():
-    event = fixtures.api_gateway_base_event()
-    event['resource'] = "/products/url/{url}"
-    event['path'] = "/products/url/https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB01H24LM58"
-    event['httpMethod'] = "GET"
-    event['pathParameters'] = {"url": "https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB01H24LM58"}
-    event['body'] = "null"
-
-    return event
-
-
-@pytest.fixture
-def dynamodb_mock():
-    table_name = 'products-unittest'
-
-    mock = mock_dynamodb2()
-    mock.start()
-
-    dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
-
-    table = dynamodb.create_table(
-            TableName=table_name,
-            KeySchema=[{'AttributeName': 'productId', 'KeyType': 'HASH'}],
-            AttributeDefinitions=[
-                {'AttributeName': 'productId', 'AttributeType': 'S'},
-                {'AttributeName': 'productUrl', 'AttributeType': 'S'}
-            ],
-            ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5},
-            GlobalSecondaryIndexes=[
-                {
-                    'IndexName': 'producturl-index',
-                    'KeySchema': [{'AttributeName': 'productUrl', 'KeyType': 'HASH'}],
-                    'Projection': {'ProjectionType': 'ALL'}
-                }
-            ]
-        )
-
-    items = [
-        {
-            "productId": "12345678-prod-0001-1234-abcdefghijkl",
-            "brand": "BABYBJÖRN",
-            "details": "Travel Cot Easy Go, Anthracite, with transport bag",
-            "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
-            "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58"
-        },
-        {
-            "productId": "12345678-prod-0002-1234-abcdefghijkl",
-            "brand": "John Lewis & Partners",
-            "details": "Baby GOTS Organic Cotton Elephant Sleepsuit, Pack of 3, White",
-            "price": "13.00",
-            "imageUrl": "https://johnlewis.scene7.com/is/image/JohnLewis/003953444?$rsp-pdp-port-640$",
-            "productUrl": "https://www.johnlewis.com/john-lewis-partners-baby-gots-organic-cotton-elephant-sleepsuit-pack-of-3-white/p4233425"
-        }
-    ]
-
-    for item in items:
-        table.put_item(TableName=table_name, Item=item)
-
-    yield
-    # teardown: stop moto server
-    mock.stop()
 
 
 class TestGetUrl:
@@ -95,7 +28,7 @@ class TestGetUrl:
 
 
 class TestUrlQuery:
-    def test_url_query(self, dynamodb_mock):
+    def test_url_query(self, table):
         query_url = 'https://www.amazon.co.uk/dp/B01H24LM58'
         product = search_url.url_query('products-unittest', 'producturl-index', query_url)
         assert product['productId'] == '12345678-prod-0001-1234-abcdefghijkl', "Product Id was not as expected."
@@ -104,7 +37,7 @@ class TestUrlQuery:
         assert product['imageUrl'] == 'https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg', "Img url was not as expected."
         assert product['productUrl'] == 'https://www.amazon.co.uk/dp/B01H24LM58', "Url was not as expected."
 
-    def test_url_query_with_price(self, dynamodb_mock):
+    def test_url_query_with_price(self, table):
         query_url = 'https://www.johnlewis.com/john-lewis-partners-baby-gots-organic-cotton-elephant-sleepsuit-pack-of-3-white/p4233425'
         product = search_url.url_query('products-unittest', 'producturl-index', query_url)
         assert product['productId'] == '12345678-prod-0002-1234-abcdefghijkl', "Product Id was not as expected."
@@ -114,21 +47,21 @@ class TestUrlQuery:
         assert product['imageUrl'] == 'https://johnlewis.scene7.com/is/image/JohnLewis/003953444?$rsp-pdp-port-640$', "Img url was not as expected."
         assert product['productUrl'] == 'https://www.johnlewis.com/john-lewis-partners-baby-gots-organic-cotton-elephant-sleepsuit-pack-of-3-white/p4233425', "Url was not as expected."
 
-    def test_query_with_wrong_table_name(self, dynamodb_mock):
+    def test_query_with_wrong_table_name(self, table):
         query_url = 'https://www.amazon.co.uk/dp/B01H24LM58'
 
         with pytest.raises(Exception) as e:
             search_url.url_query('products-unittes', 'producturl-index', query_url)
         assert str(e.value) == "Unexpected error when searching for product.", "Exception not as expected."
 
-    def test_query_with_product_that_does_not_exist(self, dynamodb_mock):
+    def test_query_with_product_that_does_not_exist(self, table):
         query_url = 'https://www.amazon.co.uk/dp/B01H24LM58/missing'
         product = search_url.url_query('products-unittest', 'producturl-index', query_url)
         assert len(product) == 0, "Product was not empty as expected"
 
 
 class TestSearchMain:
-    def test_search_main(self, monkeypatch, api_gateway_search_event, dynamodb_mock):
+    def test_search_main(self, monkeypatch, api_gateway_search_event, table):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittest')
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'producturl-index')
 
@@ -140,7 +73,7 @@ class TestSearchMain:
         assert body['product']['imageUrl'] == 'https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg', "Img url was not as expected."
         assert body['product']['productUrl'] == 'https://www.amazon.co.uk/dp/B01H24LM58', "Url was not as expected."
 
-    def test_with_url_that_does_not_exist(self, monkeypatch, api_gateway_search_event, dynamodb_mock):
+    def test_with_url_that_does_not_exist(self, monkeypatch, api_gateway_search_event, table):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittest')
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'producturl-index')
 
@@ -151,7 +84,7 @@ class TestSearchMain:
         body = json.loads(response['body'])
         assert len(body['product']) == 0, "Number of products returned was not 0"
 
-    def test_wrong_table_returns_error(self, monkeypatch, api_gateway_search_event, dynamodb_mock):
+    def test_wrong_table_returns_error(self, monkeypatch, api_gateway_search_event, table):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittes')
         monkeypatch.setitem(os.environ, 'INDEX_NAME', 'producturl-index')
 
@@ -161,7 +94,7 @@ class TestSearchMain:
         assert body['error'] == 'Unexpected error when searching for product.', "Get list response did not contain the correct error message."
 
 
-def test_handler(api_gateway_search_event, monkeypatch, dynamodb_mock):
+def test_handler(api_gateway_search_event, monkeypatch, table):
     monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittest')
     monkeypatch.setitem(os.environ, 'INDEX_NAME', 'producturl-index')
     response = search_url.handler(api_gateway_search_event, None)

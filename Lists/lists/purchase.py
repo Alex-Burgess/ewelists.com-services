@@ -5,9 +5,6 @@ from lists import common, common_table_ops, common_kpi, logger
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
-ses = boto3.client('ses', region_name='eu-west-1')
 SENDER = "Ewelists <contact@ewelists.com>"
 
 
@@ -86,6 +83,8 @@ def new_purchased_quantity(product_purchased_quantity, user_reserved_quantity):
 
 
 def update_product_and_reservation(table_name, product_key, product_reserved_q, product_purchased_q, reservation_key):
+    dynamodb = boto3.client('dynamodb')
+
     try:
         response = dynamodb.transact_write_items(
             TransactItems=[
@@ -147,7 +146,7 @@ def create_update_email_data(domain_name, name, list_id, title, quantity, reserv
     template_data = {
         "name": name,
         "list_title": title,
-        "list_url": domain_name + "/edit/" + list_id +"?tab=2",
+        "list_url": domain_name + "/edit/" + list_id + "?tab=2",
         "quantity": quantity,
         "reserved_name": reserved_name,
         "brand": product['brand'],

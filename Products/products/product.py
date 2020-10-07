@@ -14,9 +14,6 @@ if logger.handlers:
     handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
 
 
-dynamodb = boto3.client('dynamodb')
-
-
 def handler(event, context):
     response = get_main(event)
     return response
@@ -39,6 +36,7 @@ def get_main(event):
 
 def get_product(table_name, product_id):
     key = {'productId': {'S': product_id}}
+    dynamodb = boto3.client('dynamodb')
 
     try:
         response = dynamodb.get_item(

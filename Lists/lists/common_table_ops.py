@@ -7,10 +7,9 @@ from botocore.exceptions import ClientError
 log = logger.setup_logger()
 
 
-dynamodb = boto3.client('dynamodb')
-
-
 def get_list(table_name, user_id, list_id):
+    dynamodb = boto3.client('dynamodb')
+
     list_details = {}
 
     key = {
@@ -39,6 +38,7 @@ def get_list(table_name, user_id, list_id):
 
 def get_list_query(table_name, list_id):
     log.info("Querying table {} for list ID {}.".format(table_name, list_id))
+    dynamodb = boto3.client('dynamodb')
 
     try:
         response = dynamodb.query(
@@ -58,6 +58,8 @@ def get_list_query(table_name, list_id):
 
 
 def get_users_details(table_name, user_id):
+    dynamodb = boto3.client('dynamodb')
+
     key = {
         'PK': {'S': "USER#" + user_id},
         'SK': {'S': "USER#" + user_id}
@@ -80,6 +82,8 @@ def get_users_details(table_name, user_id):
 
 
 def get_user_id_from_email(table_name, index_name, email):
+    dynamodb = boto3.client('dynamodb')
+
     try:
         response = dynamodb.query(
             TableName=table_name,
@@ -100,6 +104,8 @@ def get_user_id_from_email(table_name, index_name, email):
 
 
 def get_product_item(table_name, list_id, product_id):
+    dynamodb = boto3.client('dynamodb')
+
     log.info("Getting product item {} for list {}.".format(product_id, list_id))
     key = {
         'PK': {'S': "LIST#" + list_id},
@@ -126,6 +132,8 @@ def get_product_item(table_name, list_id, product_id):
 
 
 def get_reservation_items_query(table_name, list_id, product_id, user_id):
+    dynamodb = boto3.client('dynamodb')
+
     try:
         response = dynamodb.query(
             TableName=table_name,
@@ -173,6 +181,8 @@ def check_product_not_reserved_by_user(table_name, list_id, product_id, user_id)
 
 
 def get_reservation(table_name, index_name, resv_id):
+    dynamodb = boto3.client('dynamodb')
+
     try:
         response = dynamodb.query(
             TableName=table_name,

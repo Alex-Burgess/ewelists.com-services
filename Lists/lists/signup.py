@@ -7,10 +7,6 @@ from lists import common, common_kpi, logger
 
 log = logger.setup_logger()
 
-client = boto3.client('cognito-idp')
-dynamodb = boto3.client('dynamodb')
-ses = boto3.client('ses', region_name='eu-west-1')
-
 # Email configuration
 CHARSET = "UTF-8"
 SENDER = "Ewelists <contact@ewelists.com>"
@@ -81,6 +77,8 @@ def create_email_data(domain_name, name):
 
 
 def set_random_password(user_pool_id, email):
+    client = boto3.client('cognito-idp')
+
     log.info("Using admin_set_user_password to push user out of FORCE_CHANGED_PASSWORD state.")
     password = '!' + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(12))
 
@@ -107,6 +105,8 @@ def set_random_password(user_pool_id, email):
 
 
 def create_new_cognito_user(user_pool_id, email, name):
+    client = boto3.client('cognito-idp')
+
     result = {}
 
     try:
@@ -133,6 +133,7 @@ def create_new_cognito_user(user_pool_id, email, name):
 
 
 def link_accounts(user_pool_id, email, existing_sub, new_type, new_id):
+    client = boto3.client('cognito-idp')
     log.info("Linking accounts with email {}. {} account ID ({}). Existing user pool identity ({}).".format(email, new_type, new_id, existing_sub))
 
     try:
@@ -158,6 +159,8 @@ def link_accounts(user_pool_id, email, existing_sub, new_type, new_id):
 
 
 def create_user_in_lists_db(table_name, sub, email, name):
+    dynamodb = boto3.client('dynamodb')
+
     log.info("Creating entry in table {} for user with email {} (sub: {}).".format(table_name, email, sub))
 
     user_item = {
@@ -236,6 +239,8 @@ def switch_google_domain(email):
 
 
 def get_user_client_call(user_pool_id, email):
+    client = boto3.client('cognito-idp')
+
     response = client.list_users(
         UserPoolId=user_pool_id,
         AttributesToGet=['sub', 'email'],

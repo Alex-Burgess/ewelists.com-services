@@ -6,8 +6,6 @@ from lists.common_entities import User, List
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
 
 def handler(event, context):
     response = list_main(event)
@@ -31,6 +29,8 @@ def list_main(event):
 
 
 def get_lists(table_name, index_name, cognito_user_id):
+    dynamodb = boto3.client('dynamodb')
+
     response_data = {"user": None, "owned": [], "closed": []}
 
     log.info("Querying table")

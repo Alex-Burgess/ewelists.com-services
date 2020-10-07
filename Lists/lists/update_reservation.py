@@ -5,8 +5,6 @@ from lists import common, common_table_ops, logger
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
 
 def handler(event, context):
     log.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
@@ -58,7 +56,7 @@ def calculate_difference_to_reserved_item_quantity(reserved_item, new_quantity):
     difference = new_quantity - reserved_item['quantity']
 
     if new_quantity <= 0:
-        message = "Reserved quantity cannot be reduced to 0.".format(reserved_item['quantity'], reserved_item['productId'], reserved_item['userId'])
+        message = "Reserved quantity cannot be reduced to 0."
         log.info(message)
         raise Exception(message)
 
@@ -71,6 +69,8 @@ def calculate_difference_to_reserved_item_quantity(reserved_item, new_quantity):
 
 
 def update_product_and_reservation(table_name, product_key, reservation_key, new_product_reserved_quantity, request_reserve_quantity):
+    dynamodb = boto3.client('dynamodb')
+
     try:
         response = dynamodb.transact_write_items(
             TransactItems=[

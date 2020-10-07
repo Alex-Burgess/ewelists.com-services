@@ -37,7 +37,7 @@ class List:
             self.eventDate = item.get('eventDate').get('S')
 
     def __repr__(self):
-        return "List<{} -- {} -- {}>".format(self.listId, self.title, self.occasion, self.imageUrl)
+        return "List<{} -- {} -- {} -- {}>".format(self.listId, self.title, self.occasion, self.imageUrl)
 
     def get_details(self):
         list = {
@@ -67,7 +67,7 @@ class Product:
         self.type = item.get('type').get('S')
 
     def __repr__(self):
-        return "Product<{} -- {} -- {} -- {}>".format(self.productId, self.listId, self.quantity, self.reserved, self.type)
+        return "Product<{} -- {} -- {} -- {} -- {}>".format(self.productId, self.listId, self.quantity, self.reserved, self.type)
 
     def get_details(self):
         product = {

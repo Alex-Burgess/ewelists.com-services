@@ -6,8 +6,6 @@ from botocore.exceptions import ClientError
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
 
 def handler(event, context):
     response = add_product_main(event)
@@ -39,6 +37,8 @@ def add_product_main(event):
 
 
 def create_product_item(table_name, list_id, product_id, type, quantity):
+    dynamodb = boto3.client('dynamodb')
+
     item = {
         'PK': {'S': "LIST#{}".format(list_id)},
         'SK': {'S': "PRODUCT#{}".format(product_id)},

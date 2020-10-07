@@ -2,7 +2,39 @@ import json
 import os
 import pytest
 import boto3
-from moto import mock_dynamodb2
+import uuid
+from moto import mock_dynamodb2, mock_cognitoidp
+
+
+@pytest.fixture
+def cognito_mock():
+    with mock_cognitoidp():
+        client = boto3.client('cognito-idp', region_name='eu-west-1')
+
+        user_pool_id = client.create_user_pool(PoolName='ewelists-unittest')["UserPool"]["Id"]
+        print("Userpool ID: " + user_pool_id)
+
+        client.admin_create_user(
+            UserPoolId=user_pool_id,
+            Username=str(uuid.uuid4()),
+            UserAttributes=[{"Name": "email", "Value": 'test.exists@gmail.com'}]
+        )
+
+        client.admin_create_user(
+            UserPoolId=user_pool_id,
+            Username=str(uuid.uuid4()),
+            UserAttributes=[{"Name": "email", "Value": 'test.exists2@googlemail.com'}]
+        )
+
+        yield
+
+
+@pytest.fixture
+def user_pool_id(monkeypatch):
+    client = boto3.client('cognito-idp', region_name='eu-west-1')
+    list_response = client.list_user_pools(MaxResults=1)
+    id = list_response['UserPools'][0]['Id']
+    return id
 
 
 @pytest.fixture

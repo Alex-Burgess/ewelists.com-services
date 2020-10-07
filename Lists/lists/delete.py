@@ -6,8 +6,6 @@ from botocore.exceptions import ClientError
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
 
 def handler(event, context):
     response = delete_main(event)
@@ -36,6 +34,8 @@ def delete_main(event):
 
 
 def delete_items(table_name, cognito_user_id, list_id, items):
+    dynamodb = boto3.client('dynamodb')
+
     log.info("Deleting List ID: {} for user: {}.".format(list_id, cognito_user_id))
 
     for item in items:
@@ -65,6 +65,8 @@ def delete_items(table_name, cognito_user_id, list_id, items):
 
 
 def get_items_associated_with_list(table_name, list_id):
+    dynamodb = boto3.client('dynamodb')
+
     log.info("Querying table for all items to delete")
 
     try:

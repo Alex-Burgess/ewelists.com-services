@@ -7,9 +7,6 @@ from lists import common, common_table_ops, common_kpi, logger
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
-ses = boto3.client('ses', region_name='eu-west-1')
 SENDER = "Ewelists <contact@ewelists.com>"
 
 
@@ -83,6 +80,8 @@ def create_reservation_item(list_id, list_owner_id, list_title, product_id, prod
 
 
 def create_reservation(table_name, new_product_reserved_quantity, product_key, reservation_item):
+    dynamodb = boto3.client('dynamodb')
+
     try:
         response = dynamodb.transact_write_items(
             TransactItems=[

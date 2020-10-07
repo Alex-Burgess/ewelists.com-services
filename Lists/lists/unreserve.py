@@ -5,8 +5,6 @@ from lists import common, common_table_ops, logger
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
 
 def handler(event, context):
     log.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
@@ -51,6 +49,7 @@ def unreserve_main(event):
 
 
 def unreserve_product(table_name, product_key, reservation_key, new_product_reserved_quantity):
+    dynamodb = boto3.client('dynamodb')
     try:
         response = dynamodb.transact_write_items(
             TransactItems=[

@@ -5,8 +5,6 @@ from lists import common, logger
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
 
 def handler(event, context):
     response = delete_product_main(event)
@@ -34,6 +32,8 @@ def delete_product_main(event):
 
 
 def delete_product_item(table_name, list_id, product_id):
+    dynamodb = boto3.client('dynamodb')
+    
     key = {
         'PK': {'S': "LIST#{}".format(list_id)},
         'SK': {'S': "PRODUCT#{}".format(product_id)}

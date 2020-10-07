@@ -7,8 +7,6 @@ from lists import common, common_table_ops, common_kpi, logger
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
 
 def handler(event, context):
     response = create_main(event)
@@ -37,6 +35,8 @@ def create_main(event):
 
 
 def put_item_in_table(table_name, cognito_user_id, listId, attributes, users_name):
+    dynamodb = boto3.client('dynamodb')
+
     item = {
         'PK': {'S': "LIST#{}".format(listId)},
         'SK': {'S': "USER#{}".format(cognito_user_id)},

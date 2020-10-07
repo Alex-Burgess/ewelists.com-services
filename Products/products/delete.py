@@ -12,9 +12,6 @@ if logger.handlers:
     handler.setFormatter(logging.Formatter("[%(levelname)s]\t%(asctime)s.%(msecs)dZ\t%(aws_request_id)s\t%(module)s:%(funcName)s\t%(message)s\n", "%Y-%m-%dT%H:%M:%S"))
 
 
-dynamodb = boto3.client('dynamodb')
-
-
 def handler(event, context):
     response = delete_main(event)
     return response
@@ -38,6 +35,7 @@ def delete_main(event):
 
 def delete_product(table_name, product_id):
     logger.info("Deleting Product ID: {}.".format(product_id))
+    dynamodb = boto3.client('dynamodb')
 
     key = {
         'productId': {'S': product_id},

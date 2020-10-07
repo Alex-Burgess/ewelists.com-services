@@ -4,7 +4,8 @@ phases:
   pre_build:
     commands:
       - pip install -q --upgrade pip
-      - pip install -Iv moto==1.3.14
+      # - pip install -Iv moto==1.3.14
+      - pip install -Iv moto==1.3.16
       - pip install -q --user pytest boto3 requests_mock --no-warn-script-location
       - /root/.local/bin/pytest --version
   build:

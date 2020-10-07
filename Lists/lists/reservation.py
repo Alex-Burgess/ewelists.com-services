@@ -1,11 +1,8 @@
 import json
 import os
-import boto3
 from lists import common, common_table_ops, logger
 
 log = logger.setup_logger()
-
-dynamodb = boto3.client('dynamodb')
 
 
 def handler(event, context):

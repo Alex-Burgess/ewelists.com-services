@@ -5,8 +5,6 @@ from lists import common, logger
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
 
 def handler(event, context):
     log.info("Path Parameters: {}".format(json.dumps(event['pathParameters'])))
@@ -34,6 +32,8 @@ def close_main(event):
 
 
 def update_list(table_name, user_id, list_id):
+    dynamodb = boto3.client('dynamodb')
+    
     key = {
         'PK': {'S': "LIST#{}".format(list_id)},
         'SK': {'S': "USER#{}".format(user_id)}

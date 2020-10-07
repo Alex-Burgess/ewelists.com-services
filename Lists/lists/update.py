@@ -5,8 +5,6 @@ from lists import common, logger
 
 log = logger.setup_logger()
 
-dynamodb = boto3.client('dynamodb')
-
 
 def handler(event, context):
     response = update_list_main(event)
@@ -58,6 +56,7 @@ def get_attribute_details(event):
 
 
 def get_items_to_update(table_name, list_id):
+    dynamodb = boto3.client('dynamodb')
     log.info("Querying table {} to find all items associated with list id {}".format(table_name, list_id))
 
     try:
@@ -85,6 +84,7 @@ def get_items_to_update(table_name, list_id):
 
 
 def update_list(table_name, items, new_attribute_values):
+    dynamodb = boto3.client('dynamodb')
     update_results = []
     for item in items:
         log.info("Updating item with PK ({}), SK ({}) with attribute values: {}".format(item['PK']['S'], item['SK']['S'], json.dumps(new_attribute_values)))

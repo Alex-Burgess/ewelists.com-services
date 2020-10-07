@@ -8,7 +8,6 @@ from lists.common_entities import List
 
 log = logger.setup_logger()
 
-ses = boto3.client('ses', region_name='eu-west-1')
 SENDER = "Ewelists <contact@ewelists.com>"
 
 
@@ -122,6 +121,8 @@ def create_response(code, body):
 
 
 def send_email(email, template, template_data):
+    ses = boto3.client('ses', region_name='eu-west-1')
+
     log.info("Sending email template {} with data: {}".format(template, template_data))
     try:
         response = ses.send_templated_email(
