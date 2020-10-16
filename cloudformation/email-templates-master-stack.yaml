@@ -13,7 +13,7 @@ Parameters:
       - test
   BucketEndpoint:
     Description: Name of the bucket that the nest stack templates reside in.
-    Default: https://services-email-templates.s3-eu-west-1.amazonaws.com
+    Default: https://pipeline-services-email-templates.s3-eu-west-1.amazonaws.com
     Type: String
 
 Resources:
