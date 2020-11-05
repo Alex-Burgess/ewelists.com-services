@@ -44,6 +44,19 @@ class TestPutProduct:
         product_id = create.put_product('products-unittest', product_info)
         assert len(product_id) == 36, 'Product ID not expected length.'
 
+    def test_put_product_with_search_flag(self, empty_table):
+        product_info = {
+            "retailer": "amazon.co.uk",
+            "brand": "BABYBJÖRN",
+            "details": "Travel Cot Easy Go, Anthracite, with transport bag",
+            "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58",
+            "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
+            "searchHidden": True
+        }
+
+        product_id = create.put_product('products-unittest', product_info)
+        assert len(product_id) == 36, 'Product ID not expected length.'
+
     def test_bad_table_name_throws_exception(self, empty_table):
         product_info = {
             "retailer": "amazon.co.uk",
@@ -71,6 +84,14 @@ class TestCreateMain:
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittest')
 
         response = create.create_main(api_create_with_price_event)
+        body = json.loads(response['body'])
+
+        assert len(body['productId']) == 36, "Create main response did not contain a listId."
+
+    def test_create_with_search_hidden_flag(self, monkeypatch, api_create_with_search_flag_event, empty_table):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittest')
+
+        response = create.create_main(api_create_with_search_flag_event)
         body = json.loads(response['body'])
 
         assert len(body['productId']) == 36, "Create main response did not contain a listId."

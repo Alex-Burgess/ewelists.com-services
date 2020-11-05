@@ -25,6 +25,8 @@ def search_main(event):
         product_url = get_url(event)
         parsed_url = parse_url(product_url)
         product = url_query(table_name, index_name, parsed_url)
+        if search_hidden(product):
+            product.clear()
     except Exception as e:
         logger.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -34,6 +36,14 @@ def search_main(event):
     data = {'product': product}
     response = common.create_response(200, json.dumps(data))
     return response
+
+
+def search_hidden(product):
+    if 'searchHidden' in product:
+        if product['searchHidden']:
+            return True
+
+    return False
 
 
 def get_url(event):
@@ -83,6 +93,9 @@ def url_query(table_name, index_name, url):
 
     if 'price' in p:
         product['price'] = p['price']['S']
+
+    if 'searchHidden' in p:
+        product['searchHidden'] = p['searchHidden']['BOOL']
 
     return product
 

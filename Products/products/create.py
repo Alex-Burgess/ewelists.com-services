@@ -72,6 +72,11 @@ def put_product(table_name, product_info):
     if 'price' in product_info:
         item['price'] = {'S': product_info['price']}
 
+    if 'searchHidden' in product_info:
+        item['searchHidden'] = {'BOOL': product_info['searchHidden']}
+    else:
+        item['searchHidden'] = {'BOOL': False}
+
     try:
         logger.info("Product item to be put in table: {}".format(item))
         dynamodb.put_item(TableName=table_name, Item=item)

@@ -1,5 +1,6 @@
 import pytest
 import boto3
+import json
 from moto import mock_dynamodb2
 
 
@@ -68,6 +69,15 @@ def table():
                 "details": "Travel Cot Easy Go, Anthracite, with transport bag",
                 "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
                 "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58"
+            },
+            {
+                "productId": "12345678-prod-0004-1234-abcdefghijkl",
+                "retailer": "amazon.co.uk",
+                "brand": "BABYBJÖRN",
+                "details": "Travel Cot Easy Go, Anthracite, with transport bag",
+                "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
+                "productUrl": "https://www.amazon.co.uk/dp/B01H24LM12",
+                "searchHidden": True
             }
         ]
 
@@ -113,6 +123,24 @@ def api_create_with_price_event():
     event = api_gateway_base_event()
     event['httpMethod'] = "POST"
     event['body'] = "{\n    \"retailer\": \"amazon.co.uk\",\n    \"price\": \"100.00\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\"\n}"
+
+    return event
+
+
+@pytest.fixture
+def api_create_with_search_flag_event():
+    event = api_gateway_base_event()
+    event['httpMethod'] = "POST"
+
+    event['body'] = json.dumps({
+        "brand": "BABYBJÖRN",
+        "details": "Travel Cot Easy Go, Anthracite, with transport bag",
+        "retailer": "amazon.co.uk",
+        "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
+        "productUrl": "https://www.amazon.co.uk/dp/B01H24LM12",
+        "price": "100.00",
+        "searchHidden": True
+    })
 
     return event
 

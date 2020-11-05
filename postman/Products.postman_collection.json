@@ -966,7 +966,7 @@
 									"});",
 									"",
 									"pm.test(\"Clear environment variable\", function() {",
-									"    pm.environment.unset(\"nf_product_id\")",
+									"    pm.environment.unset(\"p_product_id\")",
 									"});",
 									"",
 									"",
@@ -979,6 +979,288 @@
 							"listen": "prerequest",
 							"script": {
 								"id": "b0271be0-88a1-40ec-ac91-fb6f3787534e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/{{p_product_id}}",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products",
+								"{{p_product_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Search for product with search hidden flag",
+			"item": [
+				{
+					"name": "create product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1ef42da8-ce57-498b-bf9e-dee5afe805ef",
+								"exec": [
+									"pm.test(\"Add variable for new Product ID\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    productId = jsonData[\"productId\"];",
+									"    pm.environment.set(\"p_product_id\", productId);",
+									"});",
+									"",
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"A list Id should be returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var productId = jsonData['productId'];",
+									"    pm.expect(productId.length).to.eql(36);",
+									"});",
+									"",
+									"pm.test(\"Response message should be created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var message = jsonData['message'];",
+									"    pm.expect(message).to.eql('success');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"retailer\": \"amazon.co.uk\",\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"productUrl\": \"https://www.amazon.co.uk/dp/B01H24LM58\",\n    \"imageUrl\": \"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\",\n    \"searchHidden\": true\n}"
+						},
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "search with url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0b6eac1d-0d96-4299-8376-78ce53286954",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"The returned object should contain the correct list details\", function () {",
+									"    var product_obj = pm.response.json();",
+									"    pm.expect(product_obj.product).to.eql({});",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "fca79d6d-6261-4c98-9f66-81345caecb45",
+								"exec": [
+									"pm.environment.get(\"list_id\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{products_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/products/url/https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB01H24LM58",
+							"protocol": "https",
+							"host": [
+								"{{products_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"products",
+								"url",
+								"https%3A%2F%2Fwww.amazon.co.uk%2Fdp%2FB01H24LM58"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "delete product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "76582a86-c069-4623-8cb6-16fa3bc2eda1",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response should confirm deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var deletedBool = jsonData['deleted'];",
+									"    pm.expect(deletedBool).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Clear environment variable\", function() {",
+									"    pm.environment.unset(\"p_product_id\")",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "fdf6a8f5-b53b-46a3-aad4-d45953b9fef1",
 								"exec": [
 									""
 								],

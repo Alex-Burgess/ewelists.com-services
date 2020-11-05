@@ -13,6 +13,44 @@ stream_handler = logging.StreamHandler(sys.stdout)
 logger.addHandler(stream_handler)
 
 
+class TestSearchHidden:
+    def test_product_no_search_hidden_flag(self):
+        product = {
+            "productId": "12345678-prod-0003-1234-abcdefghijkl",
+            "retailer": "amazon.co.uk",
+            "brand": "BABYBJÖRN",
+            "details": "Travel Cot Easy Go, Anthracite, with transport bag",
+            "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
+            "productUrl": "https://www.amazon.co.uk/dp/B01H24LM12",
+        }
+        assert not search_url.search_hidden(product)
+
+    def test_product_not_hidden_from_search_hidden(self):
+        product = {
+            "productId": "12345678-prod-0003-1234-abcdefghijkl",
+            "retailer": "amazon.co.uk",
+            "brand": "BABYBJÖRN",
+            "details": "Travel Cot Easy Go, Anthracite, with transport bag",
+            "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
+            "productUrl": "https://www.amazon.co.uk/dp/B01H24LM12",
+            "searchHidden": False
+        }
+        assert not search_url.search_hidden(product)
+
+    def test_product_hidden_from_search_hidden(self):
+        product = {
+            "productId": "12345678-prod-0003-1234-abcdefghijkl",
+            "retailer": "amazon.co.uk",
+            "brand": "BABYBJÖRN",
+            "details": "Travel Cot Easy Go, Anthracite, with transport bag",
+            "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
+            "productUrl": "https://www.amazon.co.uk/dp/B01H24LM12",
+            "searchHidden": True
+        }
+
+        assert search_url.search_hidden(product)
+
+
 class TestGetUrl:
     def test_get_url(self, api_gateway_search_event):
         url = search_url.get_url(api_gateway_search_event)
@@ -47,6 +85,16 @@ class TestUrlQuery:
         assert product['imageUrl'] == 'https://johnlewis.scene7.com/is/image/JohnLewis/003953444?$rsp-pdp-port-640$', "Img url was not as expected."
         assert product['productUrl'] == 'https://www.johnlewis.com/john-lewis-partners-baby-gots-organic-cotton-elephant-sleepsuit-pack-of-3-white/p4233425', "Url was not as expected."
 
+    def test_url_query_with_search_hidden_flag(self, table):
+        query_url = 'https://www.amazon.co.uk/dp/B01H24LM12'
+        product = search_url.url_query('products-unittest', 'producturl-index', query_url)
+        assert product['productId'] == '12345678-prod-0004-1234-abcdefghijkl', "Product Id was not as expected."
+        assert product['brand'] == 'BABYBJÖRN', "Brand was not as expected."
+        assert product['details'] == 'Travel Cot Easy Go, Anthracite, with transport bag', "Details was not as expected."
+        assert product['imageUrl'] == 'https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg', "Img url was not as expected."
+        assert product['productUrl'] == 'https://www.amazon.co.uk/dp/B01H24LM12', "Url was not as expected."
+        assert product['searchHidden'], "Search hidden flag was not as expected."
+
     def test_query_with_wrong_table_name(self, table):
         query_url = 'https://www.amazon.co.uk/dp/B01H24LM58'
 
@@ -79,6 +127,17 @@ class TestSearchMain:
 
         event_no_product = copy.deepcopy(api_gateway_search_event)
         event_no_product['pathParameters']['url'] = 'https://random.co.uk/product1234'
+
+        response = search_url.search_main(event_no_product)
+        body = json.loads(response['body'])
+        assert len(body['product']) == 0, "Number of products returned was not 0"
+
+    def test_product_contains_search_hidden_flag(self, monkeypatch, api_gateway_search_event, table):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'products-unittest')
+        monkeypatch.setitem(os.environ, 'INDEX_NAME', 'producturl-index')
+
+        event_no_product = copy.deepcopy(api_gateway_search_event)
+        event_no_product['pathParameters']['url'] = 'https://www.amazon.co.uk/dp/B01H24LM12'
 
         response = search_url.search_main(event_no_product)
         body = json.loads(response['body'])
