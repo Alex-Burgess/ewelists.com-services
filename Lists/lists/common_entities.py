@@ -65,6 +65,8 @@ class Product:
         self.reserved = item.get('reserved').get('N')
         self.purchased = item.get('purchased').get('N')
         self.type = item.get('type').get('S')
+        if item.get('notes'):
+            self.notes = item.get('notes').get('S')
 
     def __repr__(self):
         return "Product<{} -- {} -- {} -- {} -- {}>".format(self.productId, self.listId, self.quantity, self.reserved, self.type)
@@ -77,6 +79,9 @@ class Product:
             'purchased': int(self.purchased),
             'type': self.type
         }
+
+        if hasattr(self, 'notes'):
+            product['notes'] = self.notes
 
         return product
 

@@ -78,7 +78,7 @@ class TestGetSharedListMain:
         p = body['products']
         assert len(p) == 6, "Get list response did not contain correct number of products."
         assert p["12345678-prod-0001-1234-abcdefghijkl"] == {"productId": "12345678-prod-0001-1234-abcdefghijkl", "quantity": 3, "reserved": 2, "purchased": 0, "type": "products"}, "Product object not correct."
-        assert p["12345678-prod-0002-1234-abcdefghijkl"] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 0, "type": "products"}, "Product object not correct."
+        assert p["12345678-prod-0002-1234-abcdefghijkl"] == {"productId": "12345678-prod-0002-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 0, "type": "products", "notes": "I would like size medium."}, "Product object not correct."
         assert p["12345678-prod-0003-1234-abcdefghijkl"] == {"productId": "12345678-prod-0003-1234-abcdefghijkl", "quantity": 1, "reserved": 1, "purchased": 0, "type": "products"}, "Product object not correct."
         assert p["12345678-notf-0010-1234-abcdefghijkl"] == {"productId": "12345678-notf-0010-1234-abcdefghijkl", "quantity": 2, "reserved": 1, "purchased": 0, "type": "notfound"}, "Product object not correct."
         assert p["12345678-prod-0004-1234-abcdefghijkl"] == {"productId": "12345678-prod-0004-1234-abcdefghijkl", "quantity": 1, "reserved": 0, "purchased": 1, "type": "products"}, "Product object not correct."

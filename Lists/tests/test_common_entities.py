@@ -49,7 +49,7 @@ class TestList:
 
 
 class TestProduct:
-    def test_get_details(self):
+    def test_get_product(self):
         product_item = {"PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"}, "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"}, "quantity": {"N": "2"}, "reserved": {"N": "1"}, "purchased": {"N": "0"}, "type": {"S": "products"}}
         product = Product(product_item).get_details()
 
@@ -58,6 +58,25 @@ class TestProduct:
         assert product['reserved'] == 1, "Product reserved quantity was not correct."
         assert product['purchased'] == 0, "Product purchased quantity was not correct."
         assert product['type'] == 'products', "Product reserved type was not correct."
+
+    def test_get_product_with_notes(self):
+        product_item = {
+            "PK": {"S": "LIST#12345678-list-0001-1234-abcdefghijkl"},
+            "SK": {"S": "PRODUCT#12345678-prod-0001-1234-abcdefghijkl"},
+            "quantity": {"N": "2"},
+            "reserved": {"N": "1"},
+            "purchased": {"N": "0"},
+            "type": {"S": "products"},
+            "notes": {"S": "I would like size small"}
+        }
+        product = Product(product_item).get_details()
+
+        assert product['productId'] == '12345678-prod-0001-1234-abcdefghijkl', "Product ID was not correct."
+        assert product['quantity'] == 2, "Product quanity was not correct."
+        assert product['reserved'] == 1, "Product reserved quantity was not correct."
+        assert product['purchased'] == 0, "Product purchased quantity was not correct."
+        assert product['type'] == 'products', "Product reserved type was not correct."
+        assert product['notes'] == 'I would like size small', "Product notes were not correct."
 
 
 class TestReservation:
