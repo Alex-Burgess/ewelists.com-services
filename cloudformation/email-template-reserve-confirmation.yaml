@@ -169,19 +169,24 @@ Resources:
                           <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding-bottom: 20px !important;">
                             <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                               <tr>
-                                <td>
+                                <td style="max-width: 200px">
                                   <div class="list-ideas" style="box-sizing: border-box; display: flex; Margin: 0 auto; align-items: center;">
                                     <img class="gift-image" style="display:block; border:none; padding-right: 0px; max-height: 150px; object-fit: contain;" width="200" alt="Ewelists"
                                       src="{{image_url}}"
                                     >
                                   </div>
                                 </td>
-                                <td style="font-family: Roboto Slab; font-size: 16px; vertical-align: center;">
+                                <td style="font-family: Roboto Slab; font-size: 16px; vertical-align: center; text-align: left">
                                   <h4 style="font-family: Roboto Slab; font-size: 15px; font-weight: 700; color: #3C4858; margin: 0;"> {{brand}} </h4>
                                   <p style="font-family: Roboto; font-size: 13px !important; font-weight: 300; color: #999; margin: 0; Margin-bottom: 15px; line-height: 24px">
                                     {{details}}
                                   </p>
                                   <h6 style="font-family: Roboto; font-size: 13px; color: #3C4858; margin: 0;">QUANTITY: {{quantity}}</h6>
+                                  <p>
+                                    <i style="font-family: Roboto; font-size: 15px; font-weight: 300; color: #999; margin-right: 20px">
+                                      {{notes}}
+                                    </i>
+                                  </p>
                                 </td>
                               </tr>
                             </table>
@@ -303,6 +308,7 @@ Resources:
               </table>
             </body>
           </html>
+
 
 
 Outputs:

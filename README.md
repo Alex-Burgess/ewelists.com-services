@@ -114,12 +114,18 @@ aws s3 cp . s3://email-templates-ewelists-test/ --recursive --exclude "*" --incl
 
 Create email template stack:
 ```
-aws cloudformation create-stack --stack-name Email-Templates-Test --template-body file://email-templates-master-stack.yaml
+aws cloudformation create-stack --stack-name Email-Templates-Test \
+ --template-body file://email-templates-master-stack.yaml \
+ --parameters ParameterKey=Environment,ParameterValue=test \
+    ParameterKey=BucketEndpoint,ParameterValue=https://email-templates-ewelists-test.s3-eu-west-1.amazonaws.com
 ```
 
 To update email template stack:
 ```
-aws cloudformation update-stack --stack-name Email-Templates-Test --template-body file://email-templates-master-stack.yaml
+aws cloudformation update-stack --stack-name Email-Templates-Test \
+ --template-body file://email-templates-master-stack.yaml \
+ --parameters ParameterKey=Environment,ParameterValue=test \
+    ParameterKey=BucketEndpoint,ParameterValue=https://email-templates-ewelists-test.s3-eu-west-1.amazonaws.com
 ```
 
 **Build and Deploy**

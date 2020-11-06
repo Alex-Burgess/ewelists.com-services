@@ -84,6 +84,15 @@ class TestGetProductItem:
             common_table_ops.get_product_item('lists-unittest', list_id, product_id)
         assert str(e.value) == "No product item exists with this ID.", "Exception not as expected."
 
+    def test_get_product_item_with_notes(self, dynamodb_mock):
+        product_id = '12345678-prod-0002-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        product_item = common_table_ops.get_product_item('lists-unittest', list_id, product_id)
+
+        expected_item = {'productId': '12345678-prod-0002-1234-abcdefghijkl', 'quantity': 1, 'reserved': 0, 'purchased': 0, 'type': 'products', 'notes': 'I would like size medium.'}
+
+        assert product_item == expected_item, "Product item was not correct."
+
 
 @pytest.mark.skip(reason="Query with begins_with is not implemented for moto")
 class TestGetReservationItems:

@@ -45,7 +45,8 @@ def reserve_main(event):
         create_reservation(table_name, new_product_reserved_quantity, product_key, reservation_item)
 
         # Step 5 - Send reserve confirmation email
-        data = create_email_data(domain_name, user['name'], resv_id, list_id, list_title, request_reserve_quantity, product)
+        notes = get_notes(product_item)
+        data = create_email_data(domain_name, user['name'], resv_id, list_id, list_title, request_reserve_quantity, notes, product)
         common.send_email(user['email'], template, data)
 
     except Exception as e:
@@ -112,7 +113,14 @@ def create_reservation(table_name, new_product_reserved_quantity, product_key, r
     return True
 
 
-def create_email_data(domain_name, name, resv_id, list_id, title, quantity, product):
+def get_notes(product_item):
+    if 'notes' in product_item:
+        return product_item['notes']
+
+    return ''
+
+
+def create_email_data(domain_name, name, resv_id, list_id, title, quantity, notes, product):
     imageUrl = common.check_image_url(product['imageUrl'])
 
     template_data = {
@@ -125,7 +133,8 @@ def create_email_data(domain_name, name, resv_id, list_id, title, quantity, prod
         "brand": product['brand'],
         "details": product['details'],
         "product_url": product['productUrl'],
-        "image_url": imageUrl
+        "image_url": imageUrl,
+        "notes": notes
     }
 
     return template_data
