@@ -20,9 +20,10 @@ def add_product_main(event):
         product_id = common.get_path_parameter(event, 'productid')
         quantity = common.get_body_attribute(event, 'quantity')
         type = common.get_product_type(event)
+        notes = get_notes(event)
         common.confirm_owner(table_name, identity, list_id)
 
-        message = create_product_item(table_name, list_id, product_id, type, quantity)
+        message = create_product_item(table_name, list_id, product_id, type, quantity, notes)
     except Exception as e:
         log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
@@ -36,7 +37,22 @@ def add_product_main(event):
     return response
 
 
-def create_product_item(table_name, list_id, product_id, type, quantity):
+def get_notes(event):
+    if not event['body']:
+        raise Exception("Body was missing required attributes.")
+
+    body_object = json.loads(event['body'])
+
+    if 'notes' in body_object:
+        value = body_object['notes']
+    else:
+        value = None
+
+    log.info("Notes: " + str(value))
+    return value
+
+
+def create_product_item(table_name, list_id, product_id, type, quantity, notes):
     dynamodb = boto3.client('dynamodb')
 
     item = {
@@ -47,6 +63,9 @@ def create_product_item(table_name, list_id, product_id, type, quantity):
         'reserved': {'N': str(0)},
         'purchased': {'N': str(0)}
     }
+
+    if notes:
+        item['notes'] = {'S': notes}
 
     try:
         log.info("Put product item: {}".format(item))

@@ -8,11 +8,29 @@ from lists import add_product, logger
 log = logger.setup_test_logger()
 
 
+class TestGetNotes:
+    def test_get_notes(self, api_base_event):
+        api_base_event['body'] = "{\n    \"notes\": \"I would size medium\"\n}"
+        notes = add_product.get_notes(api_base_event)
+        assert notes == 'I would size medium', "Body attribute returned from API event was not as expected."
+
+    def test_notes_attribute_not_present(self, api_base_event):
+        api_base_event['body'] = "{\n    \"name\": \"Test User99\"\n}"
+        notes = add_product.get_notes(api_base_event)
+        assert notes is None, "Body attribute returned from API event was not as expected."
+
+    def test_get_notes_when_body_empty(self, api_base_event):
+        api_base_event['body'] = None
+        with pytest.raises(Exception) as e:
+            add_product.get_notes(api_base_event)
+        assert str(e.value) == "Body was missing required attributes.", "Exception message not correct."
+
+
 class TestCreateProductItem:
     def test_create_product_item(self, dynamodb_mock):
         product_id = '12345678-prod-0010-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
-        result = add_product.create_product_item('lists-unittest', list_id, product_id, 'products', 1)
+        result = add_product.create_product_item('lists-unittest', list_id, product_id, 'products', 1, None)
         assert result, "Product was not added to table."
 
         # Check the table was updated with right number of items
@@ -30,10 +48,32 @@ class TestCreateProductItem:
         assert test_response['Item']['reserved']['N'] == '0', "Quantity not as expected."
         assert test_response['Item']['purchased']['N'] == '0', "Quantity not as expected."
 
+    def test_add_with_notes(self, dynamodb_mock):
+        product_id = '12345678-prod-0010-1234-abcdefghijkl'
+        list_id = '12345678-list-0001-1234-abcdefghijkl'
+        result = add_product.create_product_item('lists-unittest', list_id, product_id, 'products', 1, 'I would like the grey colour.')
+        assert result, "Product was not added to table."
+
+        # Check the table was updated with right number of items
+        dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
+
+        test_response = dynamodb.get_item(
+            TableName='lists-unittest',
+            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "PRODUCT#" + product_id}}
+        )
+
+        assert test_response['Item']['PK']['S'] == 'LIST#12345678-list-0001-1234-abcdefghijkl', "List ID not as expected."
+        assert test_response['Item']['SK']['S'] == 'PRODUCT#12345678-prod-0010-1234-abcdefghijkl', "Product Id not as expected."
+        assert test_response['Item']['type']['S'] == 'products', "Product type not as expected."
+        assert test_response['Item']['quantity']['N'] == '1', "Quantity not as expected."
+        assert test_response['Item']['reserved']['N'] == '0', "Quantity not as expected."
+        assert test_response['Item']['purchased']['N'] == '0', "Quantity not as expected."
+        assert test_response['Item']['notes']['S'] == 'I would like the grey colour.', "Product notes not as expected."
+
     def test_with_quantity_2(self, dynamodb_mock):
         product_id = '12345678-prod-0011-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
-        result = add_product.create_product_item('lists-unittest', list_id, product_id, 'products', 2)
+        result = add_product.create_product_item('lists-unittest', list_id, product_id, 'products', 2, None)
         assert result, "Product was not added to table."
 
         # Check the table was updated with right number of items
@@ -51,13 +91,26 @@ class TestCreateProductItem:
         list_id = '12345678-list-0001-1234-abcdefghijkl'
 
         with pytest.raises(Exception) as e:
-            add_product.create_product_item('lists-unittes', list_id, product_id, 'products', 1)
+            add_product.create_product_item('lists-unittes', list_id, product_id, 'products', 1, None)
         assert str(e.value) == "Product could not be created.", "Exception not as expected."
 
 
 class TestCreateProductMain:
     def test_create_product_for_products(self, api_add_product_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        response = add_product.add_product_main(api_add_product_event)
+        body = json.loads(response['body'])
+        assert body['message'], "Add product main response did not contain the correct status."
+
+    def test_add_product_with_notes(self, api_add_product_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+
+        api_add_product_event['body'] = json.dumps({
+            "quantity": 1,
+            "productType": "products",
+            "notes": "I would like the colour grey."
+        })
+
         response = add_product.add_product_main(api_add_product_event)
         body = json.loads(response['body'])
         assert body['message'], "Add product main response did not contain the correct status."
