@@ -2173,6 +2173,212 @@
 					"response": []
 				},
 				{
+					"name": "update product with notes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0981e10c-a725-4b9b-9688-c6a2f10cd63d",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Response message should be created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData['quantity']).to.eql(2);",
+									"    pm.expect(jsonData['notes']).to.eql(\"Some custom user notes\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "12fca63d-020d-40cd-8c14-904ee9a915ee",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 2,\n    \"notes\": \"Some custom user notes\"\n}"
+						},
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/product/{{p_product_id}}",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}",
+								"product",
+								"{{p_product_id}}"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
+					"name": "get list to check notes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ec6f5271-cb48-4e14-be57-6d24f37d7079",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response must be valid and have a body\", function () {",
+									"     // assert that the status code is 200",
+									"     pm.response.to.be.ok; // info, success, redirection, clientError,  serverError, are other variants",
+									"     // assert that the response has a valid JSON body",
+									"     pm.response.to.be.withBody;",
+									"     pm.response.to.be.json; // this assertion also checks if a body  exists, so the above check is not needed",
+									"});",
+									"",
+									"pm.test(\"Expected list details were not correct.\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    pm.expect(list_obj.list.listId.length).to.eql(36);",
+									"    pm.expect(list_obj.list.title).to.eql(\"My Birthday List\");",
+									"    pm.expect(list_obj.list.description).to.eql(\"A gift wish list for my birthday.\");",
+									"    pm.expect(list_obj.list.eventDate).to.eql(\"20 December 2020\");",
+									"    pm.expect(list_obj.list.occasion).to.eql(\"Birthday\");",
+									"    pm.expect(list_obj.list.imageUrl).to.eql(\"/images/celebration-default.jpg\");",
+									"});",
+									"",
+									"pm.test(\"Expected producted details were not correct\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    var product_keys = Object.keys(list_obj.products)",
+									"    pm.expect(product_keys.length).to.eql(1);",
+									"    ",
+									"    var product = list_obj.products[product_keys[0]]",
+									"    pm.expect(product.type).to.eql(\"products\");",
+									"    pm.expect(product.productId.length).to.eql(36);",
+									"    pm.expect(product.quantity).to.eql(2);",
+									"    pm.expect(product.reserved).to.eql(0);",
+									"    pm.expect(product.notes).to.eql(\"Some custom user notes\");",
+									"});",
+									"",
+									"pm.test(\"Expected list of reserved products were not correct\", function () {",
+									"    var list_obj = pm.response.json();",
+									"    pm.expect(list_obj.reserved.length).to.eql(0);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6156242c-107e-4e47-98b3-9c382babdab9",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "awsv4",
+							"awsv4": [
+								{
+									"key": "secretKey",
+									"value": "{{SecretKey}}",
+									"type": "string"
+								},
+								{
+									"key": "accessKey",
+									"value": "{{AccessKey}}",
+									"type": "string"
+								},
+								{
+									"key": "service",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "region",
+									"value": "eu-west-1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}",
+							"protocol": "https",
+							"host": [
+								"{{lists_url_id}}",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"{{env}}",
+								"lists",
+								"{{list_id}}"
+							]
+						},
+						"description": "Create list"
+					},
+					"response": []
+				},
+				{
 					"name": "delete product from list",
 					"event": [
 						{
@@ -11829,7 +12035,10 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 2,\n    \"productType\": \"products\",\n    \"notes\": \"I would like the colour pink.\"\n}"
+							"raw": "{\n    \"quantity\": 2,\n    \"productType\": \"products\",\n    \"notes\": \"I would like the colour pink.\"\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "https://{{lists_url_id}}.execute-api.eu-west-1.amazonaws.com/{{env}}/lists/{{list_id}}/product/{{p_product_id}}",

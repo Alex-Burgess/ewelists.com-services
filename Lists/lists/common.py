@@ -52,6 +52,21 @@ def get_body_attribute(event, type):
     return value
 
 
+def get_body_attribute_if_exists(event, type):
+    if not event['body']:
+        raise Exception("Body was missing required attributes.")
+
+    body_object = json.loads(event['body'])
+
+    if type in body_object:
+        value = body_object[type]
+    else:
+        value = None
+
+    log.info(type + ": " + str(value))
+    return value
+
+
 def parse_email(email):
     email = email.strip()
     email = email.lower()

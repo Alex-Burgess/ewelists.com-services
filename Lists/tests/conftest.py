@@ -423,6 +423,21 @@ def api_update_product_event():
 
 
 @pytest.fixture
+def api_update_product_with_notes_event():
+    event = api_event()
+    event['resource'] = "/lists/{id}/product/{productid}"
+    event['path'] = "/lists/12345678-list-0001-1234-abcdefghijkl/product/12345678-prod-0001-1234-abcdefghijkl",
+    event['httpMethod'] = "PUT"
+    event['pathParameters'] = {"productid": "12345678-prod-0001-1234-abcdefghijkl", "id": "12345678-list-0001-1234-abcdefghijkl"}
+    event['body'] = json.dumps({
+        "quantity": 4,
+        "notes": "Some custom user notes added"
+    })
+
+    return event
+
+
+@pytest.fixture
 def api_update_reservation_event():
     event = api_event_no_auth()
     event['resource'] = "/lists/reserve/{id}/email/{email}"

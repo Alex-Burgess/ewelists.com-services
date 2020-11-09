@@ -8,12 +8,37 @@ from lists import update_product, logger
 log = logger.setup_test_logger()
 
 
+class TestUpdateExpression:
+    def test_update_quantity(self):
+        expression = update_product.update_expression(1, None)
+        assert expression == "set quantity = :q"
+
+    def test_update_notes(self):
+        expression = update_product.update_expression(1, "Some notes")
+        assert expression == "set quantity = :q, notes = :n"
+
+
+class TestExpressionAttributeValues:
+    def test_update_quantity(self):
+        expression_values = update_product.expression_attribute_values(1, None)
+        assert expression_values == {
+            ':q': {'N': '1'}
+        }
+
+    def test_update_notes(self):
+        expression_values = update_product.expression_attribute_values(1, "Some notes")
+        assert expression_values == {
+            ':q': {'N': '1'},
+            ':n': {'S': "Some notes"}
+        }
+
+
 class TestUpdateProductItem:
     def test_update_product_item(self, dynamodb_mock):
         product_id = '12345678-prod-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
-        updated_quantity = update_product.update_product_item('lists-unittest', list_id, product_id, 4)
-        assert updated_quantity == 4, "Updated quantity was not 4."
+        updated_attributes = update_product.update_product_item('lists-unittest', list_id, product_id, 4, None)
+        assert updated_attributes['quantity'] == 4, "Updated quantity was not 4."
 
         # Check the table was updated with right number of items
         dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
@@ -25,20 +50,29 @@ class TestUpdateProductItem:
 
         assert test_response['Item']['quantity']['N'] == '4', "Quantity not as expected."
 
-    def test_update_with_same_quantity(self, dynamodb_mock):
+    def test_update_product_item_with_notes(self, dynamodb_mock):
         product_id = '12345678-prod-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
+        updated_attributes = update_product.update_product_item('lists-unittest', list_id, product_id, 4, "Some custom note")
+        assert updated_attributes['quantity'] == 4, "Updated quantity was not 4."
+        assert updated_attributes['notes'] == "Some custom note", "Updated quantity was not 4."
 
-        with pytest.raises(Exception) as e:
-            update_product.update_product_item('lists-unittest', list_id, product_id, 3)
-        assert str(e.value) == "No updates to quantity were required.", "Exception not as expected."
+        # Check the table was updated with right number of items
+        dynamodb = boto3.client('dynamodb', region_name='eu-west-1')
+
+        test_response = dynamodb.get_item(
+            TableName='lists-unittest',
+            Key={'PK': {'S': "LIST#" + list_id}, 'SK': {'S': "PRODUCT#" + product_id}}
+        )
+
+        assert test_response['Item']['quantity']['N'] == '4', "Quantity not as expected."
 
     def test_update_product_item_with_no_table(self, dynamodb_mock):
         product_id = '12345678-prod-0001-1234-abcdefghijkl'
         list_id = '12345678-list-0001-1234-abcdefghijkl'
 
         with pytest.raises(Exception) as e:
-            update_product.update_product_item('lists-unittes', list_id, product_id, 1)
+            update_product.update_product_item('lists-unittes', list_id, product_id, 1, None)
         assert str(e.value) == "No table found", "Exception not as expected."
 
 
@@ -48,6 +82,13 @@ class TestUpdateProductMain:
         response = update_product.update_product_main(api_update_product_event)
         body = json.loads(response['body'])
         assert body['quantity'] == 4, "Update to product quantity was not expected result."
+
+    def test_update_product_with_notes(self, api_update_product_with_notes_event, monkeypatch, dynamodb_mock):
+        monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')
+        response = update_product.update_product_main(api_update_product_with_notes_event)
+        body = json.loads(response['body'])
+        assert body['quantity'] == 4, "Update to product quantity was not expected result."
+        assert body['notes'] == "Some custom user notes added", "Update to product notes was not expected result."
 
     def test_update_product_with_no_quantity(self, api_update_product_event, monkeypatch, dynamodb_mock):
         monkeypatch.setitem(os.environ, 'TABLE_NAME', 'lists-unittest')

@@ -93,6 +93,24 @@ class TestGetBodyAttribute:
         assert str(e.value) == "Body was missing required attributes.", "Exception message not correct."
 
 
+class TestGetBodyAttributeIfExists:
+    def test_get_notes(self, api_base_event):
+        api_base_event['body'] = "{\n    \"notes\": \"I would size medium\"\n}"
+        notes = common.get_body_attribute_if_exists(api_base_event, 'notes')
+        assert notes == 'I would size medium', "Body attribute returned from API event was not as expected."
+
+    def test_notes_attribute_not_present(self, api_base_event):
+        api_base_event['body'] = "{\n    \"name\": \"Test User99\"\n}"
+        notes = common.get_body_attribute_if_exists(api_base_event, 'notes')
+        assert notes is None, "Body attribute returned from API event was not as expected."
+
+    def test_get_notes_when_body_empty(self, api_base_event):
+        api_base_event['body'] = None
+        with pytest.raises(Exception) as e:
+            common.get_body_attribute_if_exists(api_base_event, 'notes')
+        assert str(e.value) == "Body was missing required attributes.", "Exception message not correct."
+
+
 class TestParseEmail:
     def test_parse_email(self):
         assert common.parse_email(' Test.user@gmail.com ') == 'test.user@gmail.com'

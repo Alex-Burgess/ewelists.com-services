@@ -19,21 +19,41 @@ def update_product_main(event):
         list_id = common.get_path_parameter(event, 'id')
         product_id = common.get_path_parameter(event, 'productid')
         quantity = common.get_body_attribute(event, 'quantity')
+        notes = common.get_body_attribute_if_exists(event, 'notes')
         common.confirm_owner(table_name, identity, list_id)
 
-        quantity = update_product_item(table_name, list_id, product_id, quantity)
+        updates = update_product_item(table_name, list_id, product_id, quantity, notes)
     except Exception as e:
         log.error("Exception: {}".format(e))
         response = common.create_response(500, json.dumps({'error': str(e)}))
         log.info("Returning response: {}".format(response))
         return response
 
-    data = {'quantity': quantity}
-    response = common.create_response(200, json.dumps(data))
+    response = common.create_response(200, json.dumps(updates))
     return response
 
 
-def update_product_item(table_name, list_id, product_id, quantity):
+def update_expression(quantity, notes):
+    expression = "set quantity = :q"
+
+    if notes:
+        expression = expression + ", notes = :n"
+
+    return expression
+
+
+def expression_attribute_values(quantity, notes):
+    values = {
+        ':q': {'N': str(quantity)}
+    }
+
+    if notes:
+        values[':n'] = {'S': notes}
+
+    return values
+
+
+def update_product_item(table_name, list_id, product_id, quantity, notes):
     dynamodb = boto3.client('dynamodb')
 
     key = {
@@ -46,10 +66,8 @@ def update_product_item(table_name, list_id, product_id, quantity):
         response = dynamodb.update_item(
             TableName=table_name,
             Key=key,
-            UpdateExpression="set quantity = :q",
-            ExpressionAttributeValues={
-                ':q': {'N': str(quantity)},
-            },
+            UpdateExpression=update_expression(quantity, notes),
+            ExpressionAttributeValues=expression_attribute_values(quantity, notes),
             ConditionExpression="attribute_exists(PK)",
             ReturnValues="UPDATED_NEW"
         )
@@ -64,9 +82,11 @@ def update_product_item(table_name, list_id, product_id, quantity):
 
     log.info("Add response: {}".format(response))
 
+    updates = {}
     if 'quantity' in response['Attributes']:
-        quantity = int(response['Attributes']['quantity']['N'])
-    else:
-        raise Exception('No updates to quantity were required.')
+        updates['quantity'] = int(response['Attributes']['quantity']['N'])
 
-    return quantity
+    if 'notes' in response['Attributes']:
+        updates['notes'] = response['Attributes']['notes']['S']
+
+    return updates

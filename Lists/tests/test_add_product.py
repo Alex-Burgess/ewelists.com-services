@@ -8,24 +8,6 @@ from lists import add_product, logger
 log = logger.setup_test_logger()
 
 
-class TestGetNotes:
-    def test_get_notes(self, api_base_event):
-        api_base_event['body'] = "{\n    \"notes\": \"I would size medium\"\n}"
-        notes = add_product.get_notes(api_base_event)
-        assert notes == 'I would size medium', "Body attribute returned from API event was not as expected."
-
-    def test_notes_attribute_not_present(self, api_base_event):
-        api_base_event['body'] = "{\n    \"name\": \"Test User99\"\n}"
-        notes = add_product.get_notes(api_base_event)
-        assert notes is None, "Body attribute returned from API event was not as expected."
-
-    def test_get_notes_when_body_empty(self, api_base_event):
-        api_base_event['body'] = None
-        with pytest.raises(Exception) as e:
-            add_product.get_notes(api_base_event)
-        assert str(e.value) == "Body was missing required attributes.", "Exception message not correct."
-
-
 class TestCreateProductItem:
     def test_create_product_item(self, dynamodb_mock):
         product_id = '12345678-prod-0010-1234-abcdefghijkl'

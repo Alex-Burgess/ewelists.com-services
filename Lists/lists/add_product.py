@@ -20,7 +20,7 @@ def add_product_main(event):
         product_id = common.get_path_parameter(event, 'productid')
         quantity = common.get_body_attribute(event, 'quantity')
         type = common.get_product_type(event)
-        notes = get_notes(event)
+        notes = common.get_body_attribute_if_exists(event, 'notes')
         common.confirm_owner(table_name, identity, list_id)
 
         message = create_product_item(table_name, list_id, product_id, type, quantity, notes)
@@ -35,21 +35,6 @@ def add_product_main(event):
     data = {'message': message}
     response = common.create_response(200, json.dumps(data))
     return response
-
-
-def get_notes(event):
-    if not event['body']:
-        raise Exception("Body was missing required attributes.")
-
-    body_object = json.loads(event['body'])
-
-    if 'notes' in body_object:
-        value = body_object['notes']
-    else:
-        value = None
-
-    log.info("Notes: " + str(value))
-    return value
 
 
 def create_product_item(table_name, list_id, product_id, type, quantity, notes):
