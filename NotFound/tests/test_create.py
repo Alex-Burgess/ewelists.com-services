@@ -20,6 +20,14 @@ class TestGetProductInfo:
         assert product_info['details'] == "Travel Cot Easy Go, Anthracite, with transport bag", "Attribute details was not as expected."
         assert product_info['url'] == "https://www.amazon.co.uk/dp/B01H24LM58", "Attribute url was not as expected."
 
+    def test_get_full_product_info(self, api_gateway_create_all_event):
+        product_info = create.get_product_info(api_gateway_create_all_event)
+        assert product_info['brand'] == "BABYBJÖRN", "Attribute brand was not as expected."
+        assert product_info['details'] == "Travel Cot Easy Go, Anthracite, with transport bag", "Attribute details was not as expected."
+        assert product_info['url'] == "https://www.amazon.co.uk/dp/B01H24LM58", "Attribute url was not as expected."
+        assert product_info['imageUrl'] == "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg", "Attribute url was not as expected."
+        assert product_info['price'] == "100.00", "Attribute url was not as expected."
+
     def test_with_empty_body_throws_exception(self, api_gateway_create_event):
         event_no_body = copy.deepcopy(api_gateway_create_event)
         event_no_body['body'] = None

@@ -16,9 +16,24 @@ class TestGetProduct:
     def test_get_product(self, table):
         product_id = '12345678-notf-0010-1234-abcdefghijkl'
         product_object = product.get_product('notfound-unittest', product_id)
-        assert product_object['brand'] == "John Lewis", "Attribute brand was not as expected."
-        assert product_object['details'] == "John Lewis & Partners Safari Mobile", "Attribute details was not as expected."
-        assert product_object['productUrl'] == "https://www.johnlewis.com/john-lewis-partners-safari-mobile/p3439165", "Attribute url was not as expected."
+        assert product_object == {
+            'productId': '12345678-notf-0010-1234-abcdefghijkl',
+            'brand': 'John Lewis',
+            'details': 'John Lewis & Partners Safari Mobile',
+            'productUrl': 'https://www.johnlewis.com/john-lewis-partners-safari-mobile/p3439165'
+        }, "Object was not as expected."
+
+    def test_get_product_with_full_details(self, table):
+        product_id = '12345678-notf-0020-1234-abcdefghijkl'
+        product_object = product.get_product('notfound-unittest', product_id)
+        assert product_object == {
+            'productId': '12345678-notf-0020-1234-abcdefghijkl',
+            'brand': 'The White Company',
+            'details': 'Halden Champagne Flutes – Set Of 4',
+            'productUrl': 'https://www.thewhitecompany.com/uk/Halden-Champagne-Flutes--Set-of-4/p/GWHSC',
+            'imageUrl': 'https://whitecompany.scene7.com/is/image/whitecompany/Halden-Champagne-Flutes---Set-of-4/GWHSC_2_MAIN?$D_PDP_412x412$',
+            'price': '40.00'
+        }, "Object was not as expected."
 
     def test_with_missing_product_id(self, table):
         product_id = '12345678-notf-0011-1234-abcdefghijkl'

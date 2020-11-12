@@ -58,7 +58,7 @@ def get_product_info(event):
 
 def put_product(table_name, cognito_user_id, product_info):
     dynamodb = boto3.client('dynamodb')
-    
+
     product_id = str(uuid.uuid4())
     item = {
         'productId': {'S': product_id},
@@ -68,6 +68,12 @@ def put_product(table_name, cognito_user_id, product_info):
         "createdBy": {'S': cognito_user_id},
         'createdAt': {'N': str(int(time.time()))}
     }
+
+    if 'imageUrl' in product_info:
+        item['imageUrl'] = {'S': product_info['imageUrl']}
+
+    if 'price' in product_info:
+        item['price'] = {'S': product_info['price']}
 
     try:
         logger.info("Product item to be put in table: {}".format(item))

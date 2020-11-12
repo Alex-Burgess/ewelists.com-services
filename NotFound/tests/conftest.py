@@ -1,5 +1,6 @@
 import pytest
 import boto3
+import json
 from moto import mock_dynamodb2
 
 
@@ -18,12 +19,21 @@ def table():
         )
 
         items = [
-             {
+            {
                 "productId": "12345678-notf-0010-1234-abcdefghijkl",
                 "brand": "John Lewis",
                 "details": "John Lewis & Partners Safari Mobile",
                 "productUrl": "https://www.johnlewis.com/john-lewis-partners-safari-mobile/p3439165",
                 "createdBy": "12345678-user-0001-1234-abcdefghijkl"
+            },
+            {
+               "productId": "12345678-notf-0020-1234-abcdefghijkl",
+               "brand": "The White Company",
+               "details": "Halden Champagne Flutes – Set Of 4",
+               "productUrl": "https://www.thewhitecompany.com/uk/Halden-Champagne-Flutes--Set-of-4/p/GWHSC",
+               "imageUrl": "https://whitecompany.scene7.com/is/image/whitecompany/Halden-Champagne-Flutes---Set-of-4/GWHSC_2_MAIN?$D_PDP_412x412$",
+               "price": "40.00",
+               "createdBy": "12345678-user-0001-1234-abcdefghijkl"
             }
         ]
 
@@ -37,7 +47,26 @@ def table():
 def api_gateway_create_event():
     event = api_gateway_base_event()
     event['httpMethod'] = "POST"
-    event['body'] = "{\n    \"brand\": \"BABYBJÖRN\",\n    \"details\": \"Travel Cot Easy Go, Anthracite, with transport bag\",\n    \"url\": \"https://www.amazon.co.uk/dp/B01H24LM58\"\n}"
+    event['body'] = json.dumps({
+        "brand": "BABYBJÖRN",
+        "details": "Travel Cot Easy Go, Anthracite, with transport bag",
+        "url": "https://www.amazon.co.uk/dp/B01H24LM58"
+    })
+
+    return event
+
+
+@pytest.fixture
+def api_gateway_create_all_event():
+    event = api_gateway_base_event()
+    event['httpMethod'] = "POST"
+    event['body'] = json.dumps({
+        "brand": "BABYBJÖRN",
+        "details": "Travel Cot Easy Go, Anthracite, with transport bag",
+        "url": "https://www.amazon.co.uk/dp/B01H24LM58",
+        "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
+        "price": "100.00"
+    })
 
     return event
 
