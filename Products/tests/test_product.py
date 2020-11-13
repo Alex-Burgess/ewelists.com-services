@@ -21,6 +21,7 @@ class TestGetProduct:
         assert product_object['imageUrl'] == "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg", "Attribute url was not as expected."
         assert product_object['productUrl'] == "https://www.amazon.co.uk/dp/B01H24LM58", "Attribute url was not as expected."
         assert product_object['price'] == "100.00", "Attribute price was not as expected."
+        assert product_object['retailer'] == "amazon.co.uk", "Attribute price was not as expected."
 
     def test_get_product_no_price(self, table):
         product_id = '12345678-prod-0003-1234-abcdefghijkl'

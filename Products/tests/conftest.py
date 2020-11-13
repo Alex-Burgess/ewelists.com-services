@@ -52,7 +52,8 @@ def table():
                 "details": "Travel Cot Easy Go, Anthracite, with transport bag",
                 "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
                 "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58",
-                "price": "100.00"
+                "price": "100.00",
+                "retailer": "amazon.co.uk"
             },
             {
                 "productId": "12345678-prod-0002-1234-abcdefghijkl",
@@ -60,7 +61,8 @@ def table():
                 "details": "Baby GOTS Organic Cotton Elephant Sleepsuit, Pack of 3, White",
                 "price": "13.00",
                 "imageUrl": "https://johnlewis.scene7.com/is/image/JohnLewis/003953444?$rsp-pdp-port-640$",
-                "productUrl": "https://www.johnlewis.com/john-lewis-partners-baby-gots-organic-cotton-elephant-sleepsuit-pack-of-3-white/p4233425"
+                "productUrl": "https://www.johnlewis.com/john-lewis-partners-baby-gots-organic-cotton-elephant-sleepsuit-pack-of-3-white/p4233425",
+                "retailer": "johnlewis.com"
             },
             {
                 "productId": "12345678-prod-0003-1234-abcdefghijkl",
@@ -68,7 +70,8 @@ def table():
                 "brand": "BABYBJÖRN",
                 "details": "Travel Cot Easy Go, Anthracite, with transport bag",
                 "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
-                "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58"
+                "productUrl": "https://www.amazon.co.uk/dp/B01H24LM58",
+                "retailer": "amazon.co.uk"
             },
             {
                 "productId": "12345678-prod-0004-1234-abcdefghijkl",
@@ -77,6 +80,7 @@ def table():
                 "details": "Travel Cot Easy Go, Anthracite, with transport bag",
                 "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg",
                 "productUrl": "https://www.amazon.co.uk/dp/B01H24LM12",
+                "retailer": "amazon.co.uk",
                 "searchHidden": True
             }
         ]

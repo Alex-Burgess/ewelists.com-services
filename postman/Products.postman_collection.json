@@ -500,6 +500,7 @@
 									"    pm.expect(product_obj.details).to.eql(\"Travel Cot Easy Go, Anthracite, with transport bag\");",
 									"    pm.expect(product_obj.imageUrl).to.eql(\"https://images-na.ssl-images-amazon.com/images/I/81qYpf1Sm2L._SX679_.jpg\");",
 									"    pm.expect(product_obj.productUrl).to.eql(\"https://www.amazon.co.uk/dp/B01H24LM58\");",
+									"    pm.expect(product_obj.retailer).to.eql(\"amazon.co.uk\");",
 									"});",
 									""
 								],

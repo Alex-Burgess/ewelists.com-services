@@ -8,6 +8,8 @@ class Product:
         self.productUrl = item.get('productUrl').get('S')
         if item.get('price'):
             self.price = item.get('price').get('S')
+        if item.get('retailer'):
+            self.retailer = item.get('retailer').get('S')
 
     def __repr__(self):
         return "Product<{} -- {} -- {} -- {}>".format(self.productId, self.brand, self.details, self.productUrl)
@@ -23,5 +25,8 @@ class Product:
 
         if hasattr(self, 'price'):
             product['price'] = self.price
+
+        if hasattr(self, 'retailer'):
+            product['retailer'] = self.retailer
 
         return product
