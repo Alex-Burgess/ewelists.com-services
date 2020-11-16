@@ -26,6 +26,10 @@ class TestPost:
         monkeypatch.setitem(os.environ, 'KPI_URL', 'https://app.cyfe.com/api/push/5eb26ce43ea308704280926221234')
         assert not common_kpi.post(os.environ, api_postman_event, 'New Lists'), "Post to cyfe failed."
 
+    def test_as_cypress(self, monkeypatch, api_cypress_event):
+        monkeypatch.setitem(os.environ, 'KPI_URL', 'https://app.cyfe.com/api/push/5eb26ce43ea308704280926221234')
+        assert not common_kpi.post(os.environ, api_cypress_event, 'New Lists'), "Post to cyfe failed."
+
     def test_with_non_api_event(self, monkeypatch, signup_with_u_and_p_event):
         monkeypatch.setitem(os.environ, 'KPI_URL', 'https://app.cyfe.com/api/push/5eb26ce43ea308704280926221234')
         assert not common_kpi.post(os.environ, signup_with_u_and_p_event, 'New Lists'), "Post to cyfe failed."
@@ -74,12 +78,18 @@ class TestPostRequest:
         assert not result, "Request did not succeed."
 
 
-class TestIsPostman:
+class TestIsTestUser:
     def test_is_not_postman(self, api_create_event):
         assert not common_kpi.is_postman(api_create_event), "Event should not be a postman event."
 
     def test_is_postman(self, api_postman_event):
         assert common_kpi.is_postman(api_postman_event), "Event should be a postman event."
+
+    def test_is_not_cypress(self, api_create_event):
+        assert not common_kpi.is_cypress(api_create_event), "Event should not be a cypress event."
+
+    def test_is_cypress(self, api_cypress_event):
+        assert common_kpi.is_cypress(api_cypress_event), "Event should be a cypress event."
 
 
 class TestGetUrl:

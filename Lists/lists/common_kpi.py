@@ -7,8 +7,8 @@ log = logger.setup_logger()
 
 
 def post(osenv, event, name):
-    if is_postman(event):
-        log.info("KPI post skipped, request was from postman.")
+    if is_postman(event) or is_cypress(event):
+        log.info("KPI post skipped, request was from postman or cypress.")
         return False
 
     datestamp = get_date()
@@ -38,6 +38,20 @@ def is_postman(event):
         return False
 
     if 'PostmanRuntime' in userAgent:
+        return True
+
+    return False
+
+
+def is_cypress(event):
+    print('Starting is cypress')
+
+    try:
+        body = event['body']
+    except Exception:
+        return False
+
+    if 'Cypress' in body:
         return True
 
     return False

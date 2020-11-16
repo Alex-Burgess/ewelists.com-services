@@ -228,6 +228,21 @@ def api_postman_event():
 
 
 @pytest.fixture
+def api_cypress_event():
+    event = api_event()
+    event['httpMethod'] = "POST"
+    event['body'] = json.dumps({
+        "title": "Cypress Baby Shower Wish List",
+        "description": "A gift wish list for my birthday.",
+        "eventDate": "25 December 2020",
+        "occasion": "Birthday",
+        "imageUrl": "/images/celebration-default.jpg",
+    })
+
+    return event
+
+
+@pytest.fixture
 def api_create_event():
     event = api_event()
     event['httpMethod'] = "POST"
