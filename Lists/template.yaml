@@ -349,6 +349,23 @@ Resources:
                           !If [Staging, !Sub "'https://${Environment}.${DomainName}'", "http://localhost:3000"]
                         ]
 
+  PostAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ServiceName}-postauth-${Environment}'
+      Handler: lists/postauth.handler
+      Runtime: python3.8
+      MemorySize: 512
+      Timeout: 5
+      Description: Creates a user in the lists table.
+      Role: !GetAtt SignUpFunctionRole.Arn
+      Tracing: Active
+      Environment:
+        Variables:
+          USERPOOL_ID:
+            Fn::ImportValue:
+              !Sub 'Auth-${Environment}-UserPoolId'
+
   ReserveProductFunction:
     Type: AWS::Serverless::Function
     Properties:

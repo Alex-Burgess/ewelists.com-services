@@ -517,3 +517,57 @@ def signup_social_event():
             "autoVerifyPhone": "false"
         }
     }
+
+
+@pytest.fixture
+def postauth_not_verified_event():
+    return {
+        "version": "1",
+        "region": "eu-west-1",
+        "userPoolId": "eu-west-1_LW335q123",
+        "userName": "72c2e9f9-0b20-454f-a117-fe5f1714d552",
+        "callerContext": {
+            "awsSdkVersion": "aws-sdk-unknown-unknown",
+            "clientId": "57l6m89od9d2s2vsjflig7dtkb"
+        },
+        "triggerSource": "PostAuthentication_Authentication",
+        "request": {
+            "userAttributes": {
+                "sub": "72c2e9f9-0b20-454f-a117-fe5f1714d552",
+                "cognito:user_status": "CONFIRMED",
+                "identities": "[{\"userId\":\"117912944878954244147\",\"providerName\":\"Google\",\"providerType\":\"Google\",\"issuer\":null,\"primary\":false,\"dateCreated\":1605522871216}]",
+                "email_verified": "false",
+                "name": "Test User",
+                "email": "test.exists@gmail.com"
+            },
+            "newDeviceUsed": "false"
+        },
+        "response": {}
+    }
+
+
+@pytest.fixture
+def postauth_verified_event():
+    return {
+        "version": "1",
+        "region": "eu-west-1",
+        "userPoolId": "eu-west-1_LW335q123",
+        "userName": "72c2e9f9-0b20-454f-a117-fe5f1714d552",
+        "callerContext": {
+            "awsSdkVersion": "aws-sdk-unknown-unknown",
+            "clientId": "57l6m89od9d2s2vsjflig7dtkb"
+        },
+        "triggerSource": "PostAuthentication_Authentication",
+        "request": {
+            "userAttributes": {
+                "sub": "72c2e9f9-0b20-454f-a117-fe5f1714d552",
+                "cognito:user_status": "CONFIRMED",
+                "identities": "[{\"userId\":\"117912944878954244147\",\"providerName\":\"Google\",\"providerType\":\"Google\",\"issuer\":null,\"primary\":false,\"dateCreated\":1605522871216}]",
+                "email_verified": "true",
+                "name": "Test User",
+                "email": "test.exists@gmail.com"
+            },
+            "newDeviceUsed": "false"
+        },
+        "response": {}
+    }
