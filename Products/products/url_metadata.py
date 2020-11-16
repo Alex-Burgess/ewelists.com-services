@@ -44,9 +44,11 @@ title_regex_rules = [
 def handler(event, context):
     try:
         url = get_url(event)
-        blocked_urls(url)
-        data = query(url)
-        data = parse_data(data)
+        if blocked_urls(url):
+            data = {}
+        else:
+            data = query(url)
+            data = parse_data(data)
         response = common.create_response(200, json.dumps(data))
     except Exception as e:
         log.error("Exception: {}".format(e))
@@ -58,7 +60,8 @@ def handler(event, context):
 
 def blocked_urls(url):
     if 'amazon' in url:
-        raise Exception("Metadata query failed.")
+        log.info("Url was in the query exclusions list.")
+        return True
 
     return False
 
@@ -78,12 +81,14 @@ def get_url(event):
 
 def query(url):
     try:
-        page = metadata_parser.MetadataParser(url=url, support_malformed=True)
+        page = metadata_parser.MetadataParser(url=url, support_malformed=True, search_head_only=True)
+        metadata = page.metadata
+        log.info("Metadata: " + json.dumps(metadata))
     except Exception as e:
         log.info("Exception: " + str(e))
         raise Exception("Metadata query failed.")
 
-    return page.metadata
+    return metadata
 
 
 def parse_data(data):
@@ -134,6 +139,9 @@ def get_site_name_from_page_title(data):
 
 
 def check_price(price):
+    if price.startswith('£'):
+        price = price[1:]
+
     p = "{:.2f}".format(float(price))
     return str(p)
 

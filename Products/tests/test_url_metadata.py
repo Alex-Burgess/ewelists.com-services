@@ -103,11 +103,11 @@ class TestHandler:
     def test_blocked_url(self, api_query_metadata_event):
         api_query_metadata_event['pathParameters'] = {'url': 'https%3A%2F%2Fwww.amazon.co.uk%2FBABYBJ%C3%96RN-Bouncer-Bliss-Jersey-Friends%2Fdp%2FB07NNTZGPS%3Fref_%3Dast_sto_dp'}
         response = url_metadata.handler(api_query_metadata_event, None)
-        assert response['statusCode'] == 500
+        assert response['statusCode'] == 200
         assert response['headers'] == {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
 
         body = json.loads(response['body'])
-        assert body['error'] == 'Metadata query failed.'
+        assert body == {}
 
     def test_not_authorized_url(self, api_query_metadata_event):
         api_query_metadata_event['pathParameters'] = {'url': 'https%3A%2F%2Fwww.jdsports.co.uk%2Fproduct%2Fred-adidas-wales-2020-home-shirt-junior%2F15963540%2F'}
@@ -211,7 +211,7 @@ class TestUpdateResponse:
         assert url_metadata.update_response({'image': 'existing image'}, 'image', ['new value1', 'new value2']) == 'existing image'
 
 
-class TestExceptionRules:
+class TestExceptionalRules:
     def test_get_site_name_from_page_title(self, metadata_response_jojo):
         value = url_metadata.get_site_name_from_page_title(metadata_response_jojo)
         assert value == 'JoJo Maman Bebe'
@@ -220,6 +220,7 @@ class TestExceptionRules:
         assert url_metadata.check_price('34') == '34.00'
         assert url_metadata.check_price('34.0') == '34.00'
         assert url_metadata.check_price('34.5') == '34.50'
+        assert url_metadata.check_price('£174.99') == '174.99'
 
     def test_check_title(self):
         assert url_metadata.check_title('Snowman Knitted Romper') == 'Snowman Knitted Romper'
@@ -247,9 +248,7 @@ class TestBlockedUrls:
         assert not url_metadata.blocked_urls('https://www.thewhitecompany.com/uk/Snowman-Knitted-Romper/p/SNTOO')
 
     def test_amazon_blocked(self):
-        with pytest.raises(Exception) as e:
-            url_metadata.blocked_urls('https://www.amazon.co.uk/dp/B01H24LM58/ref=tsm_1_fb_lk')
-        assert str(e.value) == "Metadata query failed.", "Exception not as expected."
+        assert url_metadata.blocked_urls('https://www.amazon.co.uk/dp/B01H24LM58/ref=tsm_1_fb_lk')
 
 
 class TestQuery:
