@@ -7,21 +7,19 @@ log = logger.setup_logger()
 
 
 def post(osenv, event, name):
-    if is_postman(event) or is_cypress(event):
-        log.info("KPI post skipped, request was from postman or cypress.")
-        return False
-
-    datestamp = get_date()
     url = get_url(osenv, 'KPI_URL')
-    colour = get_colour(osenv, 'KPI_COLOUR')
-    type = get_type(osenv, 'KPI_TYPE')
 
     if not url:
         log.info("KPI post skipped, no url provided in environment variable.")
         return False
+    elif is_postman(event) or is_cypress(event) or has_test_flag(event):
+        log.info("KPI post skipped, request was from postman or cypress.")
+        return False
 
+    datestamp = get_date()
+    colour = get_colour(osenv, 'KPI_COLOUR')
+    type = get_type(osenv, 'KPI_TYPE')
     data = create_json_data(name, datestamp, colour, type)
-
     result = post_request(url, data)
 
     if result:
@@ -44,8 +42,6 @@ def is_postman(event):
 
 
 def is_cypress(event):
-    print('Starting is cypress')
-
     try:
         body = event['body']
     except Exception:
@@ -53,6 +49,20 @@ def is_cypress(event):
 
     if 'Cypress' in body:
         return True
+
+    return False
+
+
+def has_test_flag(event):
+    try:
+        body = json.loads(event['body'])
+    except Exception:
+        return False
+
+    if 'test_flag' in body:
+        if body['test_flag']:
+            log.info("Test flag: " + str(body['test_flag']))
+            return True
 
     return False
 

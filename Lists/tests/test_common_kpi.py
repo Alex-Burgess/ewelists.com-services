@@ -91,6 +91,12 @@ class TestIsTestUser:
     def test_is_cypress(self, api_cypress_event):
         assert common_kpi.is_cypress(api_cypress_event), "Event should be a cypress event."
 
+    def test_has_no_test_flag(self, api_create_event):
+        assert not common_kpi.has_test_flag(api_create_event), "Event should not be a cypress event."
+
+    def test_has_test_flag(self, api_test_event):
+        assert common_kpi.has_test_flag(api_test_event), "Event should not be a cypress event."
+
 
 class TestGetUrl:
     def test_get_url(self, monkeypatch):

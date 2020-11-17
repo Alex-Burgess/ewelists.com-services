@@ -243,6 +243,17 @@ def api_cypress_event():
 
 
 @pytest.fixture
+def api_test_event():
+    event = api_event()
+    event['httpMethod'] = "POST"
+    event['body'] = json.dumps({
+        "test_flag": True
+    })
+
+    return event
+
+
+@pytest.fixture
 def api_create_event():
     event = api_event()
     event['httpMethod'] = "POST"
